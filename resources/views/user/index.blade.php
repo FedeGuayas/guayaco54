@@ -13,7 +13,6 @@
       href="{{asset('themes/back/src/plugins/datatables/media/css/dataTables.bootstrap4.css')}}">
 <link rel="stylesheet " type="text/css"
       href="{{asset('themes/back/src/plugins/datatables/media/css/responsive.dataTables.css')}}">
-
 @endpush
 
 @section('content')
@@ -36,8 +35,8 @@
             <table class="data-table stripe hover nowrap compact">
                 <thead>
                 <tr>
-                    <th>ID</th>
                     <th>Nombre</th>
+                    <th>Escenario</th>
                     <th>Email</th>
                     <th>Role</th>
                     <th>Acción</th>
@@ -45,10 +44,10 @@
                 </thead>
                 <tfoot>
                 <tr>
-                    <th ></th>
-                    <th ></th>
-                    <th ></th>
-                    <th class="tfoot_select" ></th>
+                    <th class="tfoot_search" ></th>
+                    <th class="tfoot_select"></th>
+                    <th class="tfoot_search"></th>
+                    <th class="tfoot_search" ></th>
                     <th ></th>
                 </tr>
                 </tfoot>
@@ -102,10 +101,18 @@
             },
             ajax: '{{route('getAllUsers')}}',
             columns: [
-                {data: 'id', name: 'id'},//Id
-                {data: 'nombres', orderable: false},//nombres
-                {data: 'email', name: 'email', orderable: false, searchable: false},//email
-                {data: 'roles', name: 'roles', orderable: false, searchable: false},//Area
+                {data: 'nombres',orderable: false},
+                {data: 'escenario.escenario',
+                    render: function( data, type, full, meta ) {
+                        if ( data ) {
+                            return data;
+                        }else {
+                            return '-';
+                        }
+                    }
+                },//Area
+                {data: 'email', name: 'email', orderable: false},
+                {data: 'role', name: 'role', orderable: false, searchable: false},
                 {data: 'actions', name: 'opciones', orderable: false, searchable: false}
             ],
             "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
@@ -144,6 +151,8 @@
                         // Cacturar los datos del JSON para llenar el select con las opciones
                         let extraData = (function (i) {
                             switch (i) {
+                                case 1:
+                                    return json.allEsc;
                                 case 3:
                                     return json.allRoles;
 

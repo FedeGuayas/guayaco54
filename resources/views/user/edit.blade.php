@@ -1,11 +1,21 @@
-@extends('layouts.app')
+@extends('layouts.back.master')
+
+@section('page_title','Editar usuario')
+
+@section('breadcrumbs')
+    {!! Breadcrumbs::render('user-edit',$user) !!}
+@endsection
 
 @section('content')
 
-    <div class='col-lg-4 col-lg-offset-4'>
+    <div class="pd-20 bg-white border-radius-4 box-shadow mb-30">
 
-        <h1><i class='fa fa-user-plus'></i> Editar Usuario</h1>
-        <hr>
+        <div class="clearfix mb-20">
+            <div class="pull-left">
+                <h5 class="text-blue">Editar Usuario</h5>
+            </div>
+        </div>
+
 
         {!! Form::model($user,['route'=>['users.update',$user->id],'method'=>'PUT']) !!}
 

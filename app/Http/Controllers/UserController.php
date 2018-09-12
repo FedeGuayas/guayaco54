@@ -57,8 +57,8 @@ class UserController extends Controller
         if ($request->ajax()) {
 
             $usuarios = User::
-            with('escenario', 'persona', 'facturas', 'asociados')
-//                ->join('personas', 'personas.id', '=', 'users.persona_id')//necesario el join para que funcione el CONCAT en el filterColumn
+            with('escenario', 'persona', 'facturas', 'asociados','roles','escenario')
+                ->leftJoin('escenarios','escenarios.id','=','users.escenario_id')
                 ->select('users.*');
 
             $action_buttons = '
@@ -84,24 +84,22 @@ class UserController extends Controller
                 ->addColumn('nombres', function ($usuario) {
                     return $usuario->getFullName();
                 })
-                ->addColumn('roles', function ($usuario) {
+
+                ->addColumn('role', function ($usuario) {
                     return $usuario->getRoleNames();
                 })
-                ->rawColumns(['actions'])
-//                ->addColumn('responsable', function ($proceso) {
-//                    return $proceso->worker->getFullName();
-//                })->implode('<br>')
                 ->filterColumn('nombres', function ($query, $keyword) {
                     $query->whereRaw("CONCAT(users.first_name,' ',users.last_name) like ?", ["%{$keyword}%"]);
                 })
+                ->rawColumns(['actions'])
                 ->setRowId('id');
             //Agregar variables a a la respuesta json del datatables
             if ($request->draw == 1) {
-                $roles = \App\Roles::distinct('name')->pluck('name');
-//                $meses = \App\Month::distinct('month')->pluck('month');
+                $roles = \App\Role::distinct('name')->pluck('name');
+                $esc = \App\Escenario::distinct('escenario')->pluck('escenario');
                 $datatable->with([
                     'allRoles' => $roles,
-//                    'allMeses' => $meses
+                    'allEsc' => $esc
                 ]);
             }
 

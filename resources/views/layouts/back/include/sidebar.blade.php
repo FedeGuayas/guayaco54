@@ -56,7 +56,7 @@
                         <span class="fa fa-gears"></span><span class="mtext">Administración</span>
                     </a>
                     <ul class="submenu">
-                        <li><a href="#">Usuario</a>
+                        <li><a href="{{route('users.index')}}">Usuario</a>
                         <li><a href="{{route('roles.index')}}">Roles</a>
                         <li><a href="{{route('permissions.index')}}">Permisos</a>
                         <li><a href="#">Configuración</a>
