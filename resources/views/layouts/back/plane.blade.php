@@ -31,6 +31,9 @@
     <!-- Toastr-->
     <link href="{{ asset('plugins/toastr/toastr.min.css') }}" rel="stylesheet">
 
+    <!-- FontAwesome  5.3-->
+{{--    <link href="{{ asset('plugins/fontawesome/css/fontawesome-all.min.css') }}" rel="stylesheet">--}}
+
     @stack('styles')
 
     <!-- Global site tag (gtag.js) - Google Analytics -->

@@ -56,7 +56,15 @@
                         <span class="fa fa-gears"></span><span class="mtext">Administración</span>
                     </a>
                     <ul class="submenu">
-                        <li><a href="{{route('users.index')}}">Usuario</a>
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle">
+                                <i class="fas fa-users-cog"></i><span class="mtext"><i class="fa fa-users" aria-hidden="true"></i> Usuarios </span>
+                            </a>
+                            <ul class="submenu child">
+                                <li><a href="{{route('users.index')}}">Activos <i class="icon-copy fa fa-check-circle-o" aria-hidden="true"></i></a> </li>
+                                <li><a href="#">Inactivos <i class="fa fa-user-times" aria-hidden="true"></i></a></li>
+                            </ul>
+                        </li>
                         <li><a href="{{route('roles.index')}}">Roles</a>
                         <li><a href="{{route('permissions.index')}}">Permisos</a>
                         <li><a href="#">Configuración</a>

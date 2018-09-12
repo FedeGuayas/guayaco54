@@ -27,7 +27,7 @@
                                         <div class="contact-avatar">
                                                                 <span>
                                                                     @if ($asociado->persona->privado==\App\Persona::PERFIL_PRIVADO)
-                                                                        <img src="{{asset('dist/img/users/perfil/default-user.jpg')}}"
+                                                                        <img src="{{asset('images/default-user.jpg')}}"
                                                                              alt="" class="avatar-photo">
                                                                     @else
                                                                         @if ($asociado->persona->user['avatar'])
@@ -35,7 +35,7 @@
                                                                                  alt="Foto de Usuario"
                                                                                  class="avatar-photo">
                                                                         @else
-                                                                            <img src="{{asset('dist/img/users/perfil/default-user.jpg')}}"
+                                                                            <img src="{{asset('images/default-user.jpg')}}"
                                                                                  alt="" class="avatar-photo">
                                                                         @endif
                                                                     @endif

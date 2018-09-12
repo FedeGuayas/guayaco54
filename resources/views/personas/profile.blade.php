@@ -32,7 +32,7 @@
                         <img src="{{ asset('dist/img/users/perfil/'.Auth::user()->avatar)}}" alt="Foto de Usuario"
                              class="avatar-photo" id="avatar" style="max-height: 100%">
                     @else
-                        <img src="{{asset('dist/img/users/perfil/default-user.jpg')}}" alt="" class="avatar-photo">
+                        <img src="{{asset('images/default-user.jpg')}}" alt="" class="avatar-photo">
                     @endif
 
                     <div class="progress">

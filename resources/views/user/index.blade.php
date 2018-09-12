@@ -38,7 +38,7 @@
                     <th>Nombre</th>
                     <th>Escenario</th>
                     <th>Email</th>
-                    <th>Role</th>
+                    <th>Roles</th>
                     <th>Acción</th>
                 </tr>
                 </thead>
@@ -47,7 +47,7 @@
                     <th class="tfoot_search" ></th>
                     <th class="tfoot_select"></th>
                     <th class="tfoot_search"></th>
-                    <th class="tfoot_search" ></th>
+                    <th ></th>
                     <th ></th>
                 </tr>
                 </tfoot>
@@ -107,7 +107,7 @@
                         if ( data ) {
                             return data;
                         }else {
-                            return '-';
+                            return ' ';
                         }
                     }
                 },//Area
@@ -116,7 +116,7 @@
                 {data: 'actions', name: 'opciones', orderable: false, searchable: false}
             ],
             "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
-                console.log(aData);
+//                console.log(aData);
             },
             initComplete: function (settings, json) {
                 $('.data-table').fadeIn();
@@ -153,9 +153,6 @@
                             switch (i) {
                                 case 1:
                                     return json.allEsc;
-                                case 3:
-                                    return json.allRoles;
-
                             }
                         })(column.index());
 

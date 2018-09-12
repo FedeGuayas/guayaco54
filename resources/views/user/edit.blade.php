@@ -10,7 +10,7 @@
 
     <div class="pd-20 bg-white border-radius-4 box-shadow mb-30">
 
-        <div class="clearfix mb-20">
+        <div class="clearfix mb-15">
             <div class="pull-left">
                 <h5 class="text-blue">Editar Usuario</h5>
             </div>
@@ -18,58 +18,96 @@
 
 
         {!! Form::model($user,['route'=>['users.update',$user->id],'method'=>'PUT']) !!}
+        <div class="row">
+            <div class="col-md-3 col-sm-6">
+                <div class="form-group">
+                    {{ Form::label('first_name', 'Nombres') }}
+                    {{ Form::text('first_name', null,['class' => 'form-control','style'=>'text-transform: uppercase']) }}
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6">
+                <div class="form-group">
+                    {{ Form::label('last_name', 'Apellidos') }}
+                    {{ Form::text('last_name', null,['class' => 'form-control','style'=>'text-transform: uppercase']) }}
+                </div>
 
-        <div class="form-group">
-            {{ Form::label('first_name', 'Nombres') }}
-            {{ Form::text('first_name', null,['class' => 'form-control','style'=>'text-transform: uppercase']) }}
-        </div>
-
-        <div class="form-group">
-            {{ Form::label('last_name', 'Apellidos') }}
-            {{ Form::text('last_name', null,['class' => 'form-control','style'=>'text-transform: uppercase']) }}
-        </div>
-
-
-        <div class="form-group">
-            {{ Form::label('email', 'Email') }}
-            {{ Form::email('email', null,['class' => 'form-control','style'=>'text-transform: lowercase']) }}
-        </div>
-
-        <div class="form-group">
-            {!! Form::label('roles','Roles') !!}
-            <div class='form-group'>
-                @foreach ($roles as $role)
-                    {{ Form::checkbox('roles[]',  $role->id, $user->roles ) }}
-                    {{ Form::label($role->name, ucfirst($role->name)) }}
-                @endforeach
+            </div>
+            <div class="col-md-3 col-sm-6">
+                <div class="form-group ">
+                    {{ Form::label('email', 'Email') }}
+                    {{ Form::email('email', null,['class' => 'form-control','style'=>'text-transform: lowercase']) }}
+                    <small class="form-text text-danger">Si cambia el email deberá confirmar el nuevo para poder iniciar
+                        sesión
+                    </small>
+                </div>
             </div>
         </div>
-
-        {!! Form::label('permisos','Permisos Directos') !!}
-        <div class='form-group'>
-            @foreach ($permisos as $per)
-                {{ Form::checkbox('permissions[]' ,$per->id,$user->permissions ) }}
-                {{ Form::label($per->name, ucfirst($per->name)) }}
-            @endforeach
+        <div class="row">
+            <div class="col-md-3">
+                <div class="form-group">
+                    {{ Form::label('password', 'Contraseña Nueva') }}<br>
+                    {{ Form::password('password', ['class' => 'form-control']) }}
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    {{ Form::label('password', 'Confirmar Contraseña') }}<br>
+                    {{ Form::password('password_confirmation', ['class' => 'form-control']) }}
+                </div>
+            </div>
+            @if ($user->hasRole('employee'))
+                <div class="col-md-3 col-sm-6">
+                    <div class="form-group ">
+                        {{ Form::label('escenario_id', 'Escenario') }}
+                        {!! Form::select('escenario_id', $esc_list,$user->escenario, ['class'=>'selectpicker show-tick form-control','data-style'=>'btn-outline-primary']) !!}
+                    </div>
+                    <small class="form-text text-danger">Punto de cobro</small>
+                </div>
+            @endif
         </div>
 
+    </div>
 
-        <div class="form-group">
-            {{ Form::label('password', 'Contraseña') }}<br>
-            {{ Form::password('password', ['class' => 'form-control']) }}
-
+    <div class="clearfix mb-15">
+        <div class="pull-left">
+            <h5 class="text-danger">Roles</h5>
         </div>
+    </div>
+    <div class="row">
+        @foreach ($roles as $role)
+            <div class="col-md-3 col-sm-6">
+                <div class='form-group'>
+                    {{ Form::checkbox('roles[]',  $role->id, $user->roles ) }}
+                    {{ Form::label($role->name, ucfirst($role->name)) }}
+                </div>
+            </div>
+        @endforeach
+    </div>
 
-        <div class="form-group">
-            {{ Form::label('password', 'Confirmar Contraseña') }}<br>
-            {{ Form::password('password_confirmation', ['class' => 'form-control']) }}
+    <div class="clearfix mb-15">
+        <div class="pull-left">
+            <h5 class="text-danger">Permisos Directos</h5>
         </div>
+    </div>
+    <div class="row">
 
-        {{ Form::button('Add', ['class' => 'btn btn-primary','type'=>'submit']) }}
+        @foreach ($permisos as $per)
+            <div class="col-md-3 col-sm-6">
+                <div class='form-group'>
+                    {{ Form::checkbox('permissions[]' ,$per->id,$user->permissions ) }}
+                    {{ Form::label($per->name, ucfirst($per->name)) }}
+                </div>
+            </div>
+        @endforeach
+
+    </div>
+
+
+    {{ Form::button('Add', ['class' => 'btn btn-primary','type'=>'submit']) }}
 
     {!! Form::close() !!}
 
-</div>
+    </div>
 
 @endsection
 

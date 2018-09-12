@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Asociado;
+use App\Escenario;
 use App\Permission;
 use App\Persona;
 use App\Role;
@@ -48,17 +49,23 @@ class UserController extends Controller
     }
 
     /**
-     * Todos los usuarios ajax
+     * Usuarios que no son trabajadores (role!=employee),  ajax
      */
     public function getAllUsers(Request $request)
     {
-        $user_login = $request->user();
 
         if ($request->ajax()) {
 
             $usuarios = User::
             with('escenario', 'persona', 'facturas', 'asociados','roles','escenario')
                 ->leftJoin('escenarios','escenarios.id','=','users.escenario_id')
+                ->where('first_name','!=','admin') //no mostrar el admin
+//                ->whereHas('roles', function($q){ //con rol=employee
+//                    $q->where('name', '=', 'employee');
+//                })
+//                ->whereDoesntHave('roles', function($query) { //que el rol no sea employee
+//                    $query->where('name', '=', 'employee');
+//                })
                 ->select('users.*');
 
             $action_buttons = '
@@ -95,10 +102,8 @@ class UserController extends Controller
                 ->setRowId('id');
             //Agregar variables a a la respuesta json del datatables
             if ($request->draw == 1) {
-                $roles = \App\Role::distinct('name')->pluck('name');
                 $esc = \App\Escenario::distinct('escenario')->pluck('escenario');
                 $datatable->with([
-                    'allRoles' => $roles,
                     'allEsc' => $esc
                 ]);
             }
@@ -108,6 +113,7 @@ class UserController extends Controller
         }
 
     }
+
 
 
     /**
@@ -208,13 +214,15 @@ class UserController extends Controller
     public function edit($id)
     {
 
-        $user = User::find($id);
+        $user = User::with('roles')->find($id);
         $roles = Role::all();
         $permisos = Permission::all();
+        $escenarios=Escenario::where('status',Escenario::ACTIVO)->get();
+        $esc_list=$escenarios->pluck('escenario','id');
 
         //        $roles = Role::pluck('name', 'id');
 
-        return view('user.edit', compact('user', 'roles', 'permisos'));
+        return view('user.edit', compact('user', 'roles', 'permisos','esc_list'));
 
     }
 
@@ -227,7 +235,7 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
-
+        dd($request->all());
         $this->validate($request, [
             'first_name' => 'required',
             'last_name' => 'required',
@@ -245,6 +253,7 @@ class UserController extends Controller
             $last_name = $request->input('last_name');
             $email = $request->input('email');
             $password = $request->input('password');
+            $esc_id = $request->input('escenario_id');
 
             $user->first_name = $first_name;
             $user->last_name = $last_name;
@@ -260,6 +269,11 @@ class UserController extends Controller
 
             if ($password) {
                 $user->password = $password;
+            }
+
+            if (isset($esc_id)){
+                $escenario=Escenario::findOrFail($esc_id);
+                $user->escenario()->associate($escenario);
             }
 
 //        $user->fill($request->except('roles', 'permissions', 'password'));
