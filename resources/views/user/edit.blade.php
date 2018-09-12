@@ -55,7 +55,16 @@
                     {{ Form::password('password_confirmation', ['class' => 'form-control']) }}
                 </div>
             </div>
-           
+            @if ($user->hasRole('employee'))
+                <div class="col-md-3 col-sm-6">
+                    <div class="form-group ">
+                        {{ Form::label('escenario_id', 'Escenario') }}
+                        {!! Form::select('escenario_id', $esc_list,$user->escenario, ['class'=>'selectpicker show-tick form-control','data-style'=>'btn-outline-primary']) !!}
+                    </div>
+                    <small class="form-text text-danger">Punto de cobro</small>
+                </div>
+            @endif
+            esto es nuevo
         </div>
 
     </div>
