@@ -16,8 +16,11 @@ class DatabaseSeeder extends Seeder
     {
         // $this->call(UsersTableSeeder::class);
 
+        //deshabilito las foreign key para evitar problemas en las migraciones
+        DB::statement('SET FOREIGN_KEY_CHECKS=0');
+
         // Preguntar por la migracion refresh de la bbdd, default es no
-        if ($this->command->confirm('Relalizar refresh migration antes de los seed, esto borrara todos los datos?')) {
+        if ($this->command->confirm('Realizar refresh migration antes de los seed?, esto borrara todos los datos!')) {
             // Call the php artisan migrate:refresh
             $this->command->call('migrate:refresh');
             $this->command->warn("Datos limpiados, iniciando una bbdd en blanco.");
@@ -34,10 +37,10 @@ class DatabaseSeeder extends Seeder
         $this->command->info('Agregados los permisos por defecto.');
 
         // Confirmar para crear los roles
-        if ($this->command->confirm('Crear roles para cada usuario, el predeterminado es administrador y usuario? [y|N]', true)) {
+        if ($this->command->confirm('Crear roles para cada usuario, predeterminados son Administrador, Empleado, Cliente, Registrado y Anonimo? [y|N]', true)) {
 
             // Preguntar por los nombres de los roles
-            $input_roles = $this->command->ask('Entre los roles separados por coma.', 'admin,user');
+            $input_roles = $this->command->ask('Entre los roles separados por coma. Los siguientes se crearan por defecto sino escribe ninguno', 'admin,employee,client,registered,anonymous');
 
             // Explode roles separados por coma
             $roles_array = explode(',', $input_roles);
@@ -66,9 +69,18 @@ class DatabaseSeeder extends Seeder
             $this->command->info('Agregado solamente el rol de usuario por defecto "User".');
         }
 
-        // crear datos de prueba
-//        factory(\App\Post::class, 30)->create();
-        $this->command->info('Adicionando algunos datos de prueba para Posts .');
+        $cant_users=100;
+
+        //llamada a demas seeders
+        //datos de prueba de users
+        factory(User::class,$cant_users)->create();
+        $this->command->info('Adicionando algunos datos de prueba para Users.');
+
+        //escenarios
+        $this->call(EscenariosTableSeeder::class);
+        //formas de pago
+        $this->call(MPagosTableSeeder::class);
+        
         $this->command->warn('Completado :)');
 
     } //fin run

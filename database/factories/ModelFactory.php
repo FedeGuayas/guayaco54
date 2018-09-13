@@ -16,11 +16,15 @@ $factory->define(App\User::class, function (Faker\Generator $faker) {
     static $password;
 
     return [
-//        'name' => $faker->name,
         'first_name' => $faker->firstName(),
         'last_name' => $faker->lastName,
         'email' => $faker->unique()->safeEmail,
+        //        'persona_id'=>
+        //        'escenario_id'=>
         'password' => $password ?: $password = 'secret',
+        //        'avatar'=>
         'remember_token' => str_random(10),
+        'verified'=>$verificado=$faker->randomElement([\App\User::USUARIO_VERIFICADO,\App\User::USUARIO_NO_VERIFICADO]),
+        'verification_token'=>$verificado=\App\User::USUARIO_VERIFICADO ? null : \App\User::onlyGenerateToken()
     ];
 });
