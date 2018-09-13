@@ -235,7 +235,6 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
-        dd($request->all());
         $this->validate($request, [
             'first_name' => 'required',
             'last_name' => 'required',

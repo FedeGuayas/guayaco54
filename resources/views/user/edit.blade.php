@@ -16,8 +16,8 @@
             </div>
         </div>
 
-
         {!! Form::model($user,['route'=>['users.update',$user->id],'method'=>'PUT']) !!}
+
         <div class="row">
             <div class="col-md-3 col-sm-6">
                 <div class="form-group">
@@ -64,51 +64,49 @@
                     <small class="form-text text-danger">Punto de cobro</small>
                 </div>
             @endif
-            esto es nuevo
         </div>
 
-    </div>
 
-    <div class="clearfix mb-15">
-        <div class="pull-left">
-            <h5 class="text-danger">Roles</h5>
-        </div>
-    </div>
-    <div class="row">
-        @foreach ($roles as $role)
-            <div class="col-md-3 col-sm-6">
-                <div class='form-group'>
-                    {{ Form::checkbox('roles[]',  $role->id, $user->roles ) }}
-                    {{ Form::label($role->name, ucfirst($role->name)) }}
-                </div>
+        <div class="clearfix mb-15">
+            <div class="pull-left">
+                <h5 class="text-danger">Roles</h5>
             </div>
-        @endforeach
-    </div>
-
-    <div class="clearfix mb-15">
-        <div class="pull-left">
-            <h5 class="text-danger">Permisos Directos</h5>
         </div>
-    </div>
-    <div class="row">
-
-        @foreach ($permisos as $per)
-            <div class="col-md-3 col-sm-6">
-                <div class='form-group'>
-                    {{ Form::checkbox('permissions[]' ,$per->id,$user->permissions ) }}
-                    {{ Form::label($per->name, ucfirst($per->name)) }}
+        <div class="row">
+            @foreach ($roles as $role)
+                <div class="col-md-3 col-sm-6">
+                    <div class='form-group'>
+                        {{ Form::checkbox('roles[]',  $role->id, $user->roles ) }}
+                        {{ Form::label($role->name, ucfirst($role->name)) }}
+                    </div>
                 </div>
+            @endforeach
+        </div>
+
+        <div class="clearfix mb-15">
+            <div class="pull-left">
+                <h5 class="text-danger">Permisos Directos</h5>
             </div>
-        @endforeach
+        </div>
+        <div class="row">
+            @foreach ($permisos as $per)
+                <div class="col-md-3 col-sm-6">
+                    <div class='form-group'>
+                        {{ Form::checkbox('permissions[]' ,$per->id,$user->permissions ) }}
+                        {{ Form::label($per->name, ucfirst($per->name)) }}
+                    </div>
+                </div>
+            @endforeach
+        </div>
+
+        {{ Form::button('Guardar', ['class' => 'btn btn-primary','type'=>'submit']) }}
+        {!! Form::close() !!}
 
     </div>
 
 
-    {{ Form::button('Add', ['class' => 'btn btn-primary','type'=>'submit']) }}
 
-    {!! Form::close() !!}
 
-    </div>
 
 @endsection
 

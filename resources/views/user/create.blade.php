@@ -1,13 +1,22 @@
-@extends('layouts.app')
+@extends('layouts.back.master')
+
+@section('page_title','Crear usuario')
+
+@section('breadcrumbs')
+    {!! Breadcrumbs::render('user-create') !!}
+@endsection
 
 @section('content')
 
-    <div class='col-lg-4 col-lg-offset-4'>
+    <div class="pd-20 bg-white border-radius-4 box-shadow mb-30">
 
-        <h1><i class='fa fa-user-plus'></i> Agregar Usuario</h1>
-        <hr>
+        <div class="clearfix mb-15">
+            <div class="pull-left">
+                <h5 class="text-blue">Agregar Usuario</h5>
+            </div>
+        </div>
 
-        {!! Form::open(['route'=>'users.store', 'method'=>'POST']) !!}
+        {!! Form::open(['route'=>'users.store', 'method'=>'POST','autocomplete'=>'off']) !!}
 
         <div class="form-group">
             {{ Form::label('first_name', 'Nombres') }}
@@ -51,7 +60,7 @@
             {{ Form::password('password_confirmation', ['class' => 'form-control']) }}
         </div>
 
-        {{ Form::button('Add', ['class' => 'btn btn-primary','type'=>'submit']) }}
+        {{ Form::button('Guardar', ['class' => 'btn btn-primary','type'=>'submit']) }}
 
     {!! Form::close() !!}
 

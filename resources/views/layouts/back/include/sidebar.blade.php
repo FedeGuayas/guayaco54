@@ -24,6 +24,7 @@
                     <ul class="submenu">
                         <li><a href="{{route('circuitos.index')}}">Circuitos</a>
                         <li><a href="{{route('categorias.index')}}">Categorias</a>
+                        <li><a href="#">Categoria / Circuitos</a>
                         <li><a href="{{route('tallas.index')}}">Tallas</a>
                         <li><a href="{{route('escenarios.index')}}">Escenarios</a>
                         <li><a href="{{route('deportes.index')}}">Deportes</a>
