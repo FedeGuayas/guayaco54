@@ -97,6 +97,7 @@ Route::middleware(['auth', 'isVerified'])->group(function () {
         Route::resource('tallas', 'TallaController',['except'=>['show']]);
         Route::resource('escenarios', 'EscenarioController',['except'=>['show','destroy']]);
         Route::resource('deportes', 'DeporteController',['except'=>['show','destroy']]);
+        Route::resource('categoria-circuito', 'CategoriaCircuitoController',['except'=>['show','destroy']]);
 
         Route::resource('roles', 'RoleController');
         Route::resource('permissions', 'PermissionController');

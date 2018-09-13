@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateCategoriaCircuitosTable extends Migration
+class CreateCategoriaCircuitoTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,7 @@ class CreateCategoriaCircuitosTable extends Migration
      */
     public function up()
     {
-        Schema::create('categoria_circuitos', function (Blueprint $table) {
+        Schema::create('categoria_circuito', function (Blueprint $table) {
             $table->integer('categoria_id')->unsigned();
             $table->integer('circuito_id')->unsigned();
 
@@ -34,6 +34,6 @@ class CreateCategoriaCircuitosTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('categoria_circuitos');
+        Schema::dropIfExists('categoria_circuito');
     }
 }

@@ -38,9 +38,18 @@ class Circuito extends Model
         $this->attributes['title']=mb_strtolower($value);
     }
 
+    /**
+     * Relaciones
+     */
     //un circuito puede estar en varios productos
     public function productos()
     {
         return $this->hasMany('App\Producto');
+    }
+
+    //las categorias que pertenencen al circuito
+    public function categorias()
+    {
+        return $this->belongsToMany('App\Categoria');
     }
 }

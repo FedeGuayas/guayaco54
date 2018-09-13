@@ -40,7 +40,7 @@ class DatabaseSeeder extends Seeder
         if ($this->command->confirm('Crear roles para cada usuario, predeterminados son Administrador, Empleado, Cliente, Registrado y Anonimo? [y|N]', true)) {
 
             // Preguntar por los nombres de los roles
-            $input_roles = $this->command->ask('Entre los roles separados por coma. Los siguientes se crearan por defecto sino escribe ninguno', 'admin,employee,client,registered,anonymous');
+            $input_roles = $this->command->ask('Entre los roles separados por coma. Enter para aceptar por defecto :', 'admin,employee,client,registered,anonymous');
 
             // Explode roles separados por coma
             $roles_array = explode(',', $input_roles);
