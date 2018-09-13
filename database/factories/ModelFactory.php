@@ -25,6 +25,6 @@ $factory->define(App\User::class, function (Faker\Generator $faker) {
         //        'avatar'=>
         'remember_token' => str_random(10),
         'verified'=>$verificado=$faker->randomElement([\App\User::USUARIO_VERIFICADO,\App\User::USUARIO_NO_VERIFICADO]),
-        'verification_token'=>$verificado=\App\User::USUARIO_VERIFICADO ? null : \App\User::onlyGenerateToken()
+        'verification_token'=> $verificado==\App\User::USUARIO_VERIFICADO ? null : \App\User::onlyGenerateToken()
     ];
 });
