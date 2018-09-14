@@ -25,15 +25,15 @@ class Impuesto extends Model
         $this->attributes['nombre']=strtolower($value);
     }
 
-    public function getDivisorAttribute()
-    {
-        return  $this->attributes['divisor']/100;
-    }
-
-    public function setDivisorAttribute($value)
-    {
-        //1.14  1.12 * 100 = 114 112
-        $this->attributes['divisor']=$value*100;
-    }
+//    public function getDivisorAttribute()
+//    {
+//        return  $this->attributes['divisor']/100;
+//    }
+//
+//    public function setDivisorAttribute($value)
+//    {
+//        //1.14  1.12 * 100 = 114 112
+//        $this->attributes['divisor']=$value*100;
+//    }
 
 }

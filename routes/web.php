@@ -90,6 +90,8 @@ Route::middleware(['auth', 'isVerified'])->group(function () {
 
         //Vista configuracion
         Route::get('configurations','ConfiguracionController@index')->name('admin.configurations.index');
+        //Guardar configuracion
+        Route::post('configurations/store','ConfiguracionController@store')->name('admin.configurations.store');
 
 
 
@@ -99,6 +101,8 @@ Route::middleware(['auth', 'isVerified'])->group(function () {
         Route::resource('tallas', 'TallaController',['except'=>['show']]);
         Route::resource('escenarios', 'EscenarioController',['except'=>['show','destroy']]);
         Route::resource('deportes', 'DeporteController',['except'=>['show','destroy']]);
+        Route::resource('ejercicios', 'EjercicioController',['except'=>['show','destroy']]);
+        Route::resource('taxes', 'ImpuestoController',['except'=>['show','destroy']]);
         Route::resource('categoria-circuito', 'CategoriaCircuitoController',['except'=>['show','destroy']]);
         Route::resource('productos', 'ProductoController');
 

@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Ejercicio;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class EjercicioController extends Controller
 {
@@ -35,7 +37,52 @@ class EjercicioController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $rules = [
+            'year'=>'required|max:4|unique:ejercicios,year'
+        ];
+
+        $messages = [
+            'year.unique' => 'El valor del campo año ya está en uso.',
+            'year.max' => 'El campo año no debe contener más de 4 caracteres.',
+            'year.required'=>'El valor del campo año es requerido.',
+        ];
+
+        $validator = Validator::make($request->all(), $rules,$messages);
+
+        if ($validator->fails()) {
+            $notification = [
+                'message_toastr' => $validator->errors()->first(),
+                'alert-type' => 'error'];
+            return back()->with($notification)->withInput();
+        }
+
+        $year=$request->input('year');
+
+        try {
+            DB::beginTransaction();
+
+            $ejer=new Ejercicio();
+            $ejer->year=$year;
+            $ejer->status=Ejercicio::ACTIVO;
+            $ejer->save();
+
+            DB::Commit();
+
+            $notification = [
+                'message_toastr' => 'El año se guardo correctamente',
+                'alert-type' => 'success'];
+            return redirect()->route('admin.configurations.index')->with($notification);
+
+        }catch (\Exception $e){
+            DB::rollBack();
+//            $message=$e->getMessage();
+            $message='Ocurrio un error y no se pudo guardar el año';
+            $notification = [
+                'message_toastr' => $message,
+                'alert-type' => 'error'];
+            return redirect()->back()->with($notification)->withInput();
+        }
+
     }
 
     /**
@@ -57,7 +104,7 @@ class EjercicioController extends Controller
      */
     public function edit(Ejercicio $ejercicio)
     {
-        //
+
     }
 
     /**
@@ -67,9 +114,54 @@ class EjercicioController extends Controller
      * @param  \App\Ejercicio  $ejercicio
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Ejercicio $ejercicio)
+    public function update(Request $request, $id)
     {
-        //
+        $rules = [
+            'year'=>'required|max:4|unique:ejercicios,year,'.$id
+        ];
+
+        $messages = [
+            'year.unique' => 'El valor del campo año ya está en uso.',
+            'year.max' => 'El campo año no debe contener más de 4 caracteres.',
+            'year.required'=>'El valor del campo año es requerido.',
+        ];
+
+        $validator = Validator::make($request->all(), $rules,$messages);
+
+        if ($validator->fails()) {
+            $notification = [
+                'message_toastr' => $validator->errors()->first(),
+                'alert-type' => 'error'];
+            return back()->with($notification)->withInput();
+        }
+
+        $year=$request->input('year');
+        $status=$request->input('status');
+
+        try {
+            DB::beginTransaction();
+
+            $ejer=Ejercicio::findOrFail($id);
+            $ejer->year=$year;
+            $status=='on' ? $ejer->status=Ejercicio::ACTIVO : $ejer->status=Ejercicio::INACTIVO;
+            $ejer->update();
+
+            DB::Commit();
+
+            $notification = [
+                'message_toastr' => 'El año se actualizo correctamente',
+                'alert-type' => 'success'];
+            return redirect()->route('ejercicios.index')->with($notification);
+
+        }catch (\Exception $e){
+            DB::rollBack();
+//            $message=$e->getMessage();
+            $message='Ocurrio un error y no se pudo actualizar el año';
+            $notification = [
+                'message_toastr' => $message,
+                'alert-type' => 'error'];
+            return redirect()->back()->with($notification)->withInput();
+        }
     }
 
     /**
@@ -78,8 +170,12 @@ class EjercicioController extends Controller
      * @param  \App\Ejercicio  $ejercicio
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Ejercicio $ejercicio)
+    public function destroy($id)
     {
-        //
+        $ejer=Ejercicio::findOrFail($id);
+        $ejer->status==Ejercicio::INACTIVO ? $ejer->status=Ejercicio::ACTIVO : $ejer->status=Ejercicio::INACTIVO;
+        $ejer->update();
+        return response()->json(['data'=>$ejer],200);
+
     }
 }

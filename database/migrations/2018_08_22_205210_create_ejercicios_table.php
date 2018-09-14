@@ -15,7 +15,7 @@ class CreateEjerciciosTable extends Migration
     {
         Schema::create('ejercicios', function (Blueprint $table) {
             $table->increments('id');
-            $table->char('year',4);
+            $table->char('year',4)->unique();
             $table->string('status')->default(\App\Ejercicio::ACTIVO);
         });
     }

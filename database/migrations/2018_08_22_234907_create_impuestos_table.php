@@ -16,8 +16,8 @@ class CreateImpuestosTable extends Migration
         Schema::create('impuestos', function (Blueprint $table) {
             $table->increments('id');
             $table->string('nombre');//nombre tipo impuesto Ej: IVA,etc
-            $table->unsignedTinyInteger('porciento');//porcentaje 12 %
-            $table->unsignedTinyInteger('divisor');//divisor   IVA 12%=>1.12  14%=>1.14
+            $table->integer('porciento')->unsigned();//porcentaje 12 %
+            $table->decimal('divisor',3,2)->unsigned();//divisor   IVA 12%=>1.12  14%=>1.14
             $table->string('status')->default(\App\Impuesto::ACTIVO);
         });
     }
