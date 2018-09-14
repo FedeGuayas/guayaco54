@@ -24,8 +24,18 @@ class CreateProductosTable extends Migration
             $table->text('description')->nullable(); // descripcion de la carrera, recorrido, etc
             $table->integer('price'); //precio del la carrera
             $table->string('image')->nullable();  //imagen del recorrido.
+            $table->string('status')->default(\App\Producto::ACTIVO);
 
             $table->timestamps();
+
+            $table->foreign('categoria_id')->references('id')->on('categorias')
+                ->onUpdate('cascade')->onDelete('restrict');
+            $table->foreign('circuito_id')->references('id')->on('circuitos')
+                ->onUpdate('cascade')->onDelete('restrict');
+            $table->foreign('ejercicio_id')->references('id')->on('ejercicios')
+                ->onUpdate('cascade')->onDelete('restrict');
+
+            $table->unique(['categoria_id', 'circuito_id','ejercicio_id']);
         });
     }
 

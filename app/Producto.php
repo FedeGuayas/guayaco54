@@ -5,12 +5,16 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 
 class Producto extends Model
 {
     protected $fillable = [
-        'categoria_id','ejercicio_id','circuito_id','description','price','image'
+        'categoria_id','ejercicio_id','circuito_id','description','price','image','status'
     ];
+
+    const ACTIVO='1';
+    const INACTIVO='0';
 
     public function getDescriptionAttribute()
     {

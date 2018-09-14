@@ -50,6 +50,6 @@ class Circuito extends Model
     //las categorias que pertenencen al circuito
     public function categorias()
     {
-        return $this->belongsToMany('App\Categoria');
+        return $this->belongsToMany('App\Categoria','categoria_circuito');
     }
 }

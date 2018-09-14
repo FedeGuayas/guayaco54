@@ -88,6 +88,8 @@ Route::middleware(['auth', 'isVerified'])->group(function () {
         //Users/index obtener todos los usuarios  AJAX
         Route::get('users/getAll','UserController@getAllUsers')->name('getAllUsers');
 
+        //Vista configuracion
+        Route::get('configurations','ConfiguracionController@index')->name('admin.configurations.index');
 
 
 
@@ -98,6 +100,7 @@ Route::middleware(['auth', 'isVerified'])->group(function () {
         Route::resource('escenarios', 'EscenarioController',['except'=>['show','destroy']]);
         Route::resource('deportes', 'DeporteController',['except'=>['show','destroy']]);
         Route::resource('categoria-circuito', 'CategoriaCircuitoController',['except'=>['show','destroy']]);
+        Route::resource('productos', 'ProductoController');
 
         Route::resource('roles', 'RoleController');
         Route::resource('permissions', 'PermissionController');

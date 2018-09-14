@@ -25,6 +25,7 @@
                         <li><a href="{{route('circuitos.index')}}">Circuitos</a>
                         <li><a href="{{route('categorias.index')}}">Categorias</a>
                         <li><a href="{{route('categoria-circuito.index')}}">Categoria / Circuitos</a>
+                        <li><a href="{{route('productos.index')}}">Productos</a>
                         <li><a href="{{route('tallas.index')}}">Tallas</a>
                         <li><a href="{{route('escenarios.index')}}">Escenarios</a>
                         <li><a href="{{route('deportes.index')}}">Deportes</a>
@@ -68,7 +69,7 @@
                         </li>
                         <li><a href="{{route('roles.index')}}">Roles</a>
                         <li><a href="{{route('permissions.index')}}">Permisos</a>
-                        <li><a href="#">Configuración</a>
+                        <li><a href="{{route('admin.configurations.index')}}">Configuración</a>
                         <li><a href="#">Importar Chips</a>
                         <li><a href="#">Importar Resultados</a>
                     </ul>

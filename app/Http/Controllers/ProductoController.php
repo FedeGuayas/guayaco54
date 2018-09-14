@@ -14,7 +14,9 @@ class ProductoController extends Controller
      */
     public function index()
     {
-        //
+        $productos=Producto::with('categoria','circuito','ejercicio','inscripcions')->where('status',Producto::ACTIVO)->get();
+        dd($productos);
+        return view('categoria_circuito.index',compact('productos'));
     }
 
     /**
