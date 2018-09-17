@@ -3,10 +3,10 @@
         <div class="container pd-0">
             <!-- Open Task start -->
             <div class="task-title row align-items-center">
-                <div class="col-md-8 col-sm-12">
+                <div class="col-md-6 col-sm-12">
                     <h5>Amigos asociados</h5>
                 </div>
-                <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 text-right">
+                <div class="col-md-6 col-sm-12 pull-right text-right">
                     <a href="asociado-search" data-toggle="modal"
                        data-target="#asociado-search"
                        class="bg-light-blue btn text-blue weight-500"><i
