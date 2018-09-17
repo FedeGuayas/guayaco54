@@ -89,13 +89,13 @@
                     {{--</a>--}}
                 {{--</li>--}}
 
-                @hasallroles(['registered','client'])
+                @role('client')
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle">
                         <span class="fa fa-user-o"></span><span class="mtext">Menú Usuario</span>
                     </a>
                     <ul class="submenu">
-                        <li><a href="#">Nueva Inscripción <i class="fa fa-pencil-square-o"></i></a>
+                        <li><a href="{{route('user.inscripcion.create')}}">Nueva Inscripción <i class="fa fa-pencil-square-o"></i></a>
                         <li><a href="#">Comprobantes <i class="fa fa-sticky-note-o"></i></a>
                     </ul>
                 </li>

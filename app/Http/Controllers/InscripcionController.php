@@ -2,8 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Categoria;
 use App\Inscripcion;
+use App\Producto;
+use App\Talla;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class InscripcionController extends Controller
 {
@@ -22,9 +26,35 @@ class InscripcionController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Request $request)
     {
-        //
+        $user=$request->user();
+
+        if (!isset($user->persona)) {//no tiene perfil, debe crearlo antes de inscribirse
+            $notification = [
+                'message_toastr' => 'Debe completar su perfil antes de hacer alguna inscripción',
+                'alert-type' => 'error'];
+            return redirect()->route('getProfile')->with($notification);
+        }
+
+        $edad=$user->persona->getEdad();
+
+        $cat_all=Categoria::where('status',Categoria::ACTIVO)
+            ->where([
+                ['edad_start','<=', $edad],
+                ['edad_end','>=', $edad],
+            ])->get();
+
+        $categorias=$cat_all->pluck('categoria','id');
+
+        $tallas_all=Talla::where('status',Talla::ACTIVO)
+            ->where('stock','>',0)
+            ->select(DB::raw('concat (talla," - ",color) as talla,id'))
+            ->get();
+        $tallas=$tallas_all->pluck('talla','id');
+
+
+        return view('inscripcion.online.create',compact('categorias','tallas'));
     }
 
     /**
@@ -81,5 +111,20 @@ class InscripcionController extends Controller
     public function destroy(Inscripcion $inscripcion)
     {
         //
+    }
+
+    /**
+     * Obtener lo circuitos para la categoia seleccionada
+     */
+    public function getCategoriaCircuito(Request $request){
+
+        if ($request->ajax()){
+
+            $circuitos=Producto::with('circuito')
+                ->where('status',Producto::ACTIVO)
+                ->where('categoria_id',$request->input('id'))
+                ->get();
+            return response()->json(['data'=>$circuitos],200);
+        }
     }
 }

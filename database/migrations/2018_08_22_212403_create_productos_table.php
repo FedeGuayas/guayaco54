@@ -22,7 +22,7 @@ class CreateProductosTable extends Migration
             $table->integer('ejercicio_id')->unsigned();
             $table->integer('circuito_id')->unsigned();
             $table->text('description')->nullable(); // descripcion de la carrera, recorrido, etc
-            $table->integer('price'); //precio del la carrera
+            $table->integer('price')->unsigned(); //precio del la carrera
             $table->string('image')->nullable();  //imagen del recorrido.
             $table->string('status')->default(\App\Producto::ACTIVO);
 

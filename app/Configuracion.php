@@ -51,4 +51,18 @@ class Configuracion extends Model
         $this->attributes['nombre_contacto']=mb_strtolower($value);
     }
 
+    /**
+     * Relaciones
+     */
+
+    public function ejercicio()
+    {
+        return $this->belongsTo('App\Ejercicio');
+    }
+
+    public function impuesto()
+    {
+        return $this->belongsTo('App\Impuesto');
+    }
+
 }

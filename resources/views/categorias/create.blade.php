@@ -9,7 +9,7 @@
 @push('styles')
 <!-- bootstrap-touchspin css -->
 <link rel="stylesheet" type="text/css"
-      href="{{asset('themes/back/src/plugins/bootstrap-touchspin/dist/jquery.bootstrap-touchspin.min.css')}}">
+      href="{{asset('themes/back/src/plugins/bootstrap-touchspin/dist/jquery.bootstrap-touchspin.css')}}">
 @endpush
 
 @section('content')
@@ -34,7 +34,6 @@
         </div>
         <div class="row">
             <div class="col-md-4 col-sm-6">
-
                 <div class="form-group">
                     <label for="edad_start">Edad inicio</label>
                     {!! Form::text('edad_start',null,['class'=>'edad_touchspin']) !!}

@@ -260,9 +260,10 @@
 
     <section class="mbr-section form4 cid-r0ZXsKa1l9" id="form4-6">
 
-
         <div class="container">
+
             <div class="row">
+
                 <div class="col-md-6">
                     <div class="google-map">
                         <iframe frameborder="0" style="border:0"
@@ -270,8 +271,9 @@
                                 allowfullscreen=""></iframe>
                     </div>
                 </div>
+
                 <div class="col-md-6">
-                    <h2 class="pb-3 align-left mbr-fonts-style display-2">Contacto</h2>
+                    <h3 class="pb-3 align-left mbr-fonts-style display-2">Contacto</h3>
                     <div>
                         <div class="icon-block pb-3">
                         <span class="icon-block__icon">
@@ -283,46 +285,60 @@
                         </div>
                         <div class="icon-contacts pb-3">
                             <h5 class="align-left mbr-fonts-style display-7">Listo para atenderle</h5>
-                            <p class="mbr-text align-left mbr-fonts-style display-7">Teléfono: +593 (4) 000 001 <br>
-                                Email: mail@mail.com
+                            <p class="mbr-text align-left mbr-fonts-style display-7">
+                                Dirección: {{$config ? $config->direccion : ''}} <br>
+                                Teléfonos: {{$config ? $config->telefonos : ''}} <br>
+                                Email: {{$config ? $config->email : ''}}
                             </p>
                         </div>
                     </div>
+
                     <div data-form-type="formoid">
-                        <div data-form-alert="" hidden="">¡Gracias por contactarnos!</div>
+                        {{--<div data-form-alert="" hidden="">¡Gracias por contactarnos!</div>--}}
+
                         <form class="block mbr-form" action="#" method="post"
                               data-form-title="Formulario de Contacto">
                             {!! csrf_field() !!}
                             <input type="hidden" name="email" data-form-email="true"
-                                   value="lEGXlc7PpSYCBX3ty6AOekp89secpnKg3kymC7fE5TAaPmVV0cypDQatSvKq2WjpmiGKl9bea1xEB5IHaA3/oalpLAiSa+S4+uoR9QjY5XQ8i/bzz+r4i0KoNvfZkU2X"
+                                   value="{{$config ? $config->email : 'info@fedeguayas.com.ec'}}"
                                    data-form-field="Email">
                             <div class="row">
                                 <div class="col-md-6 multi-horizontal" data-for="name">
+                                    <small class="form-text"> Su nombre</small>
                                     <input type="text" class="form-control input" name="name" data-form-field="Name"
                                            placeholder="Su Nombre" required="" id="name-form4-6" value="{{Auth::check() ? Auth::user()->getFullName() : ''}}">
                                 </div>
                                 <div class="col-md-6 multi-horizontal" data-for="phone">
+                                    <small class="form-text"> Teléfono de contacto</small>
                                     <input type="number" class="form-control input" name="phone" data-form-field="Phone"
                                            placeholder="Teléfono" required="" id="phone-form4-6">
                                 </div>
                                 <div class="col-md-12" data-for="email">
+                                    <small class="form-text"> Su correo electrónico</small>
                                     <input type="text" class="form-control input" name="email" data-form-field="Email"
                                            placeholder="Email" required="" id="email-form4-6"
                                            value="{{Auth::check() ? Auth::user()->email : ''}}">
                                 </div>
                                 <div class="col-md-12" data-for="message">
+                                    <small class="form-text"> El mensaje</small>
                                 <textarea class="form-control input" name="message" rows="3" data-form-field="Message"
                                           placeholder="Mensaje" style="resize:none; text-transform: uppercase;" id="message-form4-6" required></textarea>
                                 </div>
                                 <div class="input-group-btn col-md-12" style="margin-top: 10px;">
+                                   @if (Auth::check())
                                     <button href="" type="submit" class="btn btn-primary btn-form display-4">ENVIAR
                                         MENSAJE
                                     </button>
+                                       @else
+                                        <h5 class=" align-left text-primary ">Debe iniciar sesión para enviar el mensaje</h5>
+                                       @endif
                                 </div>
                             </div>
                         </form>
+
                     </div>
                 </div>
+
             </div>
         </div>
     </section>

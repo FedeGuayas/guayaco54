@@ -56,37 +56,39 @@
         <div class="form-group row">
             <label class="col-sm-12 col-md-2 col-form-label weight-600">Empresa *</label>
             <div class="col-sm-12 col-md-6">
-                {!! Form::text('empresa',null,['class'=>'form-control', 'style'=>'text-transform: uppercase','required']) !!}
+                {!! Form::text('empresa',isset($config->empresa) ? $config->empresa : null,['class'=>'form-control', 'style'=>'text-transform: uppercase','required']) !!}
             </div>
         </div>
         <div class="form-group row">
             <label class="col-sm-12 col-md-2 col-form-label weight-600">RUC *</label>
             <div class="col-sm-12 col-md-6">
-                {!! Form::text('ruc',null,['class'=>'form-control', 'style'=>'text-transform: uppercase','required']) !!}
+                {!! Form::text('ruc',isset($config->ruc) ? $config->ruc : null,['class'=>'form-control', 'style'=>'text-transform: uppercase','required']) !!}
             </div>
         </div>
         <div class="form-group row">
             <label class="col-sm-12 col-md-2 col-form-label weight-600">Teléfonos *</label>
             <div class="col-sm-12 col-md-6">
-                {!! Form::text('telefonos',null,['class'=>'form-control', 'style'=>'text-transform: uppercase','required']) !!}
+                {!! Form::text('telefonos',isset($config->telefonos) ? $config->telefonos : null,['class'=>'form-control', 'style'=>'text-transform: uppercase','required']) !!}
+                <small class="form-text">Separe los teléfonos con espacios</small>
             </div>
         </div>
         <div class="form-group row">
             <label class="col-sm-12 col-md-2 col-form-label weight-600">Email Contacto *</label>
             <div class="col-sm-12 col-md-6">
-                {!! Form::email('email',null,['class'=>'form-control', 'style'=>'text-transform: lowercase','required','placeholder'=>'email@contacto']) !!}
+                {!! Form::email('email',isset($config->email) ? $config->email : null,['class'=>'form-control', 'style'=>'text-transform: lowercase','required','placeholder'=>'email@contacto']) !!}
+                <small class="form-text">A este email serán dirigidos los comentarios de los usuarios</small>
             </div>
         </div>
         <div class="form-group row">
             <label class="col-sm-12 col-md-2 col-form-label weight-600">Dirección *</label>
             <div class="col-sm-12 col-md-6">
-                {!! Form::text('direccion',null,['class'=>'form-control', 'style'=>'text-transform: uppercase','required']) !!}
+                {!! Form::text('direccion',isset($config->direccion) ? $config->direccion : null,['class'=>'form-control', 'style'=>'text-transform: uppercase','required']) !!}
             </div>
         </div>
         <div class="form-group row">
             <label class="col-sm-12 col-md-2 col-form-label weight-600">Nombre Contacto *</label>
             <div class="col-sm-12 col-md-6">
-                {!! Form::text('nombre_contacto',null,['class'=>'form-control', 'style'=>'text-transform: uppercase','required']) !!}
+                {!! Form::text('nombre_contacto',isset($config->nombre_contacto) ? $config->nombre_contacto : null,['class'=>'form-control', 'style'=>'text-transform: uppercase','required']) !!}
             </div>
         </div>
 

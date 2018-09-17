@@ -11,10 +11,12 @@
 |
 */
 
-Route::get('/', function () {
+//Route::get('/', function () {
+//
+//    return view('welcome');
+//});
 
-    return view('welcome');
-});
+Route::get('/', 'HomeController@getwelcome')->name('getWelcome');
 
 Auth::routes();
 
@@ -68,7 +70,16 @@ Route::middleware(['auth', 'isVerified'])->group(function () {
         //actualizar avatar de usuario cortado con cropperjs
         Route::post('user/avatar-update', 'UserController@uploadAvatarCrop')->name('user.avatarCrop.upload');
 
+        //perfiles de las personas que se inscribiran
         Route::resource('personas', 'PersonaController');
+
+        //vista para inscripcion de usuario online
+        Route::get('inscription','InscripcionController@create')->name('user.inscripcion.create');
+
+        //Ajax para inscripciones
+        Route::get('inscription/category/circuit','InscripcionController@getCategoriaCircuito')->name('getCategoriaCircuito');
+
+
 
     });
 
@@ -91,7 +102,7 @@ Route::middleware(['auth', 'isVerified'])->group(function () {
         //Vista configuracion
         Route::get('configurations','ConfiguracionController@index')->name('admin.configurations.index');
         //Guardar configuracion
-        Route::post('configurations/store','ConfiguracionController@store')->name('admin.configurations.store');
+        Route::post('configurations/create','ConfiguracionController@create')->name('admin.configurations.store');
 
 
 

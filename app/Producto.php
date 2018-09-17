@@ -56,6 +56,6 @@ class Producto extends Model
     }
     //un producto puede estar muchas inscripciones
     public function inscripcions(){
-        return $this->hasMany('App\Incripcion');
+        return $this->hasMany('App\Inscripcion');
     }
 }

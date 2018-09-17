@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Categoria;
 use App\CategoriaCircuito;
 use App\Circuito;
+use App\Configuracion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 

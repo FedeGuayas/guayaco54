@@ -23,7 +23,7 @@ class CreateConfiguracionsTable extends Migration
             $table->string('email');//email de contacto info@fedeguayas.com.ec poner en front-end
             $table->string('direccion');//direccion de la empresa poner en front-end
             $table->string('nombre_contacto'); //nombre de la empresa
-            $table->string('status');
+            $table->string('status')->default(\App\Configuracion::ATIVO);
 
             $table->foreign('ejercicio_id')->references('id')->on('ejercicios')
                 ->onUpdate('cascade')->onDelete('restrict');
