@@ -15,7 +15,7 @@ class HomeController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth');
+        $this->middleware('auth')->only('index');
     }
 
     /**
@@ -23,9 +23,16 @@ class HomeController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        return view('home');
+        $user = $request->user();
+
+        $perfil=false;
+        if (isset($user->persona)) {//no tiene perfil, debe crearlo antes de inscribirse
+           $perfil=true;
+        }
+
+        return view('home',compact('perfil'));
     }
 
     public function getWelcome()
