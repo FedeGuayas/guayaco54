@@ -184,12 +184,37 @@
 <script>
 
     $(document).ready(function (e) {
+
         $('.date-picker').datepicker({
             language: 'es',
             dateFormat: 'yyyy-mm-dd',
             position: 'right bottom',
             maxDate: new Date()
         });
+
+        //reset modal on before show to user
+        $('#perfil-search').on('show.bs.modal', function (e) {
+            $(this).find('form').trigger('reset');
+            $("#addNames").prop('disabled',true);
+            $("#addNamesAceptar").prop('disabled',true);
+        });
+
+        $("#cerrar-modal").on('click',function () {
+            $("#persona_id").val('');
+            $("#nombres").val('');
+            $("#apellidos").val('');
+            $("#addNames").prop('disabled',true);
+            $("#addNamesAceptar").prop('disabled',true);
+            swal(
+                {
+                    type: 'info',
+                    title: 'Oops...',
+                    text: 'Cerro la ventana sin aceptar datos!'
+                }
+            );
+
+        });
+
 
     });
 
@@ -272,14 +297,15 @@
         //buscar perfil por la identificacion
         $("#search").on('click', function (event) {
             event.preventDefault();
-            let identificacion = $("#search-doc").val();
+            let identificacion = $("#search-doc").val(); //campo de busqueda
             let route = "{{route('perfil.search')}}";
             let token = $("input[name=_token]").val();
-            let persona_id = $("#persona_id");
+            let persona_id = $("#persona_id"); //id del perfil seleccionado
             let first_name = $("#nombres");
             let last_name = $("#apellidos");
+            let addNamesAceptar = $("#addNamesAceptar"); //boton de aceptar modal
+            let addNames=$("#addNames"); //checkbox
 
-            $("#addNames").prop('checked', false);
             if (identificacion === "") {
                 swal(
                     {
@@ -316,18 +342,24 @@
                             persona_id.val('');
                             first_name.val('');
                             last_name.val('');
-                            //limpio el check
+                            addNames.prop('disabled',true);
                         }
                         //se encontro persona que no tiene cuenta asociada
                         if (resp.result === 'found') {
+                            $("#persona_id").val('');
+                            $("#nombres").val('');
+                            $("#apellidos").val('');
                             $("#nombres-show").val(resp.persona.nombres);
                             $("#apellidos-show").val(resp.persona.apellidos);
                             $("#persona_id_show").val(resp.persona.id);
+                            addNames.prop('disabled', false);
                         }
 
                     },
                     error: function (resp) {
 //                    console.log(resp);
+                        addNames.prop('disabled',true);
+                        addNamesAceptar.prop('disabled',true);
                     }
                 });
 
@@ -338,12 +370,14 @@
                         persona_id.val($("#persona_id_show").val());
                         first_name.val($("#nombres-show").val());
                         last_name.val($("#apellidos-show").val());
-                        console.log('Seleccionado' + persona_id.val());
+                        addNamesAceptar.prop('disabled',false);
+//                        console.log('Seleccionado' + persona_id.val());
                     } else {
                         persona_id.val('');
                         first_name.val('');
                         last_name.val('');
-                        console.log('Deselecciono' + persona_id.val());
+                        addNamesAceptar.prop('disabled',true);
+//                        console.log('Deselecciono' + persona_id.val());
                     }
                 });
             }

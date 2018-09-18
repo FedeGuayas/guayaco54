@@ -610,7 +610,7 @@ class UserController extends Controller
             }
 
             //de lo contrario no muestro a la persona
-            return response()->json(['message' => 'Registros no encontrados. Puede agregar un perfil de un amigo y asociarlo a su cuenta', 'result' => 'not-found']);
+            return response()->json(['message' => 'Registros no encontrados.', 'result' => 'not-found']);
         }
 
     }

@@ -7,11 +7,12 @@
                 <button type="button" class="close" data-dismiss="modal"
                         aria-label="Cerrar" data-toggle="tooltip"
                         data-placement="bottom" title=""
-                        data-original-title="Cerra Ventana">
+                        data-original-title="Cerra Ventana"
+                        id="cerrar-modal">
                     <span aria-hidden="true">&times</span>
                 </button>
             </div>
-            {!! Form::open() !!}
+            {!! Form::open(['id'=>'perfil-search-form']) !!}
             {!! Form::hidden('persona_id_show',null,['id'=>'persona_id_show']) !!}
             <div class="modal-body pd-0">
                 <div class="task-list-form">
@@ -52,8 +53,8 @@
                             <div class="form-group row">
                                 <div class="col-md-12">
                                     <div class="custom-control custom-checkbox mb-5">
-                                        <input type="checkbox" class="custom-control-input" id="addNames">
-                                        <label class="custom-control-label" for="addNames">Seleccione para confirmar sus datos</label>
+                                        <input type="checkbox" class="custom-control-input" id="addNames" disabled>
+                                        <label class="custom-control-label" for="addNames" >Seleccione para confirmar sus datos</label>
                                     </div>
                                 </div>
                             </div>
@@ -63,7 +64,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary"
-                        data-dismiss="modal">Aceptar
+                        data-dismiss="modal" id="addNamesAceptar" disabled>Aceptar
                 </button>
             </div>
             {!! Form::close() !!}

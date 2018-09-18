@@ -297,14 +297,39 @@
     $(document).ready(function () {
 
 
+        //reset modal on before show to user
+        $('#asociado-search').on('show.bs.modal', function (e) {
+            $(this).find('form').trigger('reset');
+            $("#addNames").prop('disabled',true);
+            $("#aceptar-vinculado").prop('disabled',true);
+        });
+
+        $("#cerrar-modal").on('click',function () {
+            $("#addNames").prop('disabled',true);
+            $("#aceptar-vinculado").prop('disabled',true);
+            swal(
+                {
+                    type: 'info',
+                    title: 'Oops...',
+                    text: 'Cerro la ventana sin aceptar datos!'
+                }
+            );
+
+        });
+
         //buscar perfiles que no tengan cuentas de usuario para asociarlos a la cuenta logueada
-        $("#search").on('click', function (event) {
+        $("#search").on('click', function (event) { //boton search del modal
             event.preventDefault();
             let identificacion = $("#search-doc").val();
             let route = "{{route('perfil-asociado.search')}}";
             let token = $("input[name=_token]").val();
+            let addNames=$("#addNames"); //checkbox
+            let aceptarVinculado = $("#aceptar-vinculado"); //boton de aceptar modal
+            let nombreShow=$("#nombres-show");
+            let apellidoShow=$("#apellidos-show");
+            let personaIdShow=$("#persona_id_show");
 
-            $("#addNames").prop('checked', false);
+
             if (identificacion === "") {
                 swal(
                     {
@@ -334,24 +359,24 @@
                                 }
                             );
                             //limpio campos del formulario del modal
-                            $("#nombres-show").val('');
-                            $("#apellidos-show").val('');
-                            $("#persona_id_show").val('');
-                            $("#addNames").prop('disabled', true);
-                            $("#aceptar-vinculado").prop('disabled', true);
+                            nombreShow.val('');
+                            apellidoShow.val('');
+                            personaIdShow.val('');
+                            addNames.prop('disabled', true);
+                            aceptarVinculado.prop('disabled', true);
                         }
                         //se encontro persona
                         if (resp.result === 'found') {
-                            $("#nombres-show").val(resp.persona.nombres);
-                            $("#apellidos-show").val(resp.persona.apellidos);
-                            $("#persona_id_show").val(resp.persona.id);
-                            $("#addNames").prop('disabled', false);
+                            nombreShow.val(resp.persona.nombres);
+                            apellidoShow.val(resp.persona.apellidos);
+                            personaIdShow.val(resp.persona.id);
+                            addNames.prop('disabled', false);
                         }
 
                     },
                     error: function (resp) {
-                        $("#addNames").prop('disabled', true);
-                        $("#aceptar-vinculado").prop('disabled', true);
+                        addNames.prop('disabled',true);
+                        aceptarVinculado.prop('disabled',true);
 //                    console.log(resp);
                     }
                 });
@@ -361,11 +386,12 @@
                     // si se activa el check de aceptar el perfil
                     if ($(this).is(':checked')) {
                         $("#info-asociado").prop('hidden', false);
-                        $("#aceptar-vinculado").prop('disabled', false);
+                        aceptarVinculado.prop('disabled', false);
 
                     } else {
                         $("#info-asociado").prop('hidden', true);
-                        $("#aceptar-vinculado").prop('disabled', true);
+                        personaIdShow.val('');
+                        aceptarVinculado.prop('disabled', true);
                     }
                 });
             }

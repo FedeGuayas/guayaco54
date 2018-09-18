@@ -6,8 +6,9 @@
                 <h5 class="modal-title" id="asociadoSearchModalTitle">Buscar asociado</h5>
                 <button type="button" class="close" data-dismiss="modal"
                         aria-label="Cerrar" data-toggle="tooltip"
-                        data-placement="bottom" title=""
-                        data-original-title="Cerra Ventana">
+                        data-placement="bottom"
+                        data-original-title="Cerra Ventana"
+                        id="cerrar-modal">
                     <span aria-hidden="true">&times</span>
                 </button>
             </div>
@@ -62,10 +63,6 @@
             </div>
             <div class="modal-footer">
                 <button type="submit" class="btn btn-outline-primary" id="aceptar-vinculado" disabled><i class="ti-check-box"></i> Agregar Asociado</button>
-                <button type="reset" class="btn btn-outline-danger"><i class="ti-eraser"></i> Limpiar</button>
-                <button type="button" class="btn btn-outline-secondary"
-                        data-dismiss="modal"><i class="ti-close"></i> Cerrar
-                </button>
             </div>
             {!! Form::close() !!}
         </div>

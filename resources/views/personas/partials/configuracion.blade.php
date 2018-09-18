@@ -146,7 +146,6 @@
                                 cambia deberá hacerlo por uno válido al que tenga acceso
                                 para posteriormente poder validarlo, sino perdera el acceso
                                 a su cuenta <br>
-                                Dejelo en blanco si no desea cambiarlo.
                             </small>
                         </div>
                         <div class="form-group">
