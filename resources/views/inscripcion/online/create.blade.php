@@ -153,18 +153,18 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-6 col-sm-12">
+                    <div class="col-md-8 col-sm-12">
                         <label class="weight-600">Términos y Condiciones</label>
                         <div class="custom-control custom-checkbox mb-5">
-                            <input type="checkbox" class="custom-control-input" id="terminos">
+                            <input type="checkbox" class="custom-control-input" id="terminos" disabled>
                             <label class="custom-control-label" for="terminos">Confirme que ha leido y esta de acuerdo con los <a href="#terminos-modal" data-toggle="modal" class="btn btn-link"> <strong>Términos y Condiciones</strong></a></label>
                         </div>
                     </div>
                 </div>
-
-                <div class="col-md-6 row">
-                    <a href="#" class="btn btn-success" id="pagar">Pagar</a>
+                <div class="col-md-4">
+                    <button class="btn btn-success btn-block" id="pagar" disabled="">Pagar</button>
                 </div>
+
 
             </section>
 
@@ -323,18 +323,25 @@
 
         });
 
+        $("#mpago").on('change',function () {
+            if ($(this).val()!==''){
+                $("#terminos").prop('disabled',false);
+            }else {
+                $("#terminos").prop('disabled',true);
+                $("#pagar").prop('disabled', true);
 
-        //Habilitar Desabilitar inputs de formulario personal
-        let update_pagar = function () {
-            if ($("#terminos").is(":checked")) {
+            }
+        });
+
+        //Habilitar / Desabilitar boton de pago
+        $("#terminos").on('change',function (e) {
+            if ($(this).is(':checked')) {
                 $("#pagar").prop('disabled', false);
             }
             else {
                 $("#pagar").prop('disabled', true);
             }
-        };
-        $(update_pagar);
-        $("#terminos").change(update_pagar);
+        });
 
 
     });
