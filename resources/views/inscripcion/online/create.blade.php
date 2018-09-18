@@ -9,6 +9,12 @@
 
 @push('styles')
 <link rel="stylesheet" type="text/css" href="{{asset('themes/back/src/plugins/jquery-steps/jquery.steps.css')}}">
+
+<style>
+    .error {
+        color: #a94442;
+    }
+</style>
 @endpush
 
 @section('content')
@@ -37,21 +43,18 @@
                         <div class="form-group">
                             <label for="categoria_id" class="weight-600">Categorías: *</label>
                             {!! Form::select('categoria_id', $categorias,null, ['class'=>'selectpicker show-tick form-control required','data-style'=>'btn-outline-primary','id'=>'categoria_id','value'=>'{{ old("categoria_id") }}','data-container'=>'.main-container','placeholder'=>'Seleccione ...']) !!}
-                            <small class="form-text text-muted">Seleccione la categoría</small>
                         </div>
                     </div>
                     <div class="col-md-3 col-sm-12">
                         <div class="form-group">
                             <label for="categoria_id" class="weight-600">Circuitos: *</label>
                             {!! Form::select('circuito_id',[] ,null, ['class'=>'selectpicker show-tick form-control required','data-style'=>'btn-outline-primary','placeholder'=>'Seleccione ...','id'=>'circuito_id','value'=>'{{ old("circuito_id") }}','data-container'=>'.main-container']) !!}
-                            <small class="form-text text-muted">Seleccione el circuito</small>
                         </div>
                     </div>
                     <div class="col-md-3 col-sm-12">
                         <div class="form-group">
                             <label for="deporte_id" class="weight-600">Deportes: </label>
                             {!! Form::select('deporte_id', $deportes,null, ['class'=>'selectpicker show-tick form-control','data-style'=>'btn-outline-primary','id'=>'deporte_id','value'=>'{{ old("deporte_id") }}', 'data-live-search'=>'true','data-container'=>'.main-container','placeholder'=>'Seleccione ...','disabled']) !!}
-                            <small class="form-text text-muted">Seleccione solo si Categoria = Deportista</small>
                         </div>
                     </div>
                 </div>
@@ -59,15 +62,8 @@
                     <div class="col-md-3 col-sm-12">
                         <div class="form-group">
                             <label for="categoria_id" class="weight-600">Talla camiseta: </label>
-                            <div class="input-group">
-                                {!! Form::select('talla', $tallas,null, ['class'=>'selectpicker show-tick form-control','data-style'=>'btn-outline-primary','id'=>'talla','value'=>'{{ old("talla") }}','placeholder'=>'Seleccione ...', 'data-live-search'=>'true','data-container'=>'.main-container']) !!}
-                                <span class="input-group-append">
-                                        <button id="stock-talla" class="btn btn-outline-secondary disabled"
-                                                data-toggle="tooltip" data-placement="top" title="Stock">0
-                                        </button>
-                                    </span>
-                            </div>
-                            <small class="form-text text-muted">Seleccione la talla n(Negra) b(Blanca)</small>
+                            <span class="badge badge-pill badge-primary pull-right" id="stock-talla" data-toggle="tooltip" data-placement="top" title="Stock">0</span>
+                                {!! Form::select('talla', $tallas,null, ['class'=>'selectpicker show-tick form-control required','data-style'=>'btn-outline-primary','id'=>'talla','value'=>'{{ old("talla") }}','placeholder'=>'Seleccione ...', 'data-live-search'=>'true','data-container'=>'.main-container','required']) !!}
                         </div>
                     </div>
                     <div class="col-md-3 col-sm-12">
@@ -77,8 +73,7 @@
                                 <span class="input-group-prepend">
                                         <button class="btn btn-outline-secondary disabled">$</button>
                                 </span>
-                                {!! Form::text('talla',null, ['class'=>'form-control','id'=>'costo','placeholder'=>'0.00','readonly']) !!}
-
+                                {!! Form::text('costo',null, ['class'=>'form-control','id'=>'costo','placeholder'=>'0.00','readonly']) !!}
                             </div>
                         </div>
                     </div>
@@ -142,13 +137,11 @@
             {{--Paso 3--}}
             <h5>Pago y Términos</h5>
             <section>
-
                 <div class="row">
                     <div class="col-md-4 col-sm-12">
                         <div class="form-group">
                             <label for="categoria_id" class="weight-600">Formas de Pago: *</label>
                             {!! Form::select('mpago', $formas_pago,null, ['class'=>'selectpicker show-tick form-control required','data-style'=>'btn-outline-primary','id'=>'mpago','value'=>'{{ old("mpago") }}','data-container'=>'.main-container','placeholder'=>'Seleccione ...']) !!}
-                            <small class="form-text text-muted">Seleccione la froma de pago</small>
                         </div>
                     </div>
                 </div>
@@ -162,10 +155,10 @@
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <button class="btn btn-success btn-block" id="pagar" disabled="">Pagar</button>
+                    <a href="#" class="btn btn-success btn-block" id="pagar" hidden>
+                        Pagar
+                    </a>
                 </div>
-
-
             </section>
 
 
@@ -328,7 +321,7 @@
                 $("#terminos").prop('disabled',false);
             }else {
                 $("#terminos").prop('disabled',true);
-                $("#pagar").prop('disabled', true);
+                $("#pagar").prop('hidden', true);
 
             }
         });
@@ -336,10 +329,11 @@
         //Habilitar / Desabilitar boton de pago
         $("#terminos").on('change',function (e) {
             if ($(this).is(':checked')) {
-                $("#pagar").prop('disabled', false);
+//                $("#pagar").prop('disabled', false);
+                $("#pagar").prop('hidden', false);
             }
             else {
-                $("#pagar").prop('disabled', true);
+                $("#pagar").prop('hidden', true);
             }
         });
 
@@ -352,7 +346,7 @@
         transitionEffect: "fade",
         enableFinishButton: true,
         titleTemplate: '<span class="step">#index#</span> #title#',
-        errorClass: "error",
+//        errorClass: "error",
         labels: {
             finish: "Enviar",
             previous: "Anterior",
@@ -410,8 +404,15 @@
             $('#success-modal').modal('show');
         }
     }).validate({
-        errorPlacement: function errorPlacement(error, element) {
-            element.before(error);
+
+        errorClass: "error",
+        //        errorLabelContainer: '.form-text',
+        errorPlacement: function(error, element) {
+            if(element.parent('.form-control').length) {
+                error.insertAfter(element.parent());
+            } else {
+                error.insertAfter(element);
+            }
         },
         rules: {
 //            confirm: {
