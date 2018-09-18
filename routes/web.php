@@ -38,6 +38,9 @@ Route::middleware(['auth', 'isVerified'])->group(function () {
     Route::middleware(['role:admin|employee|client|registered'])->group(function () {
         //mostrar el home
         Route::get('/home', 'HomeController@index')->name('home');
+
+        //Ver terminos
+        Route::get('/terms','HomeController@getTerms')->name('terms');
     });
 
     /*
@@ -81,6 +84,8 @@ Route::middleware(['auth', 'isVerified'])->group(function () {
         Route::get('inscripcions/cost/{data?}','InscripcionController@userOnlineCosto')->name('user.getCosto');
         //Actualizar talla
         Route::get('inscripcions/talla/stock/{data?}','InscripcionController@tallaStockUpdate')->name('user.updateTallaStock');
+
+
 
 
 

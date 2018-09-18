@@ -195,3 +195,10 @@ Breadcrumbs::register('user-edit', function($breadcrumbs,$user)
     $breadcrumbs->parent('user');
     $breadcrumbs->push('Editar usuario '.$user->getFullName(), route('users.index'));
 });
+
+// Home>Terminos
+Breadcrumbs::register('terminos', function($breadcrumbs)
+{
+    $breadcrumbs->parent('home');
+    $breadcrumbs->push('Términos', route('terms'));
+});

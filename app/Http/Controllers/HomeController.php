@@ -35,10 +35,19 @@ class HomeController extends Controller
         return view('home',compact('perfil'));
     }
 
+    /**
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function getWelcome()
     {
         $config = Configuracion::where('status', Configuracion::ATIVO)->first();
         return view('welcome', compact('config'));
     }
+
+    public function getTerms(){
+        return view('inscripcion.online.terminos');
+    }
+
+
 
 }
