@@ -34,6 +34,16 @@ Breadcrumbs::register('perfil-as-edit', function($breadcrumbs)
     $breadcrumbs->push('Editar Perfil', route('getProfile'));
 });
 
+// Home>Terminos
+Breadcrumbs::register('terminos', function($breadcrumbs)
+{
+    $breadcrumbs->parent('home');
+    $breadcrumbs->push('Términos', route('terms'));
+});
+
+
+
+//************* BACK **************//
 
 // Home>Parametrizacion>Circuitos
 Breadcrumbs::register('circuito', function($breadcrumbs)
@@ -133,7 +143,6 @@ Breadcrumbs::register('deporte-edit', function($breadcrumbs,$deporte)
 });
 
 
-
 // Home>Administracion>Permisos
 Breadcrumbs::register('permiso', function($breadcrumbs)
 {
@@ -152,7 +161,6 @@ Breadcrumbs::register('permiso-edit', function($breadcrumbs,$permiso)
     $breadcrumbs->parent('permiso');
     $breadcrumbs->push('Editar permiso '.$permiso->name, route('permissions.index'));
 });
-
 
 
 // Home>Administracion>Roles
@@ -174,9 +182,6 @@ Breadcrumbs::register('role-edit', function($breadcrumbs,$role)
     $breadcrumbs->push('Editar role '.$role->name, route('roles.index'));
 });
 
-
-
-
 // Home>Administracion>Usuarios
 Breadcrumbs::register('user', function($breadcrumbs)
 {
@@ -196,9 +201,33 @@ Breadcrumbs::register('user-edit', function($breadcrumbs,$user)
     $breadcrumbs->push('Editar usuario '.$user->getFullName(), route('users.index'));
 });
 
-// Home>Terminos
-Breadcrumbs::register('terminos', function($breadcrumbs)
+
+
+
+// Home>Incripciones>Personas
+Breadcrumbs::register('clientes', function($breadcrumbs)
 {
     $breadcrumbs->parent('home');
-    $breadcrumbs->push('Términos', route('terms'));
+    $breadcrumbs->push('Clientes ', route('personas.index'));
 });
+
+//// Home>Profile
+//Breadcrumbs::register('perfil-create', function($breadcrumbs)
+//{
+//    $breadcrumbs->parent('home');
+//    $breadcrumbs->push('Crear Perfil', route('getProfile'));
+//});
+//
+////Home>Profile [Asociado] >Create
+//Breadcrumbs::register('perfil-as-create', function($breadcrumbs)
+//{
+//    $breadcrumbs->parent('perfil');
+//    $breadcrumbs->push('Crear Perfil', route('getProfile'));
+//});
+//
+////Home>Profile [Asociado] > Edit
+//Breadcrumbs::register('perfil-as-edit', function($breadcrumbs)
+//{
+//    $breadcrumbs->parent('perfil');
+//    $breadcrumbs->push('Editar Perfil', route('getProfile'));
+//});

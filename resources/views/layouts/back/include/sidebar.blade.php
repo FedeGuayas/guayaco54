@@ -38,7 +38,7 @@
                         <span class="fa fa-archive"></span><span class="mtext">Inscripciones</span>
                     </a>
                     <ul class="submenu">
-                        <li><a href="#">Personas a Inscribir</a></li>
+                        <li><a href="{{route('personas.index')}}">Clientes a Inscribir</a></li>
                         <li><a href="#">Inscripciones</a></li>
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle">

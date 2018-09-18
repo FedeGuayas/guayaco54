@@ -11,6 +11,7 @@ use function Couchbase\defaultEncoder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Yajra\Datatables\Datatables;
 
 class PersonaController extends Controller
 {
@@ -22,27 +23,95 @@ class PersonaController extends Controller
     }
 
     /**
-     * Display a listing of the resource.
+     * Mostra todos los perfiles existentes
      *
      * @return \Illuminate\Http\Response
      */
     public function index()
     {
-        //
+        return view('personas.back.index');
+    }
+
+
+    /**
+     * Usuarios que no son trabajadores (role!=employee),  ajax
+     */
+    public function getAllPersonas(Request $request){
+
+        if ($request->ajax()) {
+
+            $personas = Persona::
+
+            with('user', 'inscripciones')
+                ->where('estado',Persona::PERFIL_ACTIVO)
+//                ->leftJoin('users','personas.id','=','users.persona_id')
+//                ->where('first_name','!=','admin') //no mostrar el admin
+//                ->whereHas('roles', function($q){ //con rol=employee
+//                    $q->where('name', '=', 'employee');
+//                })
+//                ->whereDoesntHave('roles', function($query) { //que el rol no sea employee
+//                    $query->where('name', '=', 'employee');
+//                })
+                ->select('personas.*');
+
+            $action_buttons = '
+            <div class="dropdown">
+                <a class="btn btn-outline-primary dropdown-toggle" href="#" role="button" data-toggle="dropdown"><i class="fa fa-ellipsis-h"></i></a>
+                <div class="dropdown-menu dropdown-menu-right">
+                @can(\'edit_personas\')
+                    <a class="dropdown-item" href="{{ route(\'personas.edit\',[$id]) }}">
+                        <i class="fa fa-pencil text-success"></i> Editar
+                    </a>
+                @endcan
+                @can(\'delete_personas\')
+                    <a class="dropdown-item delete" href="#" data-id="{{$id}}">
+                        <i class="fa fa-trash-o text-danger"></i> Eliminar
+                    </a>
+                @endcan
+                </div>
+            </div>
+                ';
+
+            $datatable = Datatables::of($personas)
+                ->addColumn('actions', $action_buttons)
+//                ->addColumn('nombres', function ($usuario) {
+//                    return $usuario->getFullName();
+//                })
+
+//                ->addColumn('role', function ($usuario) {
+//                    return $usuario->getRoleNames();
+//                })
+//                ->filterColumn('nombres', function ($query, $keyword) {
+//                    $query->whereRaw("CONCAT(users.first_name,' ',users.last_name) like ?", ["%{$keyword}%"]);
+//                })
+                ->rawColumns(['actions'])
+                ->setRowId('id');
+            //Agregar variables a a la respuesta json del datatables
+            if ($request->draw == 1) {
+                $datatable->with([
+                    'generos'=>['MASCULINO','FEMENINO']
+                ]);
+            }
+
+            return $datatable->make(true);
+
+        }
+
     }
 
     /**
-     * Show the form for creating a new resource.
+     *Crear personas (perfiles) internamente por los trabajadores
      *
      * @return \Illuminate\Http\Response
      */
     public function create()
     {
-        //
+        return dd('crear persona');
     }
 
     /**
-     *Crear nuevo perfil de usuario asignar el nuevo rol de cliente
+     * ONLINE
+     * A este metodo accese el usuario al intentar crear su perfil por primera vez o si selecciona uno existen lo actualiza
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
@@ -171,17 +240,18 @@ class PersonaController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Metodo para editar las personas en el backend por parte de los trabjadores
      *
      * @param  \App\Persona  $persona
      * @return \Illuminate\Http\Response
      */
     public function edit(Persona $persona)
     {
-        //
+        return dd('editar persona');
     }
 
     /**
+     * ONLINE
      * Actualizar perfil existente del usuario logueado
      *
      * @param  \Illuminate\Http\Request  $request
@@ -294,7 +364,8 @@ class PersonaController extends Controller
 
 
     /**
-     *Guardar  nuevo perfil asociado y asociarlo a cuenta de usuario logueado
+     * ONLINE
+     * Este metodo es cuando un usuario online crea un perfil a un amigo y lo quiere asociar a su cuenta para poder inscribirlo
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
@@ -363,7 +434,7 @@ class PersonaController extends Controller
 
             $persona->save();
 
-            //vinculo el perfil asociado a los asociados del usuario logueado
+            //vinculo el perfil asociado a los nuevos asociados del usuario logueado
             $asociado = new Asociado();
             $asociado->persona()->associate($persona);
             $asociado->user()->associate($user);
@@ -493,13 +564,17 @@ class PersonaController extends Controller
 
 
     /**
-     * Remove the specified resource from storage.
+     * No, eliminar, Cambiar estado, accedido solo por trabajadores
      *
      * @param  \App\Persona  $persona
      * @return \Illuminate\Http\Response
      */
     public function destroy(Persona $persona)
     {
-        //
+//        $categoria=Categoria::findOrFail($id);
+
+        $persona->estado==Persona::PERFIL_INACTIVO ? $persona->estado=Persona::PERFIL_ACTIVO : $persona->estado=Persona::PERFIL_INACTIVO;
+        $persona->update();
+        return response()->json(['data'=>$persona],200);
     }
 }

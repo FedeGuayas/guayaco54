@@ -24,7 +24,7 @@ class InscripcionController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Muestra el formulario para incripcion online
      *
      * @return \Illuminate\Http\Response
      */

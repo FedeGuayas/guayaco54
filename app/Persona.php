@@ -103,7 +103,7 @@ class Persona extends Model
 
     //un persona puede estar en  muchas inscripciones
     public function inscripciones(){
-        return $this->hasMany('App\Incripcion');
+        return $this->hasMany('App\Inscripcion');
     }
 
 
