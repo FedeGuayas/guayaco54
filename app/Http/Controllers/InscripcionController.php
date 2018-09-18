@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Categoria;
+use App\Deporte;
 use App\Inscripcion;
+use App\Mpago;
 use App\Producto;
 use App\Talla;
 use Illuminate\Http\Request;
@@ -28,7 +30,7 @@ class InscripcionController extends Controller
      */
     public function create(Request $request)
     {
-        $user=$request->user();
+        $user = $request->user();
 
         if (!isset($user->persona)) {//no tiene perfil, debe crearlo antes de inscribirse
             $notification = [
@@ -37,30 +39,37 @@ class InscripcionController extends Controller
             return redirect()->route('getProfile')->with($notification);
         }
 
-        $edad=$user->persona->getEdad();
+        $edad = $user->persona->getEdad();
 
-        $cat_all=Categoria::where('status',Categoria::ACTIVO)
+        $cat_all = Categoria::where('status', Categoria::ACTIVO)
             ->where([
-                ['edad_start','<=', $edad],
-                ['edad_end','>=', $edad],
+                ['edad_start', '<=', $edad],
+                ['edad_end', '>=', $edad],
             ])->get();
 
-        $categorias=$cat_all->pluck('categoria','id');
+        $categorias = $cat_all->pluck('categoria', 'id');
 
-        $tallas_all=Talla::where('status',Talla::ACTIVO)
-            ->where('stock','>',0)
+        $tallas_all = Talla::where('status', Talla::ACTIVO)
+            ->where('stock', '>', 0)
             ->select(DB::raw('concat (talla," - ",color) as talla,id'))
             ->get();
-        $tallas=$tallas_all->pluck('talla','id');
+        $tallas = $tallas_all->pluck('talla', 'id');
 
+        $deporte_all = Deporte::where('status', Deporte::ACTIVO)->get();
+        $deportes = $deporte_all->pluck('deporte', 'id');
 
-        return view('inscripcion.online.create',compact('categorias','tallas'));
+        $mp=Mpago::where('status',Mpago::ACTIVO)->get();
+        $formas_pago=$mp->pluck('nombre','id');
+
+        $perfil=$user->persona;
+
+        return view('inscripcion.online.create', compact('categorias', 'tallas', 'deportes','perfil','formas_pago'));
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
@@ -71,7 +80,7 @@ class InscripcionController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Inscripcion  $inscripcion
+     * @param  \App\Inscripcion $inscripcion
      * @return \Illuminate\Http\Response
      */
     public function show(Inscripcion $inscripcion)
@@ -82,7 +91,7 @@ class InscripcionController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Inscripcion  $inscripcion
+     * @param  \App\Inscripcion $inscripcion
      * @return \Illuminate\Http\Response
      */
     public function edit(Inscripcion $inscripcion)
@@ -93,8 +102,8 @@ class InscripcionController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Inscripcion  $inscripcion
+     * @param  \Illuminate\Http\Request $request
+     * @param  \App\Inscripcion $inscripcion
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, Inscripcion $inscripcion)
@@ -105,7 +114,7 @@ class InscripcionController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Inscripcion  $inscripcion
+     * @param  \App\Inscripcion $inscripcion
      * @return \Illuminate\Http\Response
      */
     public function destroy(Inscripcion $inscripcion)
@@ -116,15 +125,67 @@ class InscripcionController extends Controller
     /**
      * Obtener lo circuitos para la categoia seleccionada
      */
-    public function getCategoriaCircuito(Request $request){
+    public function getCategoriaCircuito(Request $request)
+    {
 
-        if ($request->ajax()){
+        if ($request->ajax()) {
 
-            $circuitos=Producto::with('circuito')
-                ->where('status',Producto::ACTIVO)
-                ->where('categoria_id',$request->input('id'))
+            $circuitos = Producto::with('circuito')
+                ->where('status', Producto::ACTIVO)
+                ->where('categoria_id', $request->input('id'))
                 ->get();
-            return response()->json(['data'=>$circuitos],200);
+
+            $categoria = Categoria::where('id', $request->input('id'))->first();
+
+            $deportista = false;
+            if (stristr($categoria->categoria, 'deport')) {
+                $deportista = true;
+            }
+
+            return response()->json(['data' => $circuitos, 'deportista' => $deportista], 200);
         }
     }
+
+
+    /**
+     * Obtener el costo de la inscripcion
+     */
+    public function userOnlineCosto(Request $request)
+    {
+
+        if ($request->ajax()) {
+
+            $producto = Producto::where('status', Producto::ACTIVO)
+                ->where('categoria_id', $request->input('categoria_id'))
+                ->where('circuito_id', $request->input('circuito_id'))
+                ->first();
+
+            $costo = 0;
+            if ($producto) {
+                $costo = number_format($producto->price, 2, '.', ' ');
+            }
+
+            return response()->json(['data' => $costo], 200);
+        }
+    }
+
+
+    //Mostrar stock de tallas
+    public function tallaStockUpdate(Request $request)
+    {
+        if ($request->ajax()){
+
+            $talla=Talla::where('status',Talla::ACTIVO)
+                ->where('id',$request->input('talla_id'))
+                ->first();
+
+
+            $talla ? $stock=$talla->stock : $stock=0;
+
+            return response()->json(['data' => $stock], 200);
+        }
+
+    }
+
+
 }

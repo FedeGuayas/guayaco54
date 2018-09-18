@@ -30,8 +30,8 @@ class HomeController extends Controller
 
     public function getWelcome()
     {
-        $config=Configuracion::where('status',Configuracion::ATIVO)->first();
-        return view('welcome',compact('config'));
+        $config = Configuracion::where('status', Configuracion::ATIVO)->first();
+        return view('welcome', compact('config'));
     }
 
 }

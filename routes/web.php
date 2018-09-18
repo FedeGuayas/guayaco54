@@ -75,9 +75,13 @@ Route::middleware(['auth', 'isVerified'])->group(function () {
 
         //vista para inscripcion de usuario online
         Route::get('inscription','InscripcionController@create')->name('user.inscripcion.create');
-
         //Ajax para inscripciones
         Route::get('inscription/category/circuit','InscripcionController@getCategoriaCircuito')->name('getCategoriaCircuito');
+        //Actualizar costo
+        Route::get('inscripcions/cost/{data?}','InscripcionController@userOnlineCosto')->name('user.getCosto');
+        //Actualizar talla
+        Route::get('inscripcions/talla/stock/{data?}','InscripcionController@tallaStockUpdate')->name('user.updateTallaStock');
+
 
 
 

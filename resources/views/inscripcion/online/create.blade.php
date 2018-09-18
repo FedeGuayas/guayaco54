@@ -21,48 +21,153 @@
 
         <div class="form-text text-info small">Si desea inscribir a un amigo
             <a href="{{route('getProfile')}}#asociados" class="weight-600"><i class="ion-man"></i>, click aqui
-            </a> para cargar al  Asociado
+            </a> para cargar al Asociado
         </div>
 
 
         <div class="wizard-content">
-            {!! Form::open(['route' => 'personas.store', 'method' => 'post', 'autocomplete'=> 'off', 'class'=>'tab-wizard wizard-circle wizard','id'=>'form-wizard' ]) !!}
+            {!! Form::open(['method' => 'post', 'autocomplete'=> 'off', 'class'=>'tab-wizard wizard-circle wizard','id'=>'form-wizard' ]) !!}
             {!! Form::hidden('asociado_id',null,['id'=>'asociado_id']) !!}
 
             {{--Paso 1--}}
-
-
-            <h5>Datos de la carrera</h5>
+            <h5>Carrera</h5>
             <section>
                 <div class="row">
                     <div class="col-md-3 col-sm-12">
                         <div class="form-group">
                             <label for="categoria_id" class="weight-600">Categorías: *</label>
-                            {!! Form::select('categoria_id', $categorias,null, ['class'=>'selectpicker show-tick form-control required','data-style'=>'btn-outline-primary','id'=>'categoria_id','value'=>'{{ old("categoria_id") }}','required']) !!}
+                            {!! Form::select('categoria_id', $categorias,null, ['class'=>'selectpicker show-tick form-control required','data-style'=>'btn-outline-primary','id'=>'categoria_id','value'=>'{{ old("categoria_id") }}','data-container'=>'.main-container','placeholder'=>'Seleccione ...']) !!}
                             <small class="form-text text-muted">Seleccione la categoría</small>
                         </div>
                     </div>
                     <div class="col-md-3 col-sm-12">
                         <div class="form-group">
                             <label for="categoria_id" class="weight-600">Circuitos: *</label>
-                            {!! Form::select('circuito_id',[] ,null, ['class'=>'selectpicker show-tick form-control required','data-style'=>'btn-outline-primary','placeholder'=>'Seleccione ...','id'=>'circuito_id','value'=>'{{ old("circuito_id") }}','required']) !!}
+                            {!! Form::select('circuito_id',[] ,null, ['class'=>'selectpicker show-tick form-control required','data-style'=>'btn-outline-primary','placeholder'=>'Seleccione ...','id'=>'circuito_id','value'=>'{{ old("circuito_id") }}','data-container'=>'.main-container']) !!}
                             <small class="form-text text-muted">Seleccione el circuito</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-sm-12">
+                        <div class="form-group">
+                            <label for="deporte_id" class="weight-600">Deportes: </label>
+                            {!! Form::select('deporte_id', $deportes,null, ['class'=>'selectpicker show-tick form-control','data-style'=>'btn-outline-primary','id'=>'deporte_id','value'=>'{{ old("deporte_id") }}', 'data-live-search'=>'true','data-container'=>'.main-container','placeholder'=>'Seleccione ...','disabled']) !!}
+                            <small class="form-text text-muted">Seleccione solo si Categoria = Deportista</small>
                         </div>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-md-3 col-sm-12">
                         <div class="form-group">
-                            <label for="categoria_id" class="weight-600">Talla camiseta: *</label>
-                            {!! Form::select('talla', $tallas,null, ['class'=>'selectpicker show-tick form-control','data-style'=>'btn-outline-primary','id'=>'talla','value'=>'{{ old("talle") }}','required']) !!}
-                            <small class="form-text text-muted">Seleccione la talla </small>
+                            <label for="categoria_id" class="weight-600">Talla camiseta: </label>
+                            <div class="input-group">
+                                {!! Form::select('talla', $tallas,null, ['class'=>'selectpicker show-tick form-control','data-style'=>'btn-outline-primary','id'=>'talla','value'=>'{{ old("talla") }}','placeholder'=>'Seleccione ...', 'data-live-search'=>'true','data-container'=>'.main-container']) !!}
+                                <span class="input-group-append">
+                                        <button id="stock-talla" class="btn btn-outline-secondary disabled"
+                                                data-toggle="tooltip" data-placement="top" title="Stock">0
+                                        </button>
+                                    </span>
+                            </div>
+                            <small class="form-text text-muted">Seleccione la talla n(Negra) b(Blanca)</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-sm-12">
+                        <div class="form-group">
+                            <label for="costo" class="weight-600">Costo: </label>
+                            <div class="input-group">
+                                <span class="input-group-prepend">
+                                        <button class="btn btn-outline-secondary disabled">$</button>
+                                </span>
+                                {!! Form::text('talla',null, ['class'=>'form-control','id'=>'costo','placeholder'=>'0.00','readonly']) !!}
+
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 <small class="form-text text-danger"> * Campos obligatorios</small>
+            </section>
+
+            {{--Paso 2--}}
+            <h5>Facturación</h5>
+            <section>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>Nombres :</label>
+                            {!! Form::text('nombres',$perfil->nombres,['class'=>'form-control required','style'=>'text-transform: uppercase', 'value'=>'{{ old("nombres") }}','required','id'=>'nombres']) !!}
+
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>Apellidos :</label>
+                            {!! Form::text('apellidos',$perfil->apellidos,['class'=>'form-control required','style'=>'text-transform: uppercase','value'=>'{{ old("apellidos") }}','required','id'=>'apellidos']) !!}
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>Identificación: </label>
+                            {!! Form::text('num_doc',$perfil->num_doc,['class'=>'form-control required','style'=>'text-transform: uppercase','value'=>'{{ old("num_doc") }}','required']) !!}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>Email :</label>
+                            {!! Form::email('email',$perfil->email ? $perfil->email : Auth::user()->email,['class'=>'form-control required','placeholder'=>'Email','style'=>'text-transform: lowercase','value'=>'{{ old("email") }}','required']) !!}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>Teléfono :</label>
+                            {!! Form::text('telefono',$perfil->telefono ? $perfil->telefono : '',['class'=>'form-control','value'=>'{{ old("telefono") }}']) !!}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>Dirección: </label>
+                            {!! Form::text('direccion',$perfil->direccion ? $perfil->direccion : '',['class'=>'form-control','value'=>'{{ old("direccion") }}']) !!}
+                        </div>
+                    </div>
+                </div>
 
             </section>
+
+
+            {{--Paso 3--}}
+            <h5>Pago y Términos</h5>
+            <section>
+
+                <div class="row">
+                    <div class="col-md-4 col-sm-12">
+                        <div class="form-group">
+                            <label for="categoria_id" class="weight-600">Formas de Pago: *</label>
+                            {!! Form::select('mpago', $formas_pago,null, ['class'=>'selectpicker show-tick form-control required','data-style'=>'btn-outline-primary','id'=>'mpago','value'=>'{{ old("mpago") }}','data-container'=>'.main-container','placeholder'=>'Seleccione ...']) !!}
+                            <small class="form-text text-muted">Seleccione la froma de pago</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 col-sm-12">
+                        <label class="weight-600">Términos y Condiciones</label>
+                        <div class="custom-control custom-checkbox mb-5">
+                            <input type="checkbox" class="custom-control-input" id="terminos">
+                            <label class="custom-control-label" for="terminos">Confirme que ha leido y esta de acuerdo con los <a href="#terminos-modal" data-toggle="modal" class="btn btn-link"> <strong>Términos y Condiciones</strong></a></label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 row">
+                    <a href="#" class="btn btn-success" id="pagar">Pagar</a>
+                </div>
+
+            </section>
+
 
             {!! Form::close() !!}
 
@@ -70,9 +175,10 @@
 
     </div>
 
+    @include('inscripcion.online.modals.add-to-card')
+    @include('inscripcion.online.modals.terminos-modal')
 
 @endsection
-
 
 @push('scripts')
 <script src="{{asset('themes/back/src/plugins/jquery-validation/dist/jquery.validate.js')}}"></script>
@@ -84,45 +190,153 @@
     $(document).ready(function (event) {
 
         $("#categoria_id").change(function () {
-            let id=this.value;
-            let token= $("input[name=token]").val();
-            let circuito=$("#circuito_id");
-           let prom=new Promise ((resolve,reject)=>{
-               $.ajax({
-                   url:"{{route('getCategoriaCircuito')}}",
-                   type: "GET",
-                   headers: {'X-CSRF-TOKEN': token},
-                   dataType:'json',
-                   data:{id:id},
-                   success:(response)=>{
-                       resolve(response);
-                   },
-                   error:(error)=>{
-                       reject(error);
-                   }
-               });
+            let id = this.value;
+            let token = $("input[name=token]").val();
+            let deporte = $("#deporte_id");
+            let talla = $("#talla");
+            let circuito = $("#circuito_id");
+            $("#costo").val('0.00');
+            let prom = new Promise((resolve, reject) => {
+                $.ajax({
+                    url: "{{route('getCategoriaCircuito')}}",
+                    type: "GET",
+                    headers: {'X-CSRF-TOKEN': token},
+                    dataType: 'json',
+                    data: {id: id},
+                    success: (response) => {
+                        resolve(response);
+                    },
+                    error: (error) => {
+                        reject(error);
+                    }
+                });
 
+            });
+            prom.then((response) => {
+                if (response.deportista === false) { //no es deportista
+                    deporte.val("option:eq(0)").prop('selected', true);
+                    deporte.prop('disabled', true);
+                    deporte.selectpicker('refresh');
 
-           });
+                    talla.prop('disabled', false);
+                    talla.selectpicker("refresh");
+                } else { //es deportista
+                    swal(
+                        ' Esta opción solo se debe utilizar para participar, no tendrá costo pero no se entregará el Kit',
+                        '',
+                        'warning'
+                    );
+                    deporte.prop('disabled', false);
+                    deporte.selectpicker("refresh");
 
-           prom.then((response)=>{
-               circuito.find("option:gt(0)").remove();
-               $.each(response.data, function (ind, elem) {
-                   circuito.append('<option value="' + elem.circuito.id + '">' + elem.circuito.circuito + ' - ' + elem.circuito.title + '</option>');
-               });
-               circuito.selectpicker("refresh");
-               circuito.val("option:eq(0)").prop('selected', true);
+                    talla.val("option:eq(0)").prop('selected', true);
+                    talla.prop('disabled', true);
+                    talla.selectpicker('refresh');
+                }
 
-           }).catch((error)=>{ //error en respuest ajax
-               swal(
-                   ':( Lo sentimos ocurrio un error durante su petición',
-                   '' + error.status + ' ' + error.statusText + '',
-                   'error'
-               );
+                circuito.find("option:gt(0)").remove();
+                $.each(response.data, function (ind, elem) {
+                    circuito.append('<option value="' + elem.circuito.id + '">' + elem.circuito.circuito + ' - ' + elem.circuito.title + '</option>');
+                });
+                circuito.selectpicker("refresh");
+
+            }).catch((error) => { //error en respuest ajax
+                swal(
+                    ':( Lo sentimos ocurrio un error durante su petición',
+                    '' + error.status + ' ' + error.statusText + '',
+                    'error'
+                );
 //               console.log(error);
-           });
+            });
+        });
+
+        //costo
+        $("#circuito_id").change(function () {
+            let id = this.value;
+            let token = $("input[name=token]").val();
+            let categoria = $("#categoria_id").val();
+            let costo = $("#costo");
+            let prom = new Promise((resolve, reject) => {
+                $.ajax({
+                    url: "{{route('user.getCosto')}}",
+                    type: "GET",
+                    headers: {'X-CSRF-TOKEN': token},
+                    dataType: 'json',
+                    data: {
+                        circuito_id: id,
+                        categoria_id: categoria
+                    },
+                    success: (response) => {
+                        resolve(response);
+                    },
+                    error: (error) => {
+                        reject(error);
+                    }
+                });
+
+            });
+            prom.then((response) => {
+                costo.val(response.data)
+            }).catch((error) => { //error en respuest ajax
+                swal(
+                    ':( Lo sentimos ocurrio un error durante su petición',
+                    '' + error.status + ' ' + error.statusText + '',
+                    'error'
+                );
+//               console.log(error);
+            });
+        });
+
+        //stock camisetas
+        $("#talla").change(function () {
+            let id = this.value;
+            let token = $("input[name=token]").val();
+            let stock = $("#stock-talla");
+            let prom = new Promise((resolve, reject) => {
+                $.ajax({
+                    url: "{{route('user.updateTallaStock')}}",
+                    type: "GET",
+                    headers: {'X-CSRF-TOKEN': token},
+                    dataType: 'json',
+                    data: {
+                        talla_id: id
+                    },
+                    success: (response) => {
+                        resolve(response);
+                    },
+                    error: (error) => {
+                        reject(error);
+                    }
+                });
+
+            });
+            prom.then((response) => {
+                stock.html(response.data);
+            }).catch((error) => { //error en respuest ajax
+                swal(
+                    ':( Lo sentimos ocurrio un error durante su petición',
+                    '' + error.status + ' ' + error.statusText + '',
+                    'error'
+                );
+//               console.log(error);
+            });
 
         });
+
+
+        //Habilitar Desabilitar inputs de formulario personal
+        let update_pagar = function () {
+            if ($("#terminos").is(":checked")) {
+                $("#pagar").prop('disabled', false);
+            }
+            else {
+                $("#pagar").prop('disabled', true);
+            }
+        };
+        $(update_pagar);
+        $("#terminos").change(update_pagar);
+
+
     });
 
     $("#form-wizard").steps({
@@ -183,10 +397,10 @@
         },
 //      Se dispara después de la finalización.
         onFinished: function (event, currentIndex) {
-            let form = $(this);
+//            let form = $(this);
             // Enviar entradas del formulario
-            form.submit();
-//            $('#success-modal').modal('show');
+//            form.submit();
+            $('#success-modal').modal('show');
         }
     }).validate({
         errorPlacement: function errorPlacement(error, element) {
@@ -207,6 +421,7 @@
     showAlert(type, text_toastr);
     @endif
     {{-- FIN Alertas con Toastr--}}
+
 
 </script>
 @endpush

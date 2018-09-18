@@ -8,7 +8,17 @@
 @section('content')
 
     <div class="pd-20 bg-white border-radius-4 box-shadow mb-30">
-       @include('shared.reglamento_2018')
+        @include('shared.reglamento_2018')
     </div>
 
 @endsection
+
+@push('scripts')
+<script>
+
+
+
+
+</script>
+
+@endpush

@@ -18,23 +18,23 @@ class Mpago extends Model
 
     public function setNombreAttribute($value)
     {
-        $this->attributes['nombre']=strtolower($value);
+        $this->attributes['nombre']=mb_strtolower($value);
     }
 
     public function getNombreAttribute()
     {
-        return strtoupper($this->attributes['nombre']);
+        return mb_strtoupper($this->attributes['nombre']);
 
     }
 
     public function setDescripcionAttribute($value)
     {
-        $this->attributes['descripcion']=strtolower($value);
+        $this->attributes['descripcion']=mb_strtolower($value);
     }
 
     public function getDescripcionAttribute()
     {
-        return strtoupper($this->attributes['descripcion']);
+        return mb_strtoupper($this->attributes['descripcion']);
 
     }
 

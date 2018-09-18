@@ -25,7 +25,8 @@
         @endif
     </title>
 
-    <!-- CSS -->
+    <link rel="stylesheet" type="text/css" href="{{asset('themes/back/src/plugins/bootstrap-select/css/bootstrap-select.css')}}">
+    <!-- CSS Vendor-->
     <link rel="stylesheet" href="{{asset('themes/back/vendors/styles/style.css')}}">
 
     <!-- Toastr-->
@@ -52,12 +53,18 @@
 
 @yield('body')
 
-<!-- js -->
 
+<!-- js vendor-->
 <script src="{{asset('themes/back/vendors/scripts/script.js')}}"></script>
+
+<!-- js air-datepicker-->
 <script src="{{asset('themes/back/src/plugins/air-datepicker/dist/js/i18n/datepicker.es.js')}}"></script>
 
-<!-- Toastr-->
+<!-- js air-bootstrap-select-->
+<script src="{{asset('themes/back/src/plugins/bootstrap-select/js/bootstrap-select.js')}}"></script>
+<script src="{{asset('themes/back/src/plugins/bootstrap-select/js/i18n/defaults-es_ES.js')}}"></script>
+
+<!-- js Toastr-->
 <script src="{{asset('plugins/toastr/toastr.min.js') }}"></script>
 
 <!-- add sweet alert js & css in footer -->
