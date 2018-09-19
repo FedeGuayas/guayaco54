@@ -42,6 +42,7 @@ class InscripcionController extends Controller
         $edad = $user->persona->getEdad();
 
         $cat_all = Categoria::where('status', Categoria::ACTIVO)
+            ->where('categoria', 'NOT LIKE', '%deport%')//en online no se tendra en cuenta la categoria Deportistas
             ->where([
                 ['edad_start', '<=', $edad],
                 ['edad_end', '>=', $edad],
@@ -137,12 +138,12 @@ class InscripcionController extends Controller
 
             $categoria = Categoria::where('id', $request->input('id'))->first();
 
-            $deportista = false;
-            if (stristr($categoria->categoria, 'deport')) {
-                $deportista = true;
-            }
-
-            return response()->json(['data' => $circuitos, 'deportista' => $deportista], 200);
+//            $deportista = false;
+//            if (stristr($categoria->categoria, 'deport')) {
+//                $deportista = true;
+//            }
+//            return response()->json(['data' => $circuitos, 'deportista' => $deportista], 200);
+            return response()->json(['data' => $circuitos], 200);
         }
     }
 
