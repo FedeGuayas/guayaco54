@@ -24,7 +24,7 @@
                 @can('add_users')
                     <p class="font-14">para crear uno nuevo <a class="btn btn-sm btn-outline-primary"
                                                                href="{{route('personas.create')}}">
-                            <i class="fa fa-male"></i>
+                            <i class="fa fa-user-plus"></i>
                         </a>
                     </p>
                 @endcan
@@ -32,37 +32,39 @@
         </div>
 
         <div class="row">
-            <table class="data-table stripe hover nowrap compact">
-                <thead>
-                <tr>
-                    <th class="datatable-nosort">Acción</th>
-                    <th>Nombre</th>
-                    <th>Apellidos</th>
-                    <th>Num. Idenidad</th>
-                    <th>Email</th>
-                    <th>Género</th>
-                    <th>Fecha Nacimiento</th>
-                    <th>Dirección</th>
-                    <th>Teléfono</th>
-                </tr>
-                </thead>
-                <tfoot>
-                <tr>
-                    <th></th>
-                    <th class="tfoot_search"></th>
-                    <th class="tfoot_search"></th>
-                    <th class="tfoot_search"></th>
-                    <th class="tfoot_search"></th>
-                    <th class="tfoot_select"></th>
-                    <th class="tfoot_search"></th>
-                    <th class="tfoot_search"></th>
-                    <th class="tfoot_search"></th>
+            <div class="table-responsive">
+                <table class="data-table stripe hover nowrap compact">
+                    <thead>
+                    <tr>
+                        <th class="datatable-nosort">Acción</th>
+                        <th>Nombre</th>
+                        <th>Apellidos</th>
+                        <th>Num. Idenidad</th>
+                        <th>Email</th>
+                        <th>Género</th>
+                        <th>Fecha Nacimiento</th>
+                        <th>Dirección</th>
+                        <th>Teléfono</th>
+                    </tr>
+                    </thead>
+                    <tfoot>
+                    <tr>
+                        <th></th>
+                        <th class="tfoot_search"></th>
+                        <th class="tfoot_search"></th>
+                        <th class="tfoot_search"></th>
+                        <th class="tfoot_search"></th>
+                        <th class="tfoot_select"></th>
+                        <th class="tfoot_search"></th>
+                        <th class="tfoot_search"></th>
+                        <th class="tfoot_search"></th>
 
-                </tr>
-                </tfoot>
-                <tbody>
-                </tbody>
-            </table>
+                    </tr>
+                    </tfoot>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
@@ -99,7 +101,7 @@
         let table = $(".data-table").DataTable({
             lengthMenu: [[10, 30, 50], [10, 30, 50]],
             scrollCollapse: true,
-//            autoWidth: false,
+            autoWidth: false,
             responsive: true,
             processing: true,
             select: true,
@@ -111,12 +113,12 @@
             ajax: '{{route('getAllPersonas')}}',
             columns: [
                 {data: 'actions', name: 'opciones', orderable: false, searchable: false},
-                {data: 'nombres', name: 'nombres',orderable: false},
-                {data: 'apellidos', name : 'apellidos'},
-                {data: 'num_doc', name : 'num_doc'},
+                {data: 'nombres', name: 'nombres'},
+                {data: 'apellidos', name: 'apellidos'},
+                {data: 'num_doc', name: 'num_doc'},
                 {data: 'email', name: 'email', orderable: false},
-                {data: 'gen', name : 'gen'},
-                {data: 'fecha_nac', name : 'fecha_nac'},
+                {data: 'gen', name: 'gen'},
+                {data: 'fecha_nac', name: 'fecha_nac'},
                 {data: 'direccion', name: 'direccion'},
                 {data: 'telefono', name: 'telefono'}
 
@@ -182,7 +184,6 @@
     }
 
 
-
     //eliminar usuario
     $(document).on('click', '.delete', function (e) {
         e.preventDefault();
@@ -227,7 +228,7 @@
                 console.log(response)
                 swal({
                     title: ':)',
-                    text: 'Se desactivó a '+response.value.data.nombres+' '+ response.value.data.apellidos,
+                    text: 'Se desactivó a ' + response.value.data.nombres + ' ' + response.value.data.apellidos,
                     type: 'success',
                     allowOutsideClick: false,
                     allowEscapeKey: false

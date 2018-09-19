@@ -113,6 +113,19 @@ Route::middleware(['auth', 'isVerified'])->group(function () {
         //Guardar configuracion
         Route::post('configurations/create', 'ConfiguracionController@create')->name('admin.configurations.store');
 
+        //Guardar cliente
+        Route::post('cliente/create', 'PersonaController@storeBack')->name('admin.cliente.store');
+        //Update cliente
+        Route::put('cliente/{persona}/update', 'PersonaController@updateBack')->name('admin.cliente.update');
+
+        //vista para inscripcion de a un cliente backend
+        Route::get('inscription/{persona}', 'InscripcionController@createBack')->name('admin.inscripcion.create');
+        //Ajax para inscripciones
+        Route::get('inscription/category/circuit', 'InscripcionController@getCategoriaCircuito')->name('getCategoriaCircuito');
+        //Actualizar costo
+        Route::get('inscripcions/cost/{data?}', 'InscripcionController@userOnlineCosto')->name('user.getCosto');
+
+
 
         Route::resource('users', 'UserController');
         Route::resource('categorias', 'CategoriaController', ['except' => ['show', 'destroy']]);

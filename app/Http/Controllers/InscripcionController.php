@@ -6,6 +6,7 @@ use App\Categoria;
 use App\Deporte;
 use App\Inscripcion;
 use App\Mpago;
+use App\Persona;
 use App\Producto;
 use App\Talla;
 use Illuminate\Http\Request;
@@ -22,6 +23,41 @@ class InscripcionController extends Controller
     {
         //
     }
+
+    /**
+     * Muestra el formulario para incripcion a un cliente backend
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function createBack(Request $request, Persona $persona)
+    {
+        $user = $request->user();
+
+        $edad = $persona->getEdad();
+
+        $cat_all = Categoria::where('status', Categoria::ACTIVO)
+            ->where([
+                ['edad_start', '<=', $edad],
+                ['edad_end', '>=', $edad],
+            ])->get();
+
+        $categorias = $cat_all->pluck('categoria', 'id');
+
+        $tallas_all = Talla::where('status', Talla::ACTIVO)
+            ->where('stock', '>', 0)
+            ->select(DB::raw('concat (talla," - ",color) as talla,id'))
+            ->get();
+        $tallas = $tallas_all->pluck('talla', 'id');
+
+        $deporte_all = Deporte::where('status', Deporte::ACTIVO)->get();
+        $deportes = $deporte_all->pluck('deporte', 'id');
+
+        $mp=Mpago::where('status',Mpago::ACTIVO)->get();
+        $formas_pago=$mp->pluck('nombre','id');
+
+        return view('inscripcion.interna.create', compact('categorias', 'tallas', 'deportes','persona','formas_pago'));
+    }
+
 
     /**
      * Muestra el formulario para incripcion online

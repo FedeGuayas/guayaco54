@@ -202,32 +202,22 @@ Breadcrumbs::register('user-edit', function($breadcrumbs,$user)
 });
 
 
-
-
 // Home>Incripciones>Personas
 Breadcrumbs::register('clientes', function($breadcrumbs)
 {
     $breadcrumbs->parent('home');
     $breadcrumbs->push('Clientes ', route('personas.index'));
 });
+// Home>Incripciones>Personas [CREATE]
+Breadcrumbs::register('cliente-create', function($breadcrumbs)
+{
+    $breadcrumbs->parent('clientes');
+    $breadcrumbs->push('Crear Cliente', route('personas.index'));
+});
 
-//// Home>Profile
-//Breadcrumbs::register('perfil-create', function($breadcrumbs)
-//{
-//    $breadcrumbs->parent('home');
-//    $breadcrumbs->push('Crear Perfil', route('getProfile'));
-//});
-//
-////Home>Profile [Asociado] >Create
-//Breadcrumbs::register('perfil-as-create', function($breadcrumbs)
-//{
-//    $breadcrumbs->parent('perfil');
-//    $breadcrumbs->push('Crear Perfil', route('getProfile'));
-//});
-//
-////Home>Profile [Asociado] > Edit
-//Breadcrumbs::register('perfil-as-edit', function($breadcrumbs)
-//{
-//    $breadcrumbs->parent('perfil');
-//    $breadcrumbs->push('Editar Perfil', route('getProfile'));
-//});
+// Home>Incripciones>Personas [EDIT]
+Breadcrumbs::register('cliente-edit', function($breadcrumbs,$persona)
+{
+    $breadcrumbs->parent('clientes');
+    $breadcrumbs->push('Editar cliente '.$persona->getFullName(), route('personas.index'));
+});
