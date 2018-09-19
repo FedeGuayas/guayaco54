@@ -189,18 +189,24 @@ class TallaController extends Controller
     }
 
 
-    /**
+    /**BACKEND
      * Muestra el stock de la talla
      * @param $id
      * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse
      */
     public function getTallaStock(Request $request)
     {
-        $talla = Talla::findOrFail($request->input('id'));
 
-        $stock= $talla->stock;
+        if ($request->ajax()){
 
-        return response()->json(['data' => $stock], 200);
+            $talla=Talla::where('status',Talla::ACTIVO)
+                ->where('id',$request->input('talla_id'))
+                ->first();
+
+            $talla ? $stock=$talla->stock : $stock=0;
+
+            return response()->json(['data' => $stock], 200);
+        }
 
     }
 

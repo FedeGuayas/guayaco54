@@ -81,9 +81,8 @@ Route::middleware(['auth', 'isVerified'])->group(function () {
         Route::get('inscription/category/circuit', 'InscripcionController@getCategoriaCircuito')->name('getCategoriaCircuito');
         //Actualizar costo
         Route::get('inscripcions/cost/{data?}', 'InscripcionController@userOnlineCosto')->name('user.getCosto');
-        //Actualizar talla
-        Route::get('inscripcions/talla/stock/{data?}', 'InscripcionController@tallaStockUpdate')->name('user.updateTallaStock');
-
+        //Obtener stock de talla
+        Route::get('inscripcions/talla/stock/{data?}', 'InscripcionController@getTallaStock')->name('user.getTallaStock');
 
         //Personas/index obtener todas las personas  AJAX
         Route::get('persons/getAll', 'PersonaController@getAllPersonas')->name('getAllPersonas');
@@ -121,15 +120,16 @@ Route::middleware(['auth', 'isVerified'])->group(function () {
         //vista para inscripcion de a un cliente backend
         Route::get('inscription/{persona}', 'InscripcionController@createBack')->name('admin.inscripcion.create');
         //Ajax para inscripciones
-        Route::get('inscription/category/circuit', 'InscripcionController@getCategoriaCircuito')->name('getCategoriaCircuito');
+        Route::get('inscription/category/getCircuit', 'InscripcionController@getCatCir')->name('getCatCir');
         //Actualizar costo
-        Route::get('inscripcions/cost/{data?}', 'InscripcionController@userOnlineCosto')->name('user.getCosto');
+        Route::get('inscripcions/cost/{data?}', 'InscripcionController@getCosto')->name('admin.getCosto');
 
 
 
         Route::resource('users', 'UserController');
         Route::resource('categorias', 'CategoriaController', ['except' => ['show', 'destroy']]);
         Route::resource('circuitos', 'CircuitoController', ['except' => ['show', 'destroy']]);
+        Route::resource('descuentos', 'DescuentoController', ['except' => ['show']]);
         Route::resource('tallas', 'TallaController', ['except' => ['show']]);
         Route::resource('escenarios', 'EscenarioController', ['except' => ['show', 'destroy']]);
         Route::resource('deportes', 'DeporteController', ['except' => ['show', 'destroy']]);

@@ -221,3 +221,45 @@ Breadcrumbs::register('cliente-edit', function($breadcrumbs,$persona)
     $breadcrumbs->parent('clientes');
     $breadcrumbs->push('Editar cliente '.$persona->getFullName(), route('personas.index'));
 });
+
+
+
+// Home>Parametrizacion>Descuentos
+Breadcrumbs::register('descuento', function($breadcrumbs)
+{
+    $breadcrumbs->parent('home');
+    $breadcrumbs->push('Descuentos', route('descuentos.index'));
+});
+// Home>Parametrizacion>Descuentos>Crear
+Breadcrumbs::register('descuento-create', function($breadcrumbs)
+{
+    $breadcrumbs->parent('descuento');
+    $breadcrumbs->push('Crear descuento', route('descuentos.index'));
+});
+// Home>Parametrizacion>Descuentos>Edit
+Breadcrumbs::register('descuento-edit', function($breadcrumbs,$descuento)
+{
+    $breadcrumbs->parent('descuento');
+    $breadcrumbs->push('Editar descuento '.$descuento->nombre, route('descuentos.index'));
+});
+
+
+// Home>Incripciones>[create] BackEnd
+Breadcrumbs::register('inscripcion-create', function($breadcrumbs)
+{
+    $breadcrumbs->parent('clientes');
+    $breadcrumbs->push('Inscribir ', route('personas.index'));
+});
+//// Home>Incripciones>Personas [CREATE]
+//Breadcrumbs::register('cliente-create', function($breadcrumbs)
+//{
+//    $breadcrumbs->parent('clientes');
+//    $breadcrumbs->push('Crear Cliente', route('personas.index'));
+//});
+//
+//// Home>Incripciones>Personas [EDIT]
+//Breadcrumbs::register('cliente-edit', function($breadcrumbs,$persona)
+//{
+//    $breadcrumbs->parent('clientes');
+//    $breadcrumbs->push('Editar cliente '.$persona->getFullName(), route('personas.index'));
+//});

@@ -51,12 +51,6 @@
                             {!! Form::select('circuito_id',[] ,null, ['class'=>'selectpicker show-tick form-control required','data-style'=>'btn-outline-primary','placeholder'=>'Seleccione ...','id'=>'circuito_id','value'=>'{{ old("circuito_id") }}','data-container'=>'.main-container']) !!}
                         </div>
                     </div>
-                    {{--<div class="col-md-3 col-sm-12">--}}
-                        {{--<div class="form-group">--}}
-                            {{--<label for="deporte_id" class="weight-600">Deportes: </label>--}}
-                            {{--{!! Form::select('deporte_id', $deportes,null, ['class'=>'selectpicker show-tick form-control','data-style'=>'btn-outline-primary','id'=>'deporte_id','value'=>'{{ old("deporte_id") }}', 'data-live-search'=>'true','data-container'=>'.main-container','placeholder'=>'Seleccione ...','disabled']) !!}--}}
-                        {{--</div>--}}
-                    {{--</div>--}}
                 </div>
                 <div class="row">
                     <div class="col-md-3 col-sm-12">
@@ -185,7 +179,6 @@
         $("#categoria_id").change(function () {
             let id = this.value;
             let token = $("input[name=token]").val();
-//            let deporte = $("#deporte_id");
             let talla = $("#talla");
             let circuito = $("#circuito_id");
             $("#costo").val('0.00');
@@ -206,27 +199,6 @@
 
             });
             prom.then((response) => {
-//                if (response.deportista === false) { //no es deportista
-//                    deporte.val("option:eq(0)").prop('selected', true);
-//                    deporte.prop('disabled', true);
-//                    deporte.selectpicker('refresh');
-
-//                    talla.prop('disabled', false);
-//                    talla.selectpicker("refresh");
-//                } else { //es deportista
-//                    swal(
-//                        ' Esta opción solo se debe utilizar para participar, no tendrá costo pero no se entregará el Kit',
-//                        '',
-//                        'warning'
-//                    );
-//                    deporte.prop('disabled', false);
-//                    deporte.selectpicker("refresh");
-
-//                    talla.val("option:eq(0)").prop('selected', true);
-//                    talla.prop('disabled', true);
-//                    talla.selectpicker('refresh');
-//                }
-
                 circuito.find("option:gt(0)").remove();
                 $.each(response.data, function (ind, elem) {
                     circuito.append('<option value="' + elem.circuito.id + '">' + elem.circuito.circuito + ' - ' + elem.circuito.title + '</option>');
@@ -287,7 +259,7 @@
             let stock = $("#stock-talla");
             let prom = new Promise((resolve, reject) => {
                 $.ajax({
-                    url: "{{route('user.updateTallaStock')}}",
+                    url: "{{route('user.getTallaStock')}}",
                     type: "GET",
                     headers: {'X-CSRF-TOKEN': token},
                     dataType: 'json',

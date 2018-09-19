@@ -3,148 +3,248 @@
 @section('page_title','Inscribir cliente')
 
 @section('breadcrumbs')
-    {!! Breadcrumbs::render('home') !!}
+    {!! Breadcrumbs::render('inscripcion-create') !!}
 @stop
 
 
 @section('content')
 
     <div class="pd-20 bg-white border-radius-4 box-shadow mb-30">
-        <div class="clearfix">
+
+        <div class="clearfix mb-3">
             <h4 class="text-info">Inscribir al Cliente</h4>
         </div>
 
-            {!! Form::open(['method' => 'post', 'autocomplete'=> 'off', 'class'=>'form_noEnter']) !!}
+        {!! Form::open(['method' => 'post', 'autocomplete'=> 'off', 'class'=>'form_noEnter']) !!}
 
-            {{--Paso 1--}}
-            <h5>Carrera</h5>
-            <section>
-                <div class="row">
-                    <div class="col-md-3 col-sm-12">
-                        <div class="form-group">
-                            <label for="categoria_id" class="weight-600">Categorías: *</label>
-                            {!! Form::select('categoria_id', $categorias,null, ['class'=>'selectpicker show-tick form-control required','data-style'=>'btn-outline-primary','id'=>'categoria_id','value'=>'{{ old("categoria_id") }}','data-container'=>'.main-container','placeholder'=>'Seleccione ...']) !!}
-                        </div>
-                    </div>
-                    <div class="col-md-3 col-sm-12">
-                        <div class="form-group">
-                            <label for="categoria_id" class="weight-600">Circuitos: *</label>
-                            {!! Form::select('circuito_id',[] ,null, ['class'=>'selectpicker show-tick form-control required','data-style'=>'btn-outline-primary','placeholder'=>'Seleccione ...','id'=>'circuito_id','value'=>'{{ old("circuito_id") }}','data-container'=>'.main-container']) !!}
-                        </div>
-                    </div>
-                    <div class="col-md-3 col-sm-12">
-                        <div class="form-group">
-                            <label for="deporte_id" class="weight-600">Deportes: </label>
-                            {!! Form::select('deporte_id', $deportes,null, ['class'=>'selectpicker show-tick form-control','data-style'=>'btn-outline-primary','id'=>'deporte_id','value'=>'{{ old("deporte_id") }}', 'data-live-search'=>'true','data-container'=>'.main-container','placeholder'=>'Seleccione ...','disabled']) !!}
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-3 col-sm-12">
-                        <div class="form-group">
-                            <label for="categoria_id" class="weight-600">Talla camiseta: </label>
-                            <span class="badge badge-pill badge-primary pull-right" id="stock-talla" data-toggle="tooltip" data-placement="top" title="Stock">0</span>
-                                {!! Form::select('talla', $tallas,null, ['class'=>'selectpicker show-tick form-control required','data-style'=>'btn-outline-primary','id'=>'talla','value'=>'{{ old("talla") }}','placeholder'=>'Seleccione ...', 'data-live-search'=>'true','data-container'=>'.main-container','required']) !!}
-                        </div>
-                    </div>
-                    <div class="col-md-3 col-sm-12">
-                        <div class="form-group">
-                            <label for="costo" class="weight-600">Costo: </label>
-                            <div class="input-group">
-                                <span class="input-group-prepend">
-                                        <button class="btn btn-outline-secondary disabled">$</button>
-                                </span>
-                                {!! Form::text('costo',null, ['class'=>'form-control','id'=>'costo','placeholder'=>'0.00','readonly']) !!}
+        <div class="row clearfix justify-content-center">
+
+            <div class="col-md-10 col-sm-12 mb-30">
+
+                <div class="pd-20 bg-white border-radius-4 box-shadow">
+                    <h5 class="weight-500 mb-20">{{$persona->getFullName()}}</h5>
+                    <p class="font-14 text-info">Edad : {{$persona->getEdad()}} años. </p>
+
+                    <div class="tab">
+                        <ul class="nav nav-tabs" role="tablist">
+                            <li class="nav-item">
+                                <a class="nav-link active text-blue" data-toggle="tab" href="#inscripcion" role="tab"
+                                   aria-selected="true">Inscripción</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-blue" data-toggle="tab" href="#factura" role="tab"
+                                   aria-selected="false">Facturación</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-blue" data-toggle="tab" href="#perfil" role="tab"
+                                   aria-selected="false">Datos Personales</a>
+                            </li>
+                        </ul>
+
+                        <div class="tab-content">
+                            <!-- Inscripcion-->
+                            <div class="tab-pane fade show active" id="inscripcion" role="tabpanel">
+                                <div class="pd-20">
+                                    <section>
+                                        <div class="row">
+                                            <div class="col-md-3 col-sm-12">
+                                                <div class="form-group">
+                                                    {!! Form::label('categoria_id','Categorías: *',['class'=>'weight-600']) !!}
+                                                    {!! Form::select('categoria_id', $categorias,null, ['class'=>'selectpicker show-tick form-control','data-style'=>'btn-outline-primary','id'=>'categoria_id','data-container'=>'.main-container','placeholder'=>'Seleccione ...','required']) !!}
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3 col-sm-12">
+                                                <div class="form-group">
+                                                    {!! Form::label('circuito_id','Circuitos: *',['class'=>'weight-600']) !!}
+                                                    {!! Form::select('circuito_id',[] ,null, ['class'=>'selectpicker show-tick form-control','data-style'=>'btn-outline-primary','placeholder'=>'Seleccione ...','id'=>'circuito_id','data-container'=>'.main-container','required']) !!}
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3 col-sm-12">
+                                                <div class="form-group">
+                                                    {!! Form::label('deporte_id','Deportes: ',['class'=>'weight-600']) !!}
+                                                    {!! Form::select('deporte_id', $deportes,null, ['class'=>'selectpicker show-tick form-control','data-style'=>'btn-outline-primary','id'=>'deporte_id', 'data-live-search'=>'true','data-container'=>'.main-container','placeholder'=>'Seleccione ...','disabled']) !!}
+                                                    <small class="form-text text-muted"> Solo si Categoría =
+                                                        Deportista
+                                                    </small>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3 col-sm-12">
+                                                <div class="form-group">
+                                                    {!! Form::label('talla','Talla camiseta: *',['class'=>'weight-600']) !!}
+                                                    <span class="badge badge-pill badge-primary pull-right"
+                                                          id="stock-talla" data-toggle="tooltip" data-placement="top"
+                                                          title="Stock">0</span>
+                                                    {!! Form::select('talla', $tallas,null, ['class'=>'selectpicker show-tick form-control','data-style'=>'btn-outline-primary','id'=>'talla','placeholder'=>'Seleccione ...', 'data-live-search'=>'true','data-container'=>'.main-container','required']) !!}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-3 col-sm-12">
+                                                <div class="form-group">
+                                                    {!! Form::label('descuentos','Descuentos:',['class'=>'weight-600']) !!}
+                                                    {!! Form::select('descuentos', $descuentos,null, ['class'=>'selectpicker show-tick form-control','data-style'=>'btn-outline-primary','id'=>'descuentos','data-container'=>'.main-container','placeholder'=>'Seleccione ...']) !!}
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3 col-sm-12">
+                                                <div class="form-group">
+                                                    {!! Form::label('mpago','Formas de Pago: *',['class'=>'weight-600']) !!}
+                                                    {!! Form::select('mpago', $formas_pago,null, ['class'=>'selectpicker show-tick form-control','data-style'=>'btn-outline-primary','id'=>'mpago','data-container'=>'.main-container','placeholder'=>'Seleccione ...','required']) !!}
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3 col-sm-12">
+                                                <div class="form-group">
+                                                    {!! Form::label('costo','Costo:',['class'=>'weight-600']) !!}
+                                                    <div class="input-group">
+                                                    <span class="input-group-prepend">
+                                                     <button class="btn btn-outline-secondary disabled">$</button>
+                                                     </span>
+                                                        {!! Form::text('costo',null, ['class'=>'form-control','id'=>'costo','placeholder'=>'0.00','readonly']) !!}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <small class="form-text text-danger"> * Campos obligatorios</small>
+                                        <div class="row pt-2">
+                                            <div class="col-md-3">
+                                                <button type="submit" class="btn btn-block btn-primary">Guardar</button>
+                                            </div>
+                                        </div>
+                                    </section>
+                                </div>
                             </div>
-                        </div>
-                    </div>
+                            <!-- FIN Inscripcion-->
+                            <!-- Facturación-->
+                            <div class="tab-pane fade" id="factura" role="tabpanel">
+                                <div class="pd-20">
+                                    <section>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    {!! Form::label('nombres_fact','Nombres *') !!}
+                                                    {!! Form::text('nombres_fact',$persona->nombres,['class'=>'form-control','style'=>'text-transform: uppercase','required','id'=>'nombres_fact','required']) !!}
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    {!! Form::label('apellidos_fact','Apellidos *') !!}
+                                                    {!! Form::text('apellidos_fact',$persona->apellidos,['class'=>'form-control','style'=>'text-transform: uppercase','id'=>'apellidos_fact','required']) !!}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    {!! Form::label('num_doc_fact','Identificación *') !!}
+                                                    {!! Form::text('num_doc_fact',$persona->num_doc,['class'=>'form-control','style'=>'text-transform: uppercase','id'=>'num_doc_fact','required']) !!}
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    {!! Form::label('email_fact','Email *') !!}
+                                                    {!! Form::email('email_fact',$persona->email ? $persona->email : 'consumidor@final.mail',['class'=>'form-control','placeholder'=>'Email','style'=>'text-transform: lowercase','id'=>'email_fact','required']) !!}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    {!! Form::label('telefono_fact','Teléfono *') !!}
+                                                    {!! Form::text('telefono_fact',$persona->telefono ? $persona->telefono : 'N/A',['class'=>'form-control','id'=>'telefono_fact','required']) !!}
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    {!! Form::label('direccion_fact','Dirección *') !!}
+                                                    {!! Form::text('direccion_fact',$persona->direccion ? $persona->direccion : 'N/A',['class'=>'form-control','style'=>'text-transform: uppercase','id'=>'direccion_fact','required']) !!}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="custom-control custom-checkbox mb-15">
+                                            <input type="checkbox" class="custom-control-input" id="consumidor_final">
+                                            <label class="custom-control-label" for="consumidor_final"> Consumidor Final</label>
+                                        </div>
+                                        <small class="form-text text-danger"> * Campos obligatorios</small>
+                                    </section>
+                                </div>
+                            </div>
+                            <!-- FIN Facturación-->
+                            <!-- Datos Perfil-->
+                            <div class="tab-pane fade" id="perfil" role="tabpanel">
+                                <div class="pd-20">
+                                    <section class="font-12">
+                                        <div class="row">
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    {!! Form::label('nombres','Nombres') !!}
+                                                    {!! Form::text('nombres',$persona->nombres,['class'=>'form-control form-control-sm','readonly']) !!}
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    {!! Form::label('apellidos','Apellidos') !!}
+                                                    {!! Form::text('apellidos',$persona->apellidos,['class'=>'form-control form-control-sm','readonly']) !!}
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    {!! Form::label('fecha_nac','Fecha de Nacimiento') !!}
+                                                    {!! Form::text('fecha_nac',$persona->fecha_nac,['class'=>'form-control form-control-sm','readonly']) !!}
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    {!! Form::label('edad','Edad') !!}
+                                                    {!! Form::text('edad',$persona->getEdad(), ['class'=>'form-control form-control-sm','readonly']) !!}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    {!! Form::label('gen','Género') !!}
+                                                    {!! Form::text('gen',$persona->gen, ['class'=>'form-control form-control-sm','readonly']) !!}
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    {!! Form::label('num_doc','Identificación') !!}
+                                                    {!! Form::text('num_doc',$persona->num_doc,['class'=>'form-control form-control-sm','readonly']) !!}
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    {!! Form::label('email','Email') !!}
+                                                    {!! Form::text('email',$persona->email,['class'=>'form-control form-control-sm','readonly']) !!}
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    {!! Form::label('telefono','Teléfono') !!}
+                                                    {!! Form::text('telefono',$persona->telefono,['class'=>'form-control form-control-sm','readonly']) !!}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row justify-content-center">
+                                            <div class="col">
+                                                <div class="form-group">
+                                                    {!! Form::label('direccion','Dirección') !!}
+                                                    {!! Form::text('direccion',$persona->direccion, ['class'=>'form-control form-control-sm','readonly']) !!}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </section>
+                                </div>
+                            </div>
+                            <!-- FIN Datos Perfil-->
+                        </div><!-- ./ tab-content -->
+                    </div><!-- ./ tab -->
                 </div>
-
-                <small class="form-text text-danger"> * Campos obligatorios</small>
-            </section>
-
-            {{--Paso 2--}}
-            <h5>Facturación</h5>
-            <section>
-
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label>Nombres :</label>
-                            {!! Form::text('nombres',$persona->nombres,['class'=>'form-control required','style'=>'text-transform: uppercase', 'value'=>'{{ old("nombres") }}','required','id'=>'nombres']) !!}
-
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label>Apellidos :</label>
-                            {!! Form::text('apellidos',$persona->apellidos,['class'=>'form-control required','style'=>'text-transform: uppercase','value'=>'{{ old("apellidos") }}','required','id'=>'apellidos']) !!}
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label>Identificación: </label>
-                            {!! Form::text('num_doc',$persona->num_doc,['class'=>'form-control required','style'=>'text-transform: uppercase','value'=>'{{ old("num_doc") }}','required']) !!}
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label>Email :</label>
-                            {!! Form::email('email',$persona->email ? $persona->email : Auth::user()->email,['class'=>'form-control required','placeholder'=>'Email','style'=>'text-transform: lowercase','value'=>'{{ old("email") }}','required']) !!}
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label>Teléfono :</label>
-                            {!! Form::text('telefono',$persona->telefono ? $persona->telefono : '',['class'=>'form-control','value'=>'{{ old("telefono") }}']) !!}
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label>Dirección: </label>
-                            {!! Form::text('direccion',$persona->direccion ? $persona->direccion : '',['class'=>'form-control','value'=>'{{ old("direccion") }}']) !!}
-                        </div>
-                    </div>
-                </div>
-
-            </section>
-
-
-            {{--Paso 3--}}
-            <h5>Pago y Términos</h5>
-            <section>
-                <div class="row">
-                    <div class="col-md-4 col-sm-12">
-                        <div class="form-group">
-                            <label for="categoria_id" class="weight-600">Formas de Pago: *</label>
-                            {!! Form::select('mpago', $formas_pago,null, ['class'=>'selectpicker show-tick form-control required','data-style'=>'btn-outline-primary','id'=>'mpago','value'=>'{{ old("mpago") }}','data-container'=>'.main-container','placeholder'=>'Seleccione ...']) !!}
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-8 col-sm-12">
-                        <label class="weight-600">Términos y Condiciones</label>
-                        <div class="custom-control custom-checkbox mb-5">
-                            <input type="checkbox" class="custom-control-input" id="terminos" disabled>
-                            <label class="custom-control-label" for="terminos">Confirme que ha leido y esta de acuerdo con los <a href="#terminos-modal" data-toggle="modal" class="btn btn-link"> <strong>Términos y Condiciones</strong></a></label>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <a href="#" class="btn btn-success btn-block" id="pagar" hidden>
-                        Pagar
-                    </a>
-                </div>
-            </section>
+            </div>
 
             {!! Form::close() !!}
 
         </div>
+    </div>
 
 @endsection
 
@@ -152,7 +252,15 @@
 <script src="{{ asset('js/toastr_message.js') }}"></script>
 <script>
 
-    $(document).ready(function () {
+    $(document).ready(function (event) {
+
+        let nombres_fact=$("#nombres_fact");
+        let apellidos_fact=$("#apellidos_fact");
+        let num_doc_fact=$("#num_doc_fact");
+        let email_fact=$("#email_fact");
+        let telefono_fact=$("#telefono_fact");
+        let direccion_fact=$("#direccion_fact");
+
 
         $(".form_noEnter").keypress(function (e) {
             if (e.which === 13) {
@@ -160,21 +268,21 @@
             }
         });
 
-
-    });
-
-    $(document).ready(function (event) {
-
         $("#categoria_id").change(function () {
             let id = this.value;
             let token = $("input[name=token]").val();
-//            let deporte = $("#deporte_id");
+            let deporte = $("#deporte_id");
             let talla = $("#talla");
             let circuito = $("#circuito_id");
             $("#costo").val('0.00');
+            if (id === '') {
+                circuito.find("option:gt(0)").remove();
+                circuito.selectpicker("refresh");
+                return false;
+            }
             let prom = new Promise((resolve, reject) => {
                 $.ajax({
-                    url: "{{route('getCategoriaCircuito')}}",
+                    url: "{{route('getCatCir')}}",
                     type: "GET",
                     headers: {'X-CSRF-TOKEN': token},
                     dataType: 'json',
@@ -234,7 +342,7 @@
             let costo = $("#costo");
             let prom = new Promise((resolve, reject) => {
                 $.ajax({
-                    url: "{{route('user.getCosto')}}",
+                    url: "{{route('admin.getCosto')}}",
                     type: "GET",
                     headers: {'X-CSRF-TOKEN': token},
                     dataType: 'json',
@@ -270,7 +378,7 @@
             let stock = $("#stock-talla");
             let prom = new Promise((resolve, reject) => {
                 $.ajax({
-                    url: "{{route('user.updateTallaStock')}}",
+                    url: "{{route('tallas.getStock')}}",
                     type: "GET",
                     headers: {'X-CSRF-TOKEN': token},
                     dataType: 'json',
@@ -284,7 +392,6 @@
                         reject(error);
                     }
                 });
-
             });
             prom.then((response) => {
                 stock.html(response.data);
@@ -299,24 +406,33 @@
 
         });
 
-        $("#mpago").on('change',function () {
-            if ($(this).val()!==''){
-                $("#terminos").prop('disabled',false);
-            }else {
-                $("#terminos").prop('disabled',true);
+        $("#mpago").on('change', function () {
+            if ($(this).val() !== '') {
+                $("#terminos").prop('disabled', false);
+            } else {
+                $("#terminos").prop('disabled', true);
                 $("#pagar").prop('hidden', true);
 
             }
         });
 
         //Habilitar / Desabilitar boton de pago
-        $("#terminos").on('change',function (e) {
+        $("#consumidor_final").on('change', function (e) {
             if ($(this).is(':checked')) {
-//                $("#pagar").prop('disabled', false);
-                $("#pagar").prop('hidden', false);
+                nombres_fact.val('Consumidor');
+                apellidos_fact.val('Final');
+                num_doc_fact.val('999999999');
+                email_fact.val('consumidor@final.mail');
+                telefono_fact.val('N/A');
+                direccion_fact.val('N/A');
             }
             else {
-                $("#pagar").prop('hidden', true);
+                nombres_fact.val('');
+                apellidos_fact.val('');
+                num_doc_fact.val('');
+                email_fact.val('');
+                telefono_fact.val('');
+                direccion_fact('');
             }
         });
 
@@ -345,7 +461,6 @@ errors.push("{{$error}}");
     }
     showError(error);
     @endif
-
 
 </script>
 @endpush

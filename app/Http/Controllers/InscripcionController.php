@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Categoria;
 use App\Deporte;
+use App\Descuento;
 use App\Inscripcion;
 use App\Mpago;
 use App\Persona;
@@ -52,15 +53,20 @@ class InscripcionController extends Controller
         $deporte_all = Deporte::where('status', Deporte::ACTIVO)->get();
         $deportes = $deporte_all->pluck('deporte', 'id');
 
+        $descuentos_all = Descuento::where('status', Descuento::ACTIVO)
+            ->select(DB::raw('concat (porciento," % ",nombre) as nombre,id'))
+            ->get();
+        $descuentos = $descuentos_all->pluck('nombre', 'id');
+
         $mp=Mpago::where('status',Mpago::ACTIVO)->get();
         $formas_pago=$mp->pluck('nombre','id');
 
-        return view('inscripcion.interna.create', compact('categorias', 'tallas', 'deportes','persona','formas_pago'));
+        return view('inscripcion.interna.create', compact('categorias', 'tallas', 'deportes','persona','formas_pago','descuentos'));
     }
 
 
-    /**
-     * Muestra el formulario para incripcion online
+    /**ONLINE
+     * Muestra el formulario para inscripcion online
      *
      * @return \Illuminate\Http\Response
      */
@@ -159,12 +165,12 @@ class InscripcionController extends Controller
         //
     }
 
-    /**
+    /**ONLINE
+     * en este caso no se tienen en cuenta los deportes
      * Obtener lo circuitos para la categoia seleccionada
      */
     public function getCategoriaCircuito(Request $request)
     {
-
         if ($request->ajax()) {
 
             $circuitos = Producto::with('circuito')
@@ -183,8 +189,54 @@ class InscripcionController extends Controller
         }
     }
 
+    /**Para Backend
+     *
+     * Obtener lo circuitos para la categoia seleccionada
+     */
+    public function getCatCir(Request $request)
+    {
+        if ($request->ajax()) {
 
-    /**
+            $circuitos = Producto::with('circuito')
+                ->where('status', Producto::ACTIVO)
+                ->where('categoria_id', $request->input('id'))
+                ->get();
+
+            $categoria = Categoria::where('id', $request->input('id'))->first();
+
+            $deportista = false;
+            if (stristr($categoria->categoria, 'deport')) {
+                $deportista = true;
+            }
+            return response()->json(['data' => $circuitos, 'deportista' => $deportista], 200);
+        }
+    }
+
+    /**BACKEND
+     * Obtener el costo de la inscripcion,  tener en cuenta los descuentos
+     */
+    public function getCosto(Request $request)
+    {
+
+        if ($request->ajax()) {
+
+            $producto = Producto::where('status', Producto::ACTIVO)
+                ->where('categoria_id', $request->input('categoria_id'))
+                ->where('circuito_id', $request->input('circuito_id'))
+                ->first();
+
+            $costo = 0;
+
+            if ($producto) {
+                $costo = number_format($producto->price, 2, '.', ' ');
+            }
+
+            return response()->json(['data' => $costo], 200);
+        }
+    }
+
+
+    /**ONLINE
      * Obtener el costo de la inscripcion
      */
     public function userOnlineCosto(Request $request)
@@ -206,16 +258,18 @@ class InscripcionController extends Controller
         }
     }
 
-
-    //Mostrar stock de tallas
-    public function tallaStockUpdate(Request $request)
+    /**ONLINE
+     * Mostrar stock de tallas
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getTallaStock(Request $request)
     {
         if ($request->ajax()){
 
             $talla=Talla::where('status',Talla::ACTIVO)
                 ->where('id',$request->input('talla_id'))
                 ->first();
-
 
             $talla ? $stock=$talla->stock : $stock=0;
 

@@ -28,7 +28,7 @@ class HomeController extends Controller
         $user = $request->user();
 
         $perfil=false;
-        if (isset($user->persona)) {//no tiene perfil, debe crearlo antes de inscribirse
+        if (isset($user->persona) || $user->hasRole('employee')) {//no tiene perfil, debe crearlo antes de inscribirse , al empleado no pedir crearlo
            $perfil=true;
         }
 
