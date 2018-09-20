@@ -43,5 +43,13 @@ class Inscripcion extends Model
     {
         return $this->belongsTo('App\Persona');
     }
+    //en una inscripcion hay una factura si no es deprotista que tiene costo 0
+    public function factura()
+    {
+        if (!isNull($this->attributes['factura_id'])) { //
+            return $this->belongsTo('App\factura');
+        }
+
+    }
 
 }

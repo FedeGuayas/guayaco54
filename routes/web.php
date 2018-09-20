@@ -80,9 +80,9 @@ Route::middleware(['auth', 'isVerified'])->group(function () {
         //Ajax para inscripciones
         Route::get('inscription/category/circuit', 'InscripcionController@getCategoriaCircuito')->name('getCategoriaCircuito');
         //Actualizar costo
-        Route::get('inscripcions/cost/{data?}', 'InscripcionController@userOnlineCosto')->name('user.getCosto');
+        Route::get('inscription/cost/{data?}', 'InscripcionController@userOnlineCosto')->name('user.getCosto');
         //Obtener stock de talla
-        Route::get('inscripcions/talla/stock/{data?}', 'InscripcionController@getTallaStock')->name('user.getTallaStock');
+        Route::get('inscription/talla/stock/{data?}', 'InscripcionController@getTallaStock')->name('user.getTallaStock');
 
         //Personas/index obtener todas las personas  AJAX
         Route::get('persons/getAll', 'PersonaController@getAllPersonas')->name('getAllPersonas');
@@ -122,7 +122,9 @@ Route::middleware(['auth', 'isVerified'])->group(function () {
         //Ajax para inscripciones
         Route::get('inscription/category/getCircuit', 'InscripcionController@getCatCir')->name('getCatCir');
         //Actualizar costo
-        Route::get('inscripcions/cost/{data?}', 'InscripcionController@getCosto')->name('admin.getCosto');
+        Route::get('inscriptions/cost/{data?}', 'InscripcionController@getCosto')->name('admin.getCosto');
+        //Guardar Inscripcion de Backend
+        Route::post('inscription/store', 'InscripcionController@store')->name('admin.inscription.store');
 
 
 

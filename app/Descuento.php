@@ -28,7 +28,7 @@ class Descuento extends Model
 
     public function appDescuento($valor)
     {
-        return  $valor*$this->attributes['porciento']/100;
+        return  $valor*($this->attributes['porciento']/100);
     }
 
 }

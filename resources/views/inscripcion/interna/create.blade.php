@@ -15,8 +15,8 @@
             <h4 class="text-info">Inscribir al Cliente</h4>
         </div>
 
-        {!! Form::open(['method' => 'post', 'autocomplete'=> 'off', 'class'=>'form_noEnter']) !!}
-
+        {!! Form::open(['route'=>['admin.inscription.store'],'method' => 'post', 'autocomplete'=> 'off', 'class'=>'form_noEnter']) !!}
+        {!! Form::hidden('persona_id',$persona->id,['id'=>$persona->id]) !!}
         <div class="row clearfix justify-content-center">
 
             <div class="col-md-10 col-sm-12 mb-30">
@@ -96,7 +96,7 @@
                                                     {!! Form::label('costo','Costo:',['class'=>'weight-600']) !!}
                                                     <div class="input-group">
                                                     <span class="input-group-prepend">
-                                                     <button class="btn btn-outline-secondary disabled">$</button>
+                                                     <span class="btn btn-outline-secondary disabled">$</span>
                                                      </span>
                                                         {!! Form::text('costo',null, ['class'=>'form-control','id'=>'costo','placeholder'=>'0.00','readonly']) !!}
                                                     </div>
@@ -104,11 +104,6 @@
                                             </div>
                                         </div>
                                         <small class="form-text text-danger"> * Campos obligatorios</small>
-                                        <div class="row pt-2">
-                                            <div class="col-md-3">
-                                                <button type="submit" class="btn btn-block btn-primary">Guardar</button>
-                                            </div>
-                                        </div>
                                     </section>
                                 </div>
                             </div>
@@ -236,6 +231,11 @@
                                 </div>
                             </div>
                             <!-- FIN Datos Perfil-->
+                            <div class="row pt-2">
+                                <div class="col-md-3">
+                                    <button type="submit" class="btn btn-block btn-primary disabled" id="guardar_inscripcion">Guardar Inscripción</button>
+                                </div>
+                            </div>
                         </div><!-- ./ tab-content -->
                     </div><!-- ./ tab -->
                 </div>
@@ -254,12 +254,25 @@
 
     $(document).ready(function (event) {
 
+        let token = $("input[name=token]").val();
+
+        let deporte = $("#deporte_id");
+        let talla = $("#talla");
+        let circuito = $("#circuito_id");
+        let descuentos = $("#descuentos");
+        let categoria = $("#categoria_id");
+        let costo = $("#costo");
+        let stock = $("#stock-talla");
+        let guardar_inscripcion=$("#guardar_inscripcion");
+
         let nombres_fact=$("#nombres_fact");
         let apellidos_fact=$("#apellidos_fact");
         let num_doc_fact=$("#num_doc_fact");
         let email_fact=$("#email_fact");
         let telefono_fact=$("#telefono_fact");
         let direccion_fact=$("#direccion_fact");
+
+
 
 
         $(".form_noEnter").keypress(function (e) {
@@ -270,11 +283,9 @@
 
         $("#categoria_id").change(function () {
             let id = this.value;
-            let token = $("input[name=token]").val();
-            let deporte = $("#deporte_id");
-            let talla = $("#talla");
-            let circuito = $("#circuito_id");
-            $("#costo").val('0.00');
+            descuentos.val("option:eq(0)").prop('selected', true);
+            descuentos.selectpicker('refresh');
+            costo.val('0.00');
             if (id === '') {
                 circuito.find("option:gt(0)").remove();
                 circuito.selectpicker("refresh");
@@ -286,7 +297,7 @@
                     type: "GET",
                     headers: {'X-CSRF-TOKEN': token},
                     dataType: 'json',
-                    data: {id: id},
+                    data: data= {id: id},
                     success: (response) => {
                         resolve(response);
                     },
@@ -304,6 +315,9 @@
 
                     talla.prop('disabled', false);
                     talla.selectpicker("refresh");
+
+                    descuentos.prop('disabled', false);
+                    descuentos.selectpicker("refresh");
                 } else { //es deportista
                     swal(
                         ' Esta opción solo se debe utilizar para participar, no tendrá costo pero no se entregará el Kit',
@@ -316,14 +330,16 @@
                     talla.val("option:eq(0)").prop('selected', true);
                     talla.prop('disabled', true);
                     talla.selectpicker('refresh');
-                }
 
+                    descuentos.val("option:eq(0)").prop('selected', true);
+                    descuentos.prop('disabled', true);
+                    descuentos.selectpicker("refresh");
+                }
                 circuito.find("option:gt(0)").remove();
                 $.each(response.data, function (ind, elem) {
                     circuito.append('<option value="' + elem.circuito.id + '">' + elem.circuito.circuito + ' - ' + elem.circuito.title + '</option>');
                 });
                 circuito.selectpicker("refresh");
-
             }).catch((error) => { //error en respuest ajax
                 swal(
                     ':( Lo sentimos ocurrio un error durante su petición',
@@ -334,12 +350,24 @@
             });
         });
 
-        //costo
+        //costo update
         $("#circuito_id").change(function () {
-            let id = this.value;
-            let token = $("input[name=token]").val();
-            let categoria = $("#categoria_id").val();
-            let costo = $("#costo");
+            let circuito_id = this.value;
+            let categoria_id = categoria.val();
+            let descuento_id = descuentos.val();
+            getCosto(categoria_id,circuito_id,descuento_id);
+        });
+
+//        //costo update for descuentos
+        $("#descuentos").change(function () {
+            let descuento_id = this.value;
+            let circuito_id = circuito.val();
+            let categoria_id = categoria.val();
+            getCosto(categoria_id,circuito_id,descuento_id);
+        });
+
+        //costo
+        let getCosto=function(categoria_id,circuito_id,descuento_id){
             let prom = new Promise((resolve, reject) => {
                 $.ajax({
                     url: "{{route('admin.getCosto')}}",
@@ -347,8 +375,9 @@
                     headers: {'X-CSRF-TOKEN': token},
                     dataType: 'json',
                     data: {
-                        circuito_id: id,
-                        categoria_id: categoria
+                        descuento_id:descuento_id,
+                        circuito_id: circuito_id,
+                        categoria_id: categoria_id
                     },
                     success: (response) => {
                         resolve(response);
@@ -369,13 +398,11 @@
                 );
 //               console.log(error);
             });
-        });
+        };
 
         //stock camisetas
         $("#talla").change(function () {
             let id = this.value;
-            let token = $("input[name=token]").val();
-            let stock = $("#stock-talla");
             let prom = new Promise((resolve, reject) => {
                 $.ajax({
                     url: "{{route('tallas.getStock')}}",
@@ -408,10 +435,9 @@
 
         $("#mpago").on('change', function () {
             if ($(this).val() !== '') {
-                $("#terminos").prop('disabled', false);
+                guardar_inscripcion.removeClass('disabled');
             } else {
-                $("#terminos").prop('disabled', true);
-                $("#pagar").prop('hidden', true);
+                guardar_inscripcion.addClass('disabled');
 
             }
         });
@@ -419,26 +445,25 @@
         //Habilitar / Desabilitar boton de pago
         $("#consumidor_final").on('change', function (e) {
             if ($(this).is(':checked')) {
-                nombres_fact.val('Consumidor');
-                apellidos_fact.val('Final');
-                num_doc_fact.val('999999999');
-                email_fact.val('consumidor@final.mail');
-                telefono_fact.val('N/A');
-                direccion_fact.val('N/A');
+                nombres_fact.val('Consumidor').prop('readonly',true);
+                apellidos_fact.val('Final').prop('readonly',true);
+                num_doc_fact.val('999999999').prop('readonly',true);
+                email_fact.val('consumidor@final.mail').prop('readonly',true);
+                telefono_fact.val('N/A').prop('readonly',true);
+                direccion_fact.val('N/A').prop('readonly',true);
             }
             else {
-                nombres_fact.val('');
-                apellidos_fact.val('');
-                num_doc_fact.val('');
-                email_fact.val('');
-                telefono_fact.val('');
-                direccion_fact('');
+                nombres_fact.val('').prop('readonly',false);
+                apellidos_fact.val('').prop('readonly',false);
+                num_doc_fact.val('').prop('readonly',false);
+                email_fact.val('').prop('readonly',false);
+                telefono_fact.val('').prop('readonly',false);
+                direccion_fact('').prop('readonly',false);
             }
         });
 
 
     });
-
 
             {{--Alertas con Toastr--}}
             @if(Session::has('message_toastr'))
