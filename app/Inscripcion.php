@@ -20,12 +20,10 @@ class Inscripcion extends Model
     /**
      * Relaciones
      **/
-    //una inscripcion la realiza un empleado sino es inscripcion online
+    //una inscripcion la realiza un empleado sino es inscripcion online, sino el user_id=null
     public function user()
     {
-        if (!isNull($this->attributes['user_id'])) { //user_id=>empleado
-            return $this->belongsTo('App\User');
-        }
+        return $this->belongsTo('App\User');
     }
     //en una inscripcion hay un producto
     public function producto()
@@ -43,13 +41,10 @@ class Inscripcion extends Model
     {
         return $this->belongsTo('App\Persona');
     }
-    //en una inscripcion hay una factura si no es deprotista que tiene costo 0
+    //en una inscripcion hay una factura si no es deportista que tiene costo 0 y no se genera factura
     public function factura()
     {
-        if (!isNull($this->attributes['factura_id'])) { //
-            return $this->belongsTo('App\factura');
-        }
-
+        return $this->belongsTo('App\Factura');
     }
 
 }

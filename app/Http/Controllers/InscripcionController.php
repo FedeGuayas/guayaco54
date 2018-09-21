@@ -11,22 +11,103 @@ use App\Inscripcion;
 use App\Mpago;
 use App\Persona;
 use App\Producto;
+use App\Registro;
 use App\Talla;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
+use Yajra\Datatables\Datatables;
 
 class InscripcionController extends Controller
 {
     /**
-     * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
     public function index()
     {
-        //
+        return view('inscripcion.interna.index');
     }
+
+    /**
+     * Inscripciones datatable ajax
+     */
+    public function getAll(Request $request)
+    {
+
+        $user = $request->user();
+
+        if ($user->can('view_inscripciones')) {
+
+            if ($request->ajax()) {
+
+                $inscripcion = Inscripcion::
+
+//                with('user', 'producto','persona','talla','factura')
+//                ->leftJoin('users','personas.id','=','users.persona_id')
+//                ->where('first_name','!=','admin') //no mostrar el admin
+//                ->whereHas('roles', function($q){ //con rol=employee
+//                    $q->where('name', '=', 'employee');
+//                })
+//                ->whereDoesntHave('roles', function($query) { //que el rol no sea employee
+//                    $query->where('name', '=', 'employee');
+//                })
+                    select('inscripcions.*');
+
+                $action_buttons = '
+            <div class="dropdown">
+                <a class="btn btn-outline-primary dropdown-toggle" href="#" role="button" data-toggle="dropdown"><i class="fa fa-ellipsis-h"></i></a>
+                <div class="dropdown-menu dropdown-menu-left">
+                 @can(\'view_comprobantes\')
+                    <a class="dropdown-item" href="#">
+                        <i class="fa fa-print text-primary"></i>Imprimir
+                    </a>
+                @endcan
+                @can(\'edit_inscripciones\')
+                    <a class="dropdown-item" href="{{ route(\'admin.inscription.edit\',[$id]) }}">
+                        <i class="fa fa-pencil text-success"></i>Editar
+                    </a>
+                @endcan
+                @can(\'delete_inscripciones\')
+                    <a class="dropdown-item delete" href="#" data-id="{{$id}}">
+                        <i class="fa fa-trash-o text-danger"></i> Eliminar
+                    </a>
+                @endcan
+                </div>
+            </div>
+                ';
+
+                $datatable = Datatables::of($inscripcion)
+                    ->addColumn('actions', $action_buttons)
+//                ->addColumn('nombres', function ($usuario) {
+//                    return $usuario->getFullName();
+//                })
+
+//                ->addColumn('role', function ($usuario) {
+//                    return $usuario->getRoleNames();
+//                })
+//                ->filterColumn('nombres', function ($query, $keyword) {
+//                    $query->whereRaw("CONCAT(users.first_name,' ',users.last_name) like ?", ["%{$keyword}%"]);
+//                })
+                    ->rawColumns(['actions'])
+                    ->setRowId('id');
+                //Agregar variables a a la respuesta json del datatables
+//                if ($request->draw == 1) {
+//                    $datatable->with([
+//                        'generos' => ['M','F']
+//                    ]);
+//                }
+
+                return $datatable->make(true);
+
+            }
+
+        } else abort(403);
+
+    }
+
+
 
     /**
      * Muestra el formulario para incripcion a un cliente backend
@@ -120,49 +201,50 @@ class InscripcionController extends Controller
      */
     public function store(Request $request)
     {
-//        dd($request->all());
+
         $user = $request->user();
 
         $ahora = Carbon::now();
 
-//        $rules = [
-//            'persona_id' => 'required',
-//            'categoria_id' => 'required',
-//            'circuito_id' => 'required',
-//            'talla' => 'required',
-//            'mpago' => 'required',
-//            'costo' => 'required',
-//            'nombres_fact' => 'required',
-//            'apellidos_fact' => 'required',
-//            'num_doc_fact' => 'required',
-//            'email_fact' => 'required',
-//            'telefono_fact' => 'required',
-//            'direccion_fact' => 'required'
-//            //  "nombres" =>
-//            //  "apellidos" =>
-//            //  "fecha_nac" =>
-//            //  "edad" =>
-//            //  "gen" =>
-//            //  "num_doc" =>
-//            //  "email" =>
-//            //  "telefono" =>
-//            //  "direccion" =>
-//        ];
+        $rules = [
+            'persona_id' => 'required',
+            'categoria_id' => 'required',
+            'circuito_id' => 'required',
+            'talla' => 'required_without:deporte_id',
+            'mpago' => 'required',
+            'costo' => 'required',
+            'nombres_fact' => 'required',
+            'apellidos_fact' => 'required',
+            'num_doc_fact' => 'required',
+            'email_fact' => 'required|email',
+            'telefono_fact' => 'required',
+            'direccion_fact' => 'required'
+        ];
 //
-//        $messages = [
-//            'escenario.required' => 'EL escenario es un campo requerido',
-//            'escenario.unique' => 'EL nombre del escenario ya se encuentra en uso',
-//            'escenario.max' => 'EL nombre del escenario es demasiado largo, no debe sobrepasar los 20 caracteres',
-//        ];
-//
-//        $validator = Validator::make($request->all(), $rules, $messages);
-//
-//        if ($validator->fails()) {
-//            $notification = [
-//                'message_toastr' => $validator->errors()->first(),
-//                'alert-type' => 'error'];
-//            return back()->with($notification)->withInput();
-//        }
+        $messages = [
+            'persona_id.required'=>'Perfil de persona a inscribir no encontrado.',
+            'categoria_id.required'=>'El campo categoría es obligatorio.',
+            'circuito_id.required'=>'El campo circuito es obligatorio.',
+            'talla.required'=>'El campo talla es obligatorio cuando deportes no está presente.',
+            'mpago.required'=>'El campo método de pago es obligatorio.',
+            'costo.required'=>'El campo costo es obligatorio.',
+            'nombres_fact.required'=>'El campo Nombres para Facturación es obligatorio.',
+            'apellidos_fact.required'=>'El campo Apellidos para Facturación es obligatorio.',
+            'num_doc_fac.required'=>'El campo Identificación para Facturación es obligatorio.',
+            'email_fact.required'=>'El campo Email para Facturación es obligatorio.',
+            'email_fact.email'=>'El campo Email para Facturación no tiene un formato de correo correcto.',
+            'telefono_fact.required'=>'El campo Teléfono para Facturación es obligatorio.',
+            'direccion_fact.required'=>'El campo Dirección para Facturación es obligatorio.'
+        ];
+
+        $validator = Validator::make($request->all(), $rules,$messages);
+
+        if ($validator->fails()) {
+            $notification = [
+                'message_toastr' => $validator->errors()->first(),
+                'alert-type' => 'error'];
+            return back()->with($notification)->withInput();
+        }
 
         try {
 
@@ -186,7 +268,7 @@ class InscripcionController extends Controller
             $talla_id = $request->input('talla');
             $talla = Talla::where('id', $talla_id)->where('status', Talla::ACTIVO)->first();
 
-            $mpago_id = $request->input('$mpago');
+            $mpago_id = $request->input('mpago');
             $mpago = Mpago::where('status', Mpago::ACTIVO)->where('id', $mpago_id)->first();
 
             //con descuento aplicado si lo hay
@@ -199,14 +281,9 @@ class InscripcionController extends Controller
                 $desc = ($producto->price) - ($costo);
             }
 
-
-            $escenario_id = $user->escenario_id;
-
-
             $deporte = Deporte::where('id', $request->input('deporte_id'))->where('status', Deporte::ACTIVO)->first();
 
-
-            //$nexNum => numero de factura
+            //CREAR NUMERO DE FACTURA
             $maxnumFact = DB::table('facturas')->max('numero'); //maximo valor en la columna numero
             if (is_numeric($maxnumFact)) {
                 $nextNum = $maxnumFact + 1;
@@ -215,228 +292,257 @@ class InscripcionController extends Controller
                 $nextNum = 1;
             }
 
-            $factura = new  Factura();
-            $factura->numero = $nextNum;
-            $factura->fecha_edit = $ahora; //Activa, cancelada
-            $factura->descuento = $desc;
-            $factura->subtotal=$producto->price;
-            $factura->total=
+            $nombres_fact = $request->input('nombres_fact');
+            $apellidos_fact = $request->input('apellidos_fact');
+            $email_fact = $request->input('email_fact');
+            $direccion_fact = $request->input('direccion_fact');
+            $telefono_fact = $request->input('telefono_fact');
+            $num_doc_fact = $request->input('num_doc_fact');
 
-
-//            $factura->subtotal=$;
-            $factura->save();
-
-
-            // nombres_fact
-//apellidos_fact
-//num_doc_fact
-//email_fact
-//telefono_fact
-//direccion_fact
-            $factura->descuento =
+            if (!isset($deporte)) { //la factura se generará solo si no es deportista
+                //CREAR FACTURA
+                $factura = new  Factura();
+                $factura->numero = $nextNum;
+                $factura->fecha_edit = $ahora; //Activa, cancelada
+                $factura->descuento = $desc; //descuento que se hizo
+                $factura->subtotal = $producto->price; //El costo normal
+                $factura->total = $costo; //el subtotaL -descuento
+                $factura->user_id = $user->id;
+                $factura->persona()->associate($persona);
+                $factura->nombre = $nombres_fact . ' ' . $apellidos_fact;
+                $factura->email = $email_fact;
+                $factura->direccion = $direccion_fact;
+                $factura->telefono = $telefono_fact;
+                $factura->identificacion = $num_doc_fact;
+                $factura->mpago()->associate($mpago);
+                $factura->payment_id = NULL;
+                $factura->status = Factura::ACTIVA;  //crear registro (numero de corredor)
                 $factura->save();
+            }
 
-//            $deporte ? $inscripcion->factura_id=NULL: $inscripcion->factura()->associate($factura);
-            $factura->increment('numero');
+            //CREAR NUMERO DE CORREDOR
+            $maxNumCorr = DB::table('registros')->max('numero'); //maximo valor en la columna numero
+            if (is_numeric($maxNumCorr)) {
+                $nexNumCorredor = $maxNumCorr + 1;
+            } else {
+                $maxNumCorr = 0;
+                $nexNumCorredor = 1;
+            }
 
-
+            //CREAR INSCRIPCION
             $inscripcion = new Inscripcion();
-            $inscripcion->escenario_id = $escenario_id;
+            $inscripcion->escenario_id = $user->escenario_id;
             $inscripcion->producto()->associate($producto);
             $inscripcion->persona()->associate($persona);
-            $inscripcion->user_id = $user->id;
+            $inscripcion->user()->associate($user);
             $inscripcion->user_edit = NULL;
             $deporte ? $inscripcion->deporte_id = $deporte->id : $inscripcion->deporte_id = NULL;
-            $inscripcion->fecha = $ahora;
-            $inscripcion->num_corredor = NULL;
+            $deporte ? $inscripcion->factura_id = NULL : $inscripcion->factura()->associate($factura);
+            $inscripcion->fecha = $ahora; //fecha de aprobacion,
+            $inscripcion->num_corredor = $nexNumCorredor;
             $inscripcion->kit = NULL;
-            $inscripcion->num_corredor = NULL;
-            $talla ? $inscripcion->talla()->associate($talla) : $inscripcion->talla_id = NULL;
-            $inscripcion->costo = $request->input('costo');
-            $inscripcion->ejercicio_id = $ejercicio_id;
+            if (!isset($deporte) && isset($talla)) { //no es deportista y se escogio la talla
+                $inscripcion->talla()->associate($talla);
+            } else { //es deportista y no se escogio la talla
+                $inscripcion->talla_id = NULL;
+            }
+            $inscripcion->costo = $costo;
+            $inscripcion->ejercicio_id = $ejercicio->ejercicio_id;
             $inscripcion->status = Inscripcion::PAGADA;
             $inscripcion->save();
 
+            //CREAR EL REGISTRO DEL CORREDOR
+            $registro = new Registro();
+            $registro->numero = $nexNumCorredor;
+            $registro->inscripcion()->associate($inscripcion);
+            $registro->persona()->associate($persona);
+            $registro->save();
+
+            //ACTUALIZAR STOCK DE TALLAS
+            $talla->decrement('stock');
+            $talla->stock > 0 ? $talla->status=Talla::ACTIVO : $talla->status=Talla::INACTIVO;
+            $talla->update();
 
             DB::Commit();
 
-        }catch (\Exception $e){
-            $message=$e->getMessage();
+            $notification = [
+                'message_toastr' => 'Inscripción creada correctamente. Debe imprimir el comprobante de pago con el cuál se podrá retirar el Kit.',
+                'alert-type' => 'success'];
+            return redirect()->route('admin.inscription.index')->with($notification);
+
+        } catch (\Exception $e) {
+            $message = $e->getMessage();
+//            $message = 'Lo sentimos! Ocurrio un error y no se pudo crear la inscripción.';
+            $notification = [
+                'message_toastr' => $message,
+                'alert-type' => 'error'];
+            return redirect()->back()->with($notification)->withInput();
             DB::rollBack();
         }
 
 
-}
-
-/**
- * Display the specified resource.
- *
- * @param  \App\Inscripcion $inscripcion
- * @return \Illuminate\Http\Response
- */
-public
-function show(Inscripcion $inscripcion)
-{
-    //
-}
-
-/**
- * Show the form for editing the specified resource.
- *
- * @param  \App\Inscripcion $inscripcion
- * @return \Illuminate\Http\Response
- */
-public
-function edit(Inscripcion $inscripcion)
-{
-    //
-}
-
-/**
- * Update the specified resource in storage.
- *
- * @param  \Illuminate\Http\Request $request
- * @param  \App\Inscripcion $inscripcion
- * @return \Illuminate\Http\Response
- */
-public
-function update(Request $request, Inscripcion $inscripcion)
-{
-    //
-}
-
-/**
- * Remove the specified resource from storage.
- *
- * @param  \App\Inscripcion $inscripcion
- * @return \Illuminate\Http\Response
- */
-public
-function destroy(Inscripcion $inscripcion)
-{
-    //
-}
-
-/**ONLINE
- * en este caso no se tienen en cuenta los deportes
- * Obtener lo circuitos para la categoia seleccionada
- */
-public
-function getCategoriaCircuito(Request $request)
-{
-    if ($request->ajax()) {
-
-        $circuitos = Producto::with('circuito')
-            ->where('status', Producto::ACTIVO)
-            ->where('categoria_id', $request->input('id'))
-            ->get();
-
-        return response()->json(['data' => $circuitos], 200);
     }
-}
 
-/**Para Backend
- *
- * Obtener lo circuitos para la categoia seleccionada
- */
-public
-function getCatCir(Request $request)
-{
-    if ($request->ajax()) {
+    /**
+     * Display the specified resource.
+     *
+     * @param  \App\Inscripcion $inscripcion
+     * @return \Illuminate\Http\Response
+     */
+    public function show(Inscripcion $inscripcion)
+    {
+        //
+    }
 
-        $circuitos = Producto::with('circuito')
-            ->where('status', Producto::ACTIVO)
-            ->where('categoria_id', $request->input('id'))
-            ->get();
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @param  \App\Inscripcion $inscripcion
+     * @return \Illuminate\Http\Response
+     */
+    public function edit(Inscripcion $inscripcion)
+    {
+        //
+    }
 
-        $categoria = Categoria::where('id', $request->input('id'))->first();
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request $request
+     * @param  \App\Inscripcion $inscripcion
+     * @return \Illuminate\Http\Response
+     */
+    public function update(Request $request, Inscripcion $inscripcion)
+    {
+        //
+    }
 
-        $deportista = false;
-        if (stristr($categoria->categoria, 'deport')) {
-            $deportista = true;
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  \App\Inscripcion $inscripcion
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy(Inscripcion $inscripcion)
+    {
+        //
+    }
+
+    /**ONLINE
+     * en este caso no se tienen en cuenta los deportes
+     * Obtener lo circuitos para la categoia seleccionada
+     */
+    public function getCategoriaCircuito(Request $request)
+    {
+        if ($request->ajax()) {
+
+            $circuitos = Producto::with('circuito')
+                ->where('status', Producto::ACTIVO)
+                ->where('categoria_id', $request->input('id'))
+                ->get();
+
+            return response()->json(['data' => $circuitos], 200);
         }
-        return response()->json(['data' => $circuitos, 'deportista' => $deportista], 200);
     }
-}
 
-/**BACKEND
- * Obtener el costo de la inscripcion,  tener en cuenta los descuentos
- */
-public
-function getCosto(Request $request)
-{
+    /**Para Backend
+     *
+     * Obtener lo circuitos para la categoia seleccionada
+     */
+    public function getCatCir(Request $request)
+    {
+        if ($request->ajax()) {
 
-    if ($request->ajax()) {
+            $circuitos = Producto::with('circuito')
+                ->where('status', Producto::ACTIVO)
+                ->where('categoria_id', $request->input('id'))
+                ->get();
 
-        $producto = Producto::where('status', Producto::ACTIVO)
-            ->where('categoria_id', $request->input('categoria_id'))
-            ->where('circuito_id', $request->input('circuito_id'))
-            ->first();
+            $categoria = Categoria::where('id', $request->input('id'))->first();
 
-        $costo = 0;
+            $deportista = false;
+            if (stristr($categoria->categoria, 'deport')) {
+                $deportista = true;
+            }
+            return response()->json(['data' => $circuitos, 'deportista' => $deportista], 200);
+        }
+    }
 
-        if ($producto) {
-            $costo = number_format($producto->price, 2, '.', ' ');
+    /**BACKEND
+     * Obtener el costo de la inscripcion,  tener en cuenta los descuentos
+     */
+    public function getCosto(Request $request)
+    {
+
+        if ($request->ajax()) {
+
+            $producto = Producto::where('status', Producto::ACTIVO)
+                ->where('categoria_id', $request->input('categoria_id'))
+                ->where('circuito_id', $request->input('circuito_id'))
+                ->first();
+
+            $costo = 0;
+
+            if ($producto) {
+                $costo = number_format($producto->price, 2, '.', ' ');
+            }
+
+            $descuento = Descuento::where('status', Descuento::ACTIVO)
+                ->where('id', $request->input('descuento_id'))
+                ->first();
+
+            if ($descuento) {
+                $descuento = $descuento->appDescuento($costo);
+                $costo = $costo - $descuento;
+                $costo = number_format($costo, 2, '.', ' ');
+            }
+
+            return response()->json(['data' => $costo], 200);
+        }
+    }
+
+
+    /**ONLINE
+     * Obtener el costo de la inscripcion
+     */
+    public function userOnlineCosto(Request $request)
+    {
+
+        if ($request->ajax()) {
+
+            $producto = Producto::where('status', Producto::ACTIVO)
+                ->where('categoria_id', $request->input('categoria_id'))
+                ->where('circuito_id', $request->input('circuito_id'))
+                ->first();
+
+            $costo = 0;
+            if ($producto) {
+                $costo = number_format($producto->price, 2, '.', ' ');
+            }
+
+            return response()->json(['data' => $costo], 200);
+        }
+    }
+
+    /**ONLINE
+     * Mostrar stock de tallas
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getTallaStock(Request $request)
+    {
+        if ($request->ajax()) {
+
+            $talla = Talla::where('status', Talla::ACTIVO)
+                ->where('id', $request->input('talla_id'))
+                ->first();
+
+            $talla ? $stock = $talla->stock : $stock = 0;
+
+            return response()->json(['data' => $stock], 200);
         }
 
-        $descuento = Descuento::where('status', Descuento::ACTIVO)
-            ->where('id', $request->input('descuento_id'))
-            ->first();
-
-        if ($descuento) {
-            $descuento = $descuento->appDescuento($costo);
-            $costo = $costo - $descuento;
-            $costo = number_format($costo, 2, '.', ' ');
-        }
-
-        return response()->json(['data' => $costo], 200);
     }
-}
-
-
-/**ONLINE
- * Obtener el costo de la inscripcion
- */
-public
-function userOnlineCosto(Request $request)
-{
-
-    if ($request->ajax()) {
-
-        $producto = Producto::where('status', Producto::ACTIVO)
-            ->where('categoria_id', $request->input('categoria_id'))
-            ->where('circuito_id', $request->input('circuito_id'))
-            ->first();
-
-        $costo = 0;
-        if ($producto) {
-            $costo = number_format($producto->price, 2, '.', ' ');
-        }
-
-        return response()->json(['data' => $costo], 200);
-    }
-}
-
-/**ONLINE
- * Mostrar stock de tallas
- * @param Request $request
- * @return \Illuminate\Http\JsonResponse
- */
-public
-function getTallaStock(Request $request)
-{
-    if ($request->ajax()) {
-
-        $talla = Talla::where('status', Talla::ACTIVO)
-            ->where('id', $request->input('talla_id'))
-            ->first();
-
-        $talla ? $stock = $talla->stock : $stock = 0;
-
-        return response()->json(['data' => $stock], 200);
-    }
-
-}
 
 
 }

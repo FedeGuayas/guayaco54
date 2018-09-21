@@ -244,18 +244,18 @@ Breadcrumbs::register('descuento-edit', function($breadcrumbs,$descuento)
 });
 
 
+//// Home>Incripciones
+Breadcrumbs::register('inscripciones', function($breadcrumbs)
+{
+    $breadcrumbs->parent('home');
+    $breadcrumbs->push('Inscripciones', route('admin.inscription.index'));
+});
 // Home>Incripciones>[create] BackEnd
 Breadcrumbs::register('inscripcion-create', function($breadcrumbs)
 {
     $breadcrumbs->parent('clientes');
     $breadcrumbs->push('Inscribir ', route('personas.index'));
 });
-//// Home>Incripciones>Personas [CREATE]
-//Breadcrumbs::register('cliente-create', function($breadcrumbs)
-//{
-//    $breadcrumbs->parent('clientes');
-//    $breadcrumbs->push('Crear Cliente', route('personas.index'));
-//});
 //
 //// Home>Incripciones>Personas [EDIT]
 //Breadcrumbs::register('cliente-edit', function($breadcrumbs,$persona)
@@ -263,3 +263,6 @@ Breadcrumbs::register('inscripcion-create', function($breadcrumbs)
 //    $breadcrumbs->parent('clientes');
 //    $breadcrumbs->push('Editar cliente '.$persona->getFullName(), route('personas.index'));
 //});
+
+
+

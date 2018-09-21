@@ -40,7 +40,7 @@
                     </a>
                     <ul class="submenu">
                         <li><a href="{{route('personas.index')}}">Clientes a Inscribir</a></li>
-                        <li><a href="#">Inscripciones</a></li>
+                        <li><a href="{{route('admin.inscription.index')}}">Inscripciones</a></li>
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle">
                                 <span class="fa fa-money"></span><span class="mtext">Facturación</span>

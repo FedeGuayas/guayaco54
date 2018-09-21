@@ -106,7 +106,7 @@ class PersonaController extends Controller
                 //Agregar variables a a la respuesta json del datatables
                 if ($request->draw == 1) {
                     $datatable->with([
-                        'generos' => ['MASCULINO', 'FEMENINO']
+                        'generos' => ['M','F']
                     ]);
                 }
 

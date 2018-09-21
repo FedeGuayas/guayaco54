@@ -119,12 +119,21 @@ Route::middleware(['auth', 'isVerified'])->group(function () {
 
         //vista para inscripcion de a un cliente backend
         Route::get('inscription/{persona}', 'InscripcionController@createBack')->name('admin.inscripcion.create');
-        //Ajax para inscripciones
+        //Ajax para inscripciones obterner los circuitos para la categoria seleccionada
         Route::get('inscription/category/getCircuit', 'InscripcionController@getCatCir')->name('getCatCir');
         //Actualizar costo
         Route::get('inscriptions/cost/{data?}', 'InscripcionController@getCosto')->name('admin.getCosto');
         //Guardar Inscripcion de Backend
         Route::post('inscription/store', 'InscripcionController@store')->name('admin.inscription.store');
+        //Listar todas las inscripciones
+        Route::get('inscription', 'InscripcionController@index')->name('admin.inscription.index');
+        Route::get('inscriptions/getAll', 'InscripcionController@getAll')->name('admin.inscription.getAll');
+        //Vista para editar inscripcion
+        Route::get('inscription/{inscripcion}/edit', 'InscripcionController@edit')->name('admin.inscription.edit');
+        //Actualizar inscripcion
+        Route::put('inscription/{inscripcion}', 'InscripcionController@update')->name('admin.inscription.update');
+        //Eliminar inscripcion, pone a status c=cancelada
+        Route::delete('inscription/{inscripcion}', 'InscripcionController@destroy')->name('admin.inscription.destroy');
 
 
 

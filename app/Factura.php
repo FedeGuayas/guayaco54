@@ -15,7 +15,12 @@ class Factura extends Model
 
     public function setNombreAttribute($value)
     {
-        $this->attributes['nombre']=strtoupper($value);
+        $this->attributes['nombre']=mb_strtolower($value);
+    }
+
+    public function getNombreAttribute($value)
+    {
+        return  mb_strtoupper($value);
     }
 
     public function setEmailAttribute($value)
@@ -25,7 +30,12 @@ class Factura extends Model
 
     public function setDireccionAttribute($value)
     {
-        $this->attributes['direccion']=strtoupper($value);
+        $this->attributes['direccion']=mb_strtolower($value);
+    }
+
+    public function getDireccionAttribute($value)
+    {
+        return  mb_strtoupper($value);
     }
 
     //como payment_id es unico, pero sino es null

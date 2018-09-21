@@ -1,9 +1,9 @@
 @extends('layouts.back.master')
 
-@section('page_title','Personas')
+@section('page_title','Inscripciones')
 
 @section('breadcrumbs')
-    {!! Breadcrumbs::render('clientes') !!}
+    {!! Breadcrumbs::render('inscripciones') !!}
 @stop
 
 @push('styles')
@@ -20,11 +20,10 @@
     <div class="pd-20 bg-white border-radius-4 box-shadow mb-30">
         <div class="clearfix mb-20">
             <div class="pull-left">
-                <h5 class="text-blue">Todos los Clientes</h5>
-                @can('add_personas')
-                    <p class="font-14">para crear uno nuevo <a class="btn btn-sm btn-outline-primary"
-                                                               href="{{route('personas.create')}}">
-                            <i class="fa fa-user-plus"></i>
+                <h5 class="text-blue">Todas las inscripciones</h5>
+                @can('add_inscripciones')
+                    <p class="font-14">para inscribir debe buscar al <a class="btn btn-sm btn-outline-primary" href="{{route('personas.index')}}">cliente
+                            <i class="fa fa-user"></i>
                         </a>
                     </p>
                 @endcan
@@ -37,27 +36,27 @@
                     <thead>
                     <tr>
                         <th class="datatable-nosort">Acción</th>
-                        <th>Nombre</th>
-                        <th>Apellidos</th>
-                        <th>Num. Idenidad</th>
-                        <th>Email</th>
-                        <th>Género</th>
-                        <th>Fecha Nacimiento</th>
-                        <th>Dirección</th>
-                        <th>Teléfono</th>
+                        {{--<th>Nombres</th>--}}
+                        {{--<th>Num. Identidad</th>--}}
+                        {{--<th>Categoría</th>--}}
+                        {{--<th>Circuito</th>--}}
+                        {{--<th>Número</th>--}}
+                        {{--<th>Costo</th>--}}
+                        {{--<th>Teléfono</th>--}}
+                        {{--<th>Email</th>--}}
                     </tr>
                     </thead>
                     <tfoot>
                     <tr>
                         <th></th>
-                        <th class="tfoot_search"></th>
-                        <th class="tfoot_search"></th>
-                        <th class="tfoot_search"></th>
-                        <th class="tfoot_search"></th>
-                        <th class="tfoot_select"></th>
-                        <th class="tfoot_search"></th>
-                        <th class="tfoot_search"></th>
-                        <th class="tfoot_search"></th>
+                        {{--<th class="tfoot_search"></th>--}}
+                        {{--<th ></th>--}}
+                        {{--<th class="tfoot_search"></th>--}}
+                        {{--<th class="tfoot_search"></th>--}}
+                        {{--<th class="tfoot_select"></th>--}}
+                        {{--<th class="tfoot_search"></th>--}}
+                        {{--<th class="tfoot_search"></th>--}}
+                        {{--<th class="tfoot_search"></th>--}}
 
                     </tr>
                     </tfoot>
@@ -68,7 +67,7 @@
         </div>
     </div>
 
-    {!! Form::open(['route'=>['personas.destroy',':ID'],'method'=>'DELETE','id'=>'form-delete']) !!}
+    {!! Form::open(['route'=>['admin.inscription.destroy',':ID'],'method'=>'DELETE','id'=>'form-delete']) !!}
     {!! Form::close() !!}
 
 @endsection
@@ -110,21 +109,21 @@
             "language": {
                 "url": '/guayaco-runner/plugins/DataTables/i18n/Spanish_original.lang'
             },
-            ajax: '{{route('getAllPersonas')}}',
+            ajax: '{{route('admin.inscription.getAll')}}',
             columns: [
-                {data: 'actions', name: 'opciones', orderable: false, searchable: false},
-                {data: 'nombres', name: 'nombres'},
-                {data: 'apellidos', name: 'apellidos'},
-                {data: 'num_doc', name: 'num_doc'},
-                {data: 'email', name: 'email', orderable: false},
-                {data: 'gen', name: 'gen'},
-                {data: 'fecha_nac', name: 'fecha_nac'},
-                {data: 'direccion', name: 'direccion'},
-                {data: 'telefono', name: 'telefono'}
+                {data: 'actions', name: 'opciones', orderable: false, searchable: false}
+//                {data: 'nombres', name: 'nombres'},
+//                {data: 'apellidos', name: 'apellidos'},
+//                {data: 'num_doc', name: 'num_doc'},
+//                {data: 'email', name: 'email', orderable: false},
+//                {data: 'gen', name: 'gen'},
+//                {data: 'fecha_nac', name: 'fecha_nac'},
+//                {data: 'direccion', name: 'direccion'},
+//                {data: 'telefono', name: 'telefono'}
 
             ],
             "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
-//                console.log(aData);
+                console.log(aData);
             },
             initComplete: function (settings, json) {
                 $('.data-table').fadeIn();
@@ -159,21 +158,21 @@
 //                            select.append('<option value="' + d + '">' + d + '</option>')
 //                        });
 
-                        // Capturar los datos del JSON para llenar el select con las opciones
-                        let extraData = (function (i) {
-                            switch (i) {
-                                case 5:
-                                    return json.generos;
-                            }
-                        })(column.index());
-//                        // Draw select options
-                        extraData.forEach(function (d,j) {
-                            if (column.search() === d) {
-                                select.append('<option value="' + d + '" selected="selected">' + d + '</option>')
-                            } else {
-                                select.append('<option value="' + d + '">' + d + '</option>')
-                            }
-                        });
+//                        // Capturar los datos del JSON para llenar el select con las opciones
+//                        let extraData = (function (i) {
+//                            switch (i) {
+//                                case 5:
+//                                    return json.generos;
+//                            }
+//                        })(column.index());
+////                        // Draw select options
+//                        extraData.forEach(function (d,j) {
+//                            if (column.search() === d) {
+//                                select.append('<option value="' + d + '" selected="selected">' + d + '</option>')
+//                            } else {
+//                                select.append('<option value="' + d + '">' + d + '</option>')
+//                            }
+//                        });
                     }
                 });
             }

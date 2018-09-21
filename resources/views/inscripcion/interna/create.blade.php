@@ -50,13 +50,13 @@
                                             <div class="col-md-3 col-sm-12">
                                                 <div class="form-group">
                                                     {!! Form::label('categoria_id','Categorías: *',['class'=>'weight-600']) !!}
-                                                    {!! Form::select('categoria_id', $categorias,null, ['class'=>'selectpicker show-tick form-control','data-style'=>'btn-outline-primary','id'=>'categoria_id','data-container'=>'.main-container','placeholder'=>'Seleccione ...','required']) !!}
+                                                    {!! Form::select('categoria_id', $categorias,null, ['class'=>'selectpicker show-tick form-control','data-style'=>'btn-outline-primary','id'=>'categoria_id','data-container'=>'.main-container','placeholder'=>'Seleccione ...']) !!}
                                                 </div>
                                             </div>
                                             <div class="col-md-3 col-sm-12">
                                                 <div class="form-group">
                                                     {!! Form::label('circuito_id','Circuitos: *',['class'=>'weight-600']) !!}
-                                                    {!! Form::select('circuito_id',[] ,null, ['class'=>'selectpicker show-tick form-control','data-style'=>'btn-outline-primary','placeholder'=>'Seleccione ...','id'=>'circuito_id','data-container'=>'.main-container','required']) !!}
+                                                    {!! Form::select('circuito_id',[] ,null, ['class'=>'selectpicker show-tick form-control','data-style'=>'btn-outline-primary','placeholder'=>'Seleccione ...','id'=>'circuito_id','data-container'=>'.main-container']) !!}
                                                 </div>
                                             </div>
                                             <div class="col-md-3 col-sm-12">
@@ -74,7 +74,7 @@
                                                     <span class="badge badge-pill badge-primary pull-right"
                                                           id="stock-talla" data-toggle="tooltip" data-placement="top"
                                                           title="Stock">0</span>
-                                                    {!! Form::select('talla', $tallas,null, ['class'=>'selectpicker show-tick form-control','data-style'=>'btn-outline-primary','id'=>'talla','placeholder'=>'Seleccione ...', 'data-live-search'=>'true','data-container'=>'.main-container','required']) !!}
+                                                    {!! Form::select('talla', $tallas,null, ['class'=>'selectpicker show-tick form-control','data-style'=>'btn-outline-primary','id'=>'talla','placeholder'=>'Seleccione ...', 'data-live-search'=>'true','data-container'=>'.main-container']) !!}
                                                 </div>
                                             </div>
                                         </div>
@@ -88,7 +88,7 @@
                                             <div class="col-md-3 col-sm-12">
                                                 <div class="form-group">
                                                     {!! Form::label('mpago','Formas de Pago: *',['class'=>'weight-600']) !!}
-                                                    {!! Form::select('mpago', $formas_pago,null, ['class'=>'selectpicker show-tick form-control','data-style'=>'btn-outline-primary','id'=>'mpago','data-container'=>'.main-container','placeholder'=>'Seleccione ...','required']) !!}
+                                                    {!! Form::select('mpago', $formas_pago,null, ['class'=>'selectpicker show-tick form-control','data-style'=>'btn-outline-primary','id'=>'mpago','data-container'=>'.main-container','placeholder'=>'Seleccione ...']) !!}
                                                 </div>
                                             </div>
                                             <div class="col-md-3 col-sm-12">
@@ -233,7 +233,7 @@
                             <!-- FIN Datos Perfil-->
                             <div class="row pt-2">
                                 <div class="col-md-3">
-                                    <button type="submit" class="btn btn-block btn-primary disabled" id="guardar_inscripcion">Guardar Inscripción</button>
+                                    <button type="submit" class="btn btn-block btn-primary" id="guardar_inscripcion" disabled>Guardar Inscripción</button>
                                 </div>
                             </div>
                         </div><!-- ./ tab-content -->
@@ -435,9 +435,9 @@
 
         $("#mpago").on('change', function () {
             if ($(this).val() !== '') {
-                guardar_inscripcion.removeClass('disabled');
+                guardar_inscripcion.prop('disabled',false);
             } else {
-                guardar_inscripcion.addClass('disabled');
+                guardar_inscripcion.prop('disabled',true);
 
             }
         });

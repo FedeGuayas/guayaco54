@@ -26,7 +26,7 @@ class CreateInscripcionsTable extends Migration
             $table->string('num_corredor')->nullable();//guardar el numero para ver en la historia con k num participo
             $table->string('kit')->nullable();//si se entrego el kit=1, no entregado=null
             $table->string('talla_id',20)->nullable(); //talla de camiseta
-            $table->integer('costo');//valor que pago por la inscripcion precio de producto_id
+            $table->integer('costo');//valor neto que pago por la inscripcion
             $table->integer('ejercicio_id')->unsigned();//año de la inscripcion
             $table->string('status')->default(\App\Inscripcion::RESERVADA);
 
