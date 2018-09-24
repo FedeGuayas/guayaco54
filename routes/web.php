@@ -134,6 +134,8 @@ Route::middleware(['auth', 'isVerified'])->group(function () {
         Route::put('inscription/{inscripcion}', 'InscripcionController@update')->name('admin.inscription.update');
         //Eliminar inscripcion, pone a status c=cancelada
         Route::delete('inscription/{inscripcion}', 'InscripcionController@destroy')->name('admin.inscription.destroy');
+        //Entregar Kit
+        Route::post('inscription/{inscripcion}/setKit', 'InscripcionController@setKit')->name('admin.inscripcion.setKit');
 
 
 

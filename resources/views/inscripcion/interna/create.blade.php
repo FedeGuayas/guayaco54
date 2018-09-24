@@ -17,7 +17,7 @@
 
         @if (isset($error_email))
             <div class="animated bounceIn delay-1s border-radius-10 box-shadow alert alert-danger col-md-7" role="alert"
-                 style="position: fixed; right: 5%;top: 20%;width: 60%;">
+                 style="position: fixed; right: 5%;top: 20%;width: 60%; z-index: 9999">
                 <i class="fa fa-exclamation-triangle"></i> El cliente no tiene un <strong>correo</strong> definido
                 <strong> en Facturación. </strong> Debe indicar uno o seleccionar consumidor final
             </div>
@@ -296,7 +296,7 @@
         $('.alert').removeClass('bounceIn');
         $(".alert").addClass('bounceOut', function () {
             $(this).remove();
-        });
+            });
         }, 5000);
         @endif
 

@@ -12,6 +12,7 @@ class Inscripcion extends Model
     const CANCELADA = 'c';
 
     const KIT_ENTREGADO = '1';
+    const KIT_POR_ENTREGAR =null;
 
     protected $fillable = [
         'escenario_id', 'producto_id', 'persona_id', 'user_id', 'user_edit', 'deporte_id', 'factura_id', 'fecha', 'num_corredor', 'kit', 'talla_id', 'costo', 'ejercicio_id', 'status'

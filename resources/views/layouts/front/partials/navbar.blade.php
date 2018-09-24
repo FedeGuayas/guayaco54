@@ -36,6 +36,9 @@
                 <a class="nav-link link text-white display-4" href="{{url('/')}}#reglamento">Reglamento</a>
             </li>
             <li class="nav-item">
+                <a class="nav-link link text-white display-4" href="{{url('/')}}#terminos">Términos</a>
+            </li>
+            <li class="nav-item">
                 <a class="nav-link link text-white display-4" href="{{url('/')}}#form4-6">Contacto</a>
             </li>
             @if (Route::has('login'))

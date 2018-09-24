@@ -44,8 +44,9 @@ class InscripcionController extends Controller
 
                 $inscripcion = Inscripcion::
 
-//                with('user', 'producto','persona','talla','factura')
-//                ->leftJoin('users','personas.id','=','users.persona_id')
+                with('user', 'producto', 'producto.categoria', 'producto.circuito', 'persona', 'talla', 'factura')
+                    ->join('personas', 'personas.id', '=', 'inscripcions.persona_id')
+                    ->leftJoin('registros', 'registros.inscripcion_id', '=', 'inscripcions.id')
 //                ->where('first_name','!=','admin') //no mostrar el admin
 //                ->whereHas('roles', function($q){ //con rol=employee
 //                    $q->where('name', '=', 'employee');
@@ -53,26 +54,38 @@ class InscripcionController extends Controller
 //                ->whereDoesntHave('roles', function($query) { //que el rol no sea employee
 //                    $query->where('name', '=', 'employee');
 //                })
-                    select('inscripcions.*');
+                    ->
+                    select('inscripcions.*', 'registros.inscripcion_id', 'registros.numero');
 
                 $action_buttons = '
             <div class="dropdown">
                 <a class="btn btn-outline-primary dropdown-toggle" href="#" role="button" data-toggle="dropdown"><i class="fa fa-ellipsis-h"></i></a>
                 <div class="dropdown-menu dropdown-menu-left">
                  @can(\'view_comprobantes\')
-                    <a class="dropdown-item" href="#">
-                        <i class="fa fa-print text-primary"></i>Imprimir
+                    <a class="dropdown-item" href="#" data-toggle="tooltip" data-placement="top" title="Imprimir Comprobante">
+                        <i class="fa fa-print text-primary"></i> Imprimir
                     </a>
                 @endcan
                 @can(\'edit_inscripciones\')
-                    <a class="dropdown-item" href="{{ route(\'admin.inscription.edit\',[$id]) }}">
-                        <i class="fa fa-pencil text-success"></i>Editar
+                    <a class="dropdown-item" href="{{ route(\'admin.inscription.edit\',[$id]) }}" data-toggle="tooltip" data-placement="top" title="Editar Inscripción">
+                        <i class="fa fa-pencil text-success"></i> Editar
                     </a>
                 @endcan
                 @can(\'delete_inscripciones\')
-                    <a class="dropdown-item delete" href="#" data-id="{{$id}}">
-                        <i class="fa fa-trash-o text-danger"></i> Eliminar
+                    <a class="dropdown-item delete" href="#" data-id="{{$id}}" data-toggle="tooltip" data-placement="top" title="Eliminar">
+                        <i class="fa fa-trash-o text-danger"></i> 
                     </a>
+                @endcan
+                @can(\'entregar_kit\')
+                @if ($kit!=\\App\\Inscripcion::KIT_ENTREGADO)                
+                    <a class="dropdown-item status_kit" href="#" data-id="{{$id}}" data-toggle="tooltip" data-placement="top" title="Entregar Kit">
+                        <i class="fa fa-thumbs-o-up text-primary"></i> Entregar
+                    </a>
+                @else
+                    <a class="dropdown-item status_kit" href="#" data-id="{{$id}}" data-toggle="tooltip" data-placement="top" title="Devolver Kit">
+                        <i class="fa fa-thumbs-o-down text-danger"></i> Devolver
+                    </a>
+                @endif
                 @endcan
                 </div>
             </div>
@@ -80,24 +93,33 @@ class InscripcionController extends Controller
 
                 $datatable = Datatables::of($inscripcion)
                     ->addColumn('actions', $action_buttons)
-//                ->addColumn('nombres', function ($usuario) {
-//                    return $usuario->getFullName();
-//                })
-
+                    ->addColumn('nombres', function ($inscripcion) {
+                        return $inscripcion->persona->getFullName();
+                    })
+                    ->filterColumn('nombres', function ($query, $keyword) {
+                        $query->whereRaw("CONCAT(personas.nombres,' ',personas.apellidos) like ?", ["%{$keyword}%"]);
+                    })
+                    ->addColumn('numero', function ($inscripcion) {
+                        return $inscripcion->numero;
+                    })
+                    ->filterColumn('numero', function ($query, $keyword) {
+                        $query->whereRaw("registros.numero = ?", ["{$keyword}"]);
+                    })
 //                ->addColumn('role', function ($usuario) {
 //                    return $usuario->getRoleNames();
 //                })
-//                ->filterColumn('nombres', function ($query, $keyword) {
-//                    $query->whereRaw("CONCAT(users.first_name,' ',users.last_name) like ?", ["%{$keyword}%"]);
-//                })
+
                     ->rawColumns(['actions'])
                     ->setRowId('id');
                 //Agregar variables a a la respuesta json del datatables
-//                if ($request->draw == 1) {
-//                    $datatable->with([
-//                        'generos' => ['M','F']
-//                    ]);
-//                }
+                if ($request->draw == 1) {
+                    $categorias = \App\Categoria::distinct('categoria')->pluck('categoria');
+                    $circuitos = \App\Circuito::distinct('circuito')->pluck('circuito');
+                    $datatable->with([
+                        'allCategorias' => $categorias,
+                        'allCircuitos' => $circuitos
+                    ]);
+                }
 
                 return $datatable->make(true);
 
@@ -106,7 +128,6 @@ class InscripcionController extends Controller
         } else abort(403);
 
     }
-
 
 
     /**
@@ -118,25 +139,25 @@ class InscripcionController extends Controller
     {
         $user = $request->user();
 
-        $persona_email=$persona->email;
+        $persona_email = $persona->email;
 
         //verificar si se encuentra inscrito en el año
-        $config=Configuracion::with('ejercicio','impuesto')->where('status',Configuracion::ATIVO)->first();
-        $ejercicio=$config->ejercicio_id;
-        $inscription_true=Inscripcion::with('producto')
-                            ->where('persona_id',$persona->id)
-                            ->where('ejercicio_id',$ejercicio)
-                            ->first();
+        $config = Configuracion::with('ejercicio', 'impuesto')->where('status', Configuracion::ATIVO)->first();
+        $ejercicio = $config->ejercicio_id;
+        $inscription_true = Inscripcion::with('producto')
+            ->where('persona_id', $persona->id)
+            ->where('ejercicio_id', $ejercicio)
+            ->first();
 //dd($inscription_true);
-        if (count($inscription_true)>0) {
+        if (count($inscription_true) > 0) {
 
             $notification = [
-                'message_toastr' => "El cliente ya se encuentra inscrito en ". $inscription_true->producto->circuito->circuito."/".$inscription_true->producto->categoria->categoria ." en la presente temporada de Guayaco Runner",
+                'message_toastr' => "El cliente ya se encuentra inscrito en " . $inscription_true->producto->circuito->circuito . "/" . $inscription_true->producto->categoria->categoria . " en la presente temporada de Guayaco Runner",
                 'alert-type' => 'error'];
             return back()->with($notification);
         }
 
-        if ($persona_email=='' || is_null($persona_email)) {//no tiene perfil, debe crearlo antes de inscribirse
+        if ($persona_email == '' || is_null($persona_email)) {//no tiene perfil, debe crearlo antes de inscribirse
             $error_email = [
                 'message_toastr' => 'La persona no tiene un correo definido; para la facturación debe indicar uno o seleccionar consumidor final',
                 'alert-type' => 'warning'];
@@ -169,7 +190,7 @@ class InscripcionController extends Controller
         $mp = Mpago::where('status', Mpago::ACTIVO)->get();
         $formas_pago = $mp->pluck('nombre', 'id');
 
-        return view('inscripcion.interna.create', compact('categorias', 'tallas', 'deportes', 'persona', 'formas_pago', 'descuentos','error_email'));
+        return view('inscripcion.interna.create', compact('categorias', 'tallas', 'deportes', 'persona', 'formas_pago', 'descuentos', 'error_email'));
     }
 
 
@@ -246,22 +267,22 @@ class InscripcionController extends Controller
         ];
 //
         $messages = [
-            'persona_id.required'=>'Perfil de persona a inscribir no encontrado.',
-            'categoria_id.required'=>'El campo categoría es obligatorio.',
-            'circuito_id.required'=>'El campo circuito es obligatorio.',
-            'talla.required'=>'El campo talla es obligatorio cuando deportes no está presente.',
-            'mpago.required'=>'El campo método de pago es obligatorio.',
-            'costo.required'=>'El campo costo es obligatorio.',
-            'nombres_fact.required'=>'El campo Nombres para Facturación es obligatorio.',
-            'apellidos_fact.required'=>'El campo Apellidos para Facturación es obligatorio.',
-            'num_doc_fac.required'=>'El campo Identificación para Facturación es obligatorio.',
-            'email_fact.required'=>'El campo Email para Facturación es obligatorio. De lo contrario seleccione consumidor final',
-            'email_fact.email'=>'El campo Email para Facturación no tiene un formato de correo correcto.',
-            'telefono_fact.required'=>'El campo Teléfono para Facturación es obligatorio.',
-            'direccion_fact.required'=>'El campo Dirección para Facturación es obligatorio.'
+            'persona_id.required' => 'Perfil de persona a inscribir no encontrado.',
+            'categoria_id.required' => 'El campo categoría es obligatorio.',
+            'circuito_id.required' => 'El campo circuito es obligatorio.',
+            'talla.required' => 'El campo talla es obligatorio cuando deportes no está presente.',
+            'mpago.required' => 'El campo método de pago es obligatorio.',
+            'costo.required' => 'El campo costo es obligatorio.',
+            'nombres_fact.required' => 'El campo Nombres para Facturación es obligatorio.',
+            'apellidos_fact.required' => 'El campo Apellidos para Facturación es obligatorio.',
+            'num_doc_fac.required' => 'El campo Identificación para Facturación es obligatorio.',
+            'email_fact.required' => 'El campo Email para Facturación es obligatorio. De lo contrario seleccione consumidor final',
+            'email_fact.email' => 'El campo Email para Facturación no tiene un formato de correo correcto.',
+            'telefono_fact.required' => 'El campo Teléfono para Facturación es obligatorio.',
+            'direccion_fact.required' => 'El campo Dirección para Facturación es obligatorio.'
         ];
 
-        $validator = Validator::make($request->all(), $rules,$messages);
+        $validator = Validator::make($request->all(), $rules, $messages);
 
         if ($validator->fails()) {
             $notification = [
@@ -384,7 +405,7 @@ class InscripcionController extends Controller
 
             //ACTUALIZAR STOCK DE TALLAS
             $talla->decrement('stock');
-            $talla->stock > 0 ? $talla->status=Talla::ACTIVO : $talla->status=Talla::INACTIVO;
+            $talla->stock > 0 ? $talla->status = Talla::ACTIVO : $talla->status = Talla::INACTIVO;
             $talla->update();
 
             DB::Commit();
@@ -397,7 +418,7 @@ class InscripcionController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
 //            $message =  $e->getMessage();
-            $e->getCode()=='23000' ? $message='El cliente ya se encuentra inscrito en la carrera' : $message = 'Lo sentimos! Ocurrio un error y no se pudo crear la inscripción.';
+            $e->getCode() == '23000' ? $message = 'El cliente ya se encuentra inscrito en la carrera' : $message = 'Lo sentimos! Ocurrio un error y no se pudo crear la inscripción.';
             $notification = [
                 'message_toastr' => $message,
                 'alert-type' => 'error'];
@@ -451,6 +472,19 @@ class InscripcionController extends Controller
     public function destroy(Inscripcion $inscripcion)
     {
         //
+    }
+
+    /**
+     * Cambia estado de kit a entregado=1
+     * @param $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function setKit(Inscripcion $inscripcion)
+    {
+//        $categoria=Inscripcion::findOrFail($id);
+        $inscripcion->kit == Inscripcion::KIT_POR_ENTREGAR ? $inscripcion->kit = Inscripcion::KIT_ENTREGADO : $inscripcion->kit = Inscripcion::KIT_POR_ENTREGAR;
+        $inscripcion->update();
+        return response()->json(['data' => $inscripcion], 200);
     }
 
     /**ONLINE
