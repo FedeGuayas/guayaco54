@@ -28,7 +28,7 @@ class Inscripcion extends Model
     //en una inscripcion hay un producto
     public function producto()
     {
-        return $this->belongsTo('App\User');
+        return $this->belongsTo('App\Producto');
     }
 
     //en una inscripcion hay una persona

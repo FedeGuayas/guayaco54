@@ -15,6 +15,14 @@
             <h4 class="text-info">Inscribir al Cliente</h4>
         </div>
 
+        @if (isset($error_email))
+            <div class="animated bounceIn delay-1s border-radius-10 box-shadow alert alert-danger col-md-7" role="alert"
+                 style="position: fixed; right: 5%;top: 20%;width: 60%;">
+                <i class="fa fa-exclamation-triangle"></i> El cliente no tiene un <strong>correo</strong> definido
+                <strong> en Facturación. </strong> Debe indicar uno o seleccionar consumidor final
+            </div>
+        @endif
+
         {!! Form::open(['route'=>['admin.inscription.store'],'method' => 'post', 'autocomplete'=> 'off', 'class'=>'form_noEnter']) !!}
         {!! Form::hidden('persona_id',$persona->id,['id'=>$persona->id]) !!}
         <div class="row clearfix justify-content-center">
@@ -136,7 +144,7 @@
                                             <div class="col-md-6">
                                                 <div class="form-group">
                                                     {!! Form::label('email_fact','Email *') !!}
-                                                    {!! Form::email('email_fact',$persona->email ? $persona->email : 'consumidor@final.mail',['class'=>'form-control','placeholder'=>'Email','style'=>'text-transform: lowercase','id'=>'email_fact','required']) !!}
+                                                    {!! Form::email('email_fact',$persona->email ? $persona->email : '',['class'=>'form-control','placeholder'=>'Email','style'=>'text-transform: lowercase','id'=>'email_fact','required']) !!}
                                                 </div>
                                             </div>
                                         </div>
@@ -156,7 +164,8 @@
                                         </div>
                                         <div class="custom-control custom-checkbox mb-15">
                                             <input type="checkbox" class="custom-control-input" id="consumidor_final">
-                                            <label class="custom-control-label" for="consumidor_final"> Consumidor Final</label>
+                                            <label class="custom-control-label" for="consumidor_final"> Consumidor
+                                                Final</label>
                                         </div>
                                         <small class="form-text text-danger"> * Campos obligatorios</small>
                                     </section>
@@ -233,7 +242,9 @@
                             <!-- FIN Datos Perfil-->
                             <div class="row pt-2">
                                 <div class="col-md-3">
-                                    <button type="submit" class="btn btn-block btn-primary" id="guardar_inscripcion" disabled>Guardar Inscripción</button>
+                                    <button type="submit" class="btn btn-block btn-primary" id="guardar_inscripcion"
+                                            disabled>Guardar Inscripción
+                                    </button>
                                 </div>
                             </div>
                         </div><!-- ./ tab-content -->
@@ -263,16 +274,14 @@
         let categoria = $("#categoria_id");
         let costo = $("#costo");
         let stock = $("#stock-talla");
-        let guardar_inscripcion=$("#guardar_inscripcion");
+        let guardar_inscripcion = $("#guardar_inscripcion");
 
-        let nombres_fact=$("#nombres_fact");
-        let apellidos_fact=$("#apellidos_fact");
-        let num_doc_fact=$("#num_doc_fact");
-        let email_fact=$("#email_fact");
-        let telefono_fact=$("#telefono_fact");
-        let direccion_fact=$("#direccion_fact");
-
-
+        let nombres_fact = $("#nombres_fact");
+        let apellidos_fact = $("#apellidos_fact");
+        let num_doc_fact = $("#num_doc_fact");
+        let email_fact = $("#email_fact");
+        let telefono_fact = $("#telefono_fact");
+        let direccion_fact = $("#direccion_fact");
 
 
         $(".form_noEnter").keypress(function (e) {
@@ -281,7 +290,18 @@
             }
         });
 
-        $("#categoria_id").change(function () {
+        //Mostrar alert si no tiene correo el cliente
+        @if(isset($error_email) && empty($persona['email']))
+        setTimeout(function () {
+        $('.alert').removeClass('bounceIn');
+        $(".alert").addClass('bounceOut', function () {
+            $(this).remove();
+        });
+        }, 5000);
+        @endif
+
+
+$("#categoria_id").change(function () {
             let id = this.value;
             descuentos.val("option:eq(0)").prop('selected', true);
             descuentos.selectpicker('refresh');
@@ -297,7 +317,7 @@
                     type: "GET",
                     headers: {'X-CSRF-TOKEN': token},
                     dataType: 'json',
-                    data: data= {id: id},
+                    data: data = {id: id},
                     success: (response) => {
                         resolve(response);
                     },
@@ -355,7 +375,7 @@
             let circuito_id = this.value;
             let categoria_id = categoria.val();
             let descuento_id = descuentos.val();
-            getCosto(categoria_id,circuito_id,descuento_id);
+            getCosto(categoria_id, circuito_id, descuento_id);
         });
 
 //        //costo update for descuentos
@@ -363,11 +383,11 @@
             let descuento_id = this.value;
             let circuito_id = circuito.val();
             let categoria_id = categoria.val();
-            getCosto(categoria_id,circuito_id,descuento_id);
+            getCosto(categoria_id, circuito_id, descuento_id);
         });
 
         //costo
-        let getCosto=function(categoria_id,circuito_id,descuento_id){
+        let getCosto = function (categoria_id, circuito_id, descuento_id) {
             let prom = new Promise((resolve, reject) => {
                 $.ajax({
                     url: "{{route('admin.getCosto')}}",
@@ -375,7 +395,7 @@
                     headers: {'X-CSRF-TOKEN': token},
                     dataType: 'json',
                     data: {
-                        descuento_id:descuento_id,
+                        descuento_id: descuento_id,
                         circuito_id: circuito_id,
                         categoria_id: categoria_id
                     },
@@ -435,9 +455,9 @@
 
         $("#mpago").on('change', function () {
             if ($(this).val() !== '') {
-                guardar_inscripcion.prop('disabled',false);
+                guardar_inscripcion.prop('disabled', false);
             } else {
-                guardar_inscripcion.prop('disabled',true);
+                guardar_inscripcion.prop('disabled', true);
 
             }
         });
@@ -445,26 +465,25 @@
         //Habilitar / Desabilitar boton de pago
         $("#consumidor_final").on('change', function (e) {
             if ($(this).is(':checked')) {
-                nombres_fact.val('Consumidor').prop('readonly',true);
-                apellidos_fact.val('Final').prop('readonly',true);
-                num_doc_fact.val('999999999').prop('readonly',true);
-                email_fact.val('consumidor@final.mail').prop('readonly',true);
-                telefono_fact.val('N/A').prop('readonly',true);
-                direccion_fact.val('N/A').prop('readonly',true);
+                nombres_fact.val('Consumidor').prop('readonly', true);
+                apellidos_fact.val('Final').prop('readonly', true);
+                num_doc_fact.val('999999999').prop('readonly', true);
+                email_fact.val('consumidor@final.mail').prop('readonly', true);
+                telefono_fact.val('N/A').prop('readonly', true);
+                direccion_fact.val('N/A').prop('readonly', true);
             }
             else {
-                nombres_fact.val('').prop('readonly',false);
-                apellidos_fact.val('').prop('readonly',false);
-                num_doc_fact.val('').prop('readonly',false);
-                email_fact.val('').prop('readonly',false);
-                telefono_fact.val('').prop('readonly',false);
-                direccion_fact('').prop('readonly',false);
+                nombres_fact.val('').prop('readonly', false);
+                apellidos_fact.val('').prop('readonly', false);
+                num_doc_fact.val('').prop('readonly', false);
+                email_fact.val('').prop('readonly', false);
+                telefono_fact.val('').prop('readonly', false);
+                direccion_fact('').prop('readonly', false);
             }
         });
 
 
     });
-
             {{--Alertas con Toastr--}}
             @if(Session::has('message_toastr'))
     let type = "{{ Session::get('alert-type') }}";
@@ -473,6 +492,7 @@
             @endif
             {{-- FIN Alertas con Toastr--}}
             {{--errorres de validacion--}}
+
             @if ($errors->any())
     let errors = [];
     let error = '';
@@ -486,6 +506,7 @@ errors.push("{{$error}}");
     }
     showError(error);
     @endif
+
 
 </script>
 @endpush

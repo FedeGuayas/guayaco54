@@ -118,6 +118,30 @@ class InscripcionController extends Controller
     {
         $user = $request->user();
 
+        $persona_email=$persona->email;
+
+        //verificar si se encuentra inscrito en el año
+        $config=Configuracion::with('ejercicio','impuesto')->where('status',Configuracion::ATIVO)->first();
+        $ejercicio=$config->ejercicio_id;
+        $inscription_true=Inscripcion::with('producto')
+                            ->where('persona_id',$persona->id)
+                            ->where('ejercicio_id',$ejercicio)
+                            ->first();
+//dd($inscription_true);
+        if (count($inscription_true)>0) {
+
+            $notification = [
+                'message_toastr' => "El cliente ya se encuentra inscrito en ". $inscription_true->producto->circuito->circuito."/".$inscription_true->producto->categoria->categoria ." en la presente temporada de Guayaco Runner",
+                'alert-type' => 'error'];
+            return back()->with($notification);
+        }
+
+        if ($persona_email=='' || is_null($persona_email)) {//no tiene perfil, debe crearlo antes de inscribirse
+            $error_email = [
+                'message_toastr' => 'La persona no tiene un correo definido; para la facturación debe indicar uno o seleccionar consumidor final',
+                'alert-type' => 'warning'];
+        }
+
         $edad = $persona->getEdad();
 
         $cat_all = Categoria::where('status', Categoria::ACTIVO)
@@ -145,7 +169,7 @@ class InscripcionController extends Controller
         $mp = Mpago::where('status', Mpago::ACTIVO)->get();
         $formas_pago = $mp->pluck('nombre', 'id');
 
-        return view('inscripcion.interna.create', compact('categorias', 'tallas', 'deportes', 'persona', 'formas_pago', 'descuentos'));
+        return view('inscripcion.interna.create', compact('categorias', 'tallas', 'deportes', 'persona', 'formas_pago', 'descuentos','error_email'));
     }
 
 
@@ -231,7 +255,7 @@ class InscripcionController extends Controller
             'nombres_fact.required'=>'El campo Nombres para Facturación es obligatorio.',
             'apellidos_fact.required'=>'El campo Apellidos para Facturación es obligatorio.',
             'num_doc_fac.required'=>'El campo Identificación para Facturación es obligatorio.',
-            'email_fact.required'=>'El campo Email para Facturación es obligatorio.',
+            'email_fact.required'=>'El campo Email para Facturación es obligatorio. De lo contrario seleccione consumidor final',
             'email_fact.email'=>'El campo Email para Facturación no tiene un formato de correo correcto.',
             'telefono_fact.required'=>'El campo Teléfono para Facturación es obligatorio.',
             'direccion_fact.required'=>'El campo Dirección para Facturación es obligatorio.'
@@ -243,7 +267,7 @@ class InscripcionController extends Controller
             $notification = [
                 'message_toastr' => $validator->errors()->first(),
                 'alert-type' => 'error'];
-            return back()->with($notification)->withInput();
+            return back()->with($notification)->withInput($notification);
         }
 
         try {
@@ -371,13 +395,14 @@ class InscripcionController extends Controller
             return redirect()->route('admin.inscription.index')->with($notification);
 
         } catch (\Exception $e) {
-            $message = $e->getMessage();
-//            $message = 'Lo sentimos! Ocurrio un error y no se pudo crear la inscripción.';
+            DB::rollBack();
+//            $message =  $e->getMessage();
+            $e->getCode()=='23000' ? $message='El cliente ya se encuentra inscrito en la carrera' : $message = 'Lo sentimos! Ocurrio un error y no se pudo crear la inscripción.';
             $notification = [
                 'message_toastr' => $message,
                 'alert-type' => 'error'];
             return redirect()->back()->with($notification)->withInput();
-            DB::rollBack();
+
         }
 
 
