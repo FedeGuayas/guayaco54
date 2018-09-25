@@ -71,4 +71,10 @@ class Factura extends Model
     {
         return $this->belongsTo('App\Mpago');
     }
+
+    //descuento aplicado a una factura
+    public function descuento()
+    {
+        return $this->belongsTo('App\Descuento');
+    }
 }

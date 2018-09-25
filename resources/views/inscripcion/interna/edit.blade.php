@@ -15,14 +15,6 @@
             <h4 class="text-info">Editar inscripción</h4>
         </div>
 
-        {{--@if (isset($error_email))--}}
-            {{--<div class="animated bounceIn delay-1s border-radius-10 box-shadow alert alert-danger col-md-7" role="alert"--}}
-                 {{--style="position: fixed; right: 5%;top: 20%;width: 60%; z-index: 9999">--}}
-                {{--<i class="fa fa-exclamation-triangle"></i> El cliente no tiene un <strong>correo</strong> definido--}}
-                {{--<strong> en Facturación. </strong> Debe indicar uno o seleccionar consumidor final--}}
-            {{--</div>--}}
-        {{--@endif--}}
-
         {!! Form::model($inscripcion,['route'=>['admin.inscription.update',$inscripcion->id],'method' => 'put', 'autocomplete'=> 'off', 'class'=>'form_noEnter']) !!}
 {{--        {!! Form::hidden('persona_id',$persona->id,['id'=>$persona->id]) !!}--}}
         <div class="row clearfix justify-content-center">
@@ -73,7 +65,8 @@
                                                     <span class="badge badge-pill badge-primary pull-right"
                                                           id="stock-talla" data-toggle="tooltip" data-placement="top"
                                                           title="Stock">0</span>
-                                                    {!! Form::select('talla', $tallas,$inscripcion->talla->id, ['class'=>'selectpicker show-tick form-control','data-style'=>'btn-outline-primary','id'=>'talla','placeholder'=>'Seleccione ...', 'data-live-search'=>'true','data-container'=>'.main-container']) !!}
+                                                    {!! Form::select('talla', $tallas, $inscripcion->talla->id, ['class'=>'selectpicker show-tick form-control','data-style'=>'btn-outline-primary','id'=>'talla','placeholder'=>'Seleccione ...', 'data-live-search'=>'true','data-container'=>'.main-container']) !!}
+                                                    @if ($talla_agotada) <small class="form-text text-danger">La talla ({{$inscripcion->talla->talla.'/'.$inscripcion->talla->color}}) de esta inscripción esta agotada. Si no desea cambiar de talla no es necesario que escoja ninguna</small> @endif
                                                 </div>
                                             </div>
                                             <div class="col-md-3 col-sm-12">
@@ -90,7 +83,7 @@
                                             <div class="col-md-3 col-sm-12">
                                                 <div class="form-group">
                                                     {!! Form::label('descuentos','Descuentos:',['class'=>'weight-600']) !!}
-                                                    {!! Form::select('descuentos', $descuentos,null, ['class'=>'selectpicker show-tick form-control','data-style'=>'btn-outline-primary','id'=>'descuentos','data-container'=>'.main-container','placeholder'=>'Seleccione ...']) !!}
+                                                    {!! Form::select('descuentos', $descuentos,$inscripcion->factura->descuento_id, ['class'=>'selectpicker show-tick form-control','data-style'=>'btn-outline-primary','id'=>'descuentos','data-container'=>'.main-container','placeholder'=>'Seleccione ...']) !!}
                                                 </div>
                                             </div>
                                             <div class="col-md-3 col-sm-12">

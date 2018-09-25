@@ -140,11 +140,11 @@ class InscripcionController extends Controller
      */
     public function createBack(Request $request, Persona $persona)
     {
-        $user = $request->user();
-
         $persona_email = $persona->email;
 
-        //verificar si se encuentra inscrito en el año
+        $persona_email == '' || is_null($persona_email) ?   $error_email=true : $error_email=false;
+
+            //verificar si se encuentra inscrito en el año
         $config = Configuracion::with('ejercicio', 'impuesto')->where('status', Configuracion::ATIVO)->first();
         $ejercicio = $config->ejercicio_id;
         $inscription_true = Inscripcion::with('producto')
@@ -158,12 +158,6 @@ class InscripcionController extends Controller
                 'message_toastr' => "El cliente ya se encuentra inscrito en " . $inscription_true->producto->circuito->circuito . "/" . $inscription_true->producto->categoria->categoria . " en la presente temporada de Guayaco Runner",
                 'alert-type' => 'error'];
             return back()->with($notification);
-        }
-
-        if ($persona_email == '' || is_null($persona_email)) {//no tiene perfil, debe crearlo antes de inscribirse
-            $error_email = [
-                'message_toastr' => 'La persona no tiene un correo definido; para la facturación debe indicar uno o seleccionar consumidor final',
-                'alert-type' => 'warning'];
         }
 
         $edad = $persona->getEdad();
@@ -325,7 +319,7 @@ class InscripcionController extends Controller
                 ->where('id', $request->input('descuentos'))
                 ->first();
             $desc = 0; //descuento aplicado
-            if ($descuento && $costo !== $producto->price) {
+            if ($descuento || $costo !== $producto->price) {
                 $desc = ($producto->price) - ($costo);
             }
 
@@ -357,6 +351,7 @@ class InscripcionController extends Controller
                 $factura->total = $costo; //el subtotaL -descuento
                 $factura->user_id = $user->id;
                 $factura->persona()->associate($persona);
+                $factura->descuento()->associate($descuento);
                 $factura->nombre = $nombres_fact . ' ' . $apellidos_fact;
                 $factura->email = $email_fact;
                 $factura->direccion = $direccion_fact;
@@ -445,18 +440,6 @@ class InscripcionController extends Controller
 
 
     /**
-     * Vista Editar inscripcion Back
-     *
-     * @param  \App\Inscripcion $inscripcion
-     * @return \Illuminate\Http\Response
-     */
-//    public function editBack(Request $request, $id)
-//    {
-//
-//    }
-
-
-    /**
      * Show the form for editing the specified resource.
      *
      * @param  \App\Inscripcion $inscripcion
@@ -468,7 +451,6 @@ class InscripcionController extends Controller
 //        $inscripcion=Inscripcion::with('user', 'producto', 'persona', 'talla', 'factura')
 //            ->where('id',$id)
 //            ->first();
-
 
         $edad = $inscripcion->persona->getEdad();
 
@@ -489,6 +471,9 @@ class InscripcionController extends Controller
             ->get();
         $tallas = $tallas_all->pluck('talla', 'id');
 
+        $talla_de_inscripcion=Talla::where('id',$inscripcion->talla_id)->select('stock')->first();
+        $talla_de_inscripcion->stock > 0 ? $talla_agotada=false : $talla_agotada=true;
+
         $deporte_all = Deporte::where('status', Deporte::ACTIVO)->get();
         $deportes = $deporte_all->pluck('deporte', 'id');
 
@@ -500,7 +485,7 @@ class InscripcionController extends Controller
         $mp = Mpago::where('status', Mpago::ACTIVO)->get();
         $formas_pago = $mp->pluck('nombre', 'id');
 
-        return view('inscripcion.interna.edit', compact('categorias', 'tallas', 'deportes', 'inscripcion', 'formas_pago', 'descuentos','circuito_set'));
+        return view('inscripcion.interna.edit', compact('categorias', 'tallas', 'deportes', 'inscripcion', 'formas_pago', 'descuentos','circuito_set','talla_agotada'));
     }
 
     /**
@@ -598,17 +583,29 @@ class InscripcionController extends Controller
                 $costo = number_format($producto->price, 2, '.', ' ');
             }
 
+
+            //edad de persona a inscribir
+            $edad=intval($request->input('persona_edad'));
+            if ($edad >= 66 ) { //adulto mayor 50% descuento
+                $descuento = $costo* 0.50 ;
+                $costo = $costo - $descuento;
+                $costo = number_format($costo, 2, '.', ' ');
+                return response()->json(['data' => $costo], 200);
+            }
+
             $descuento = Descuento::where('status', Descuento::ACTIVO)
                 ->where('id', $request->input('descuento_id'))
                 ->first();
 
-            if ($descuento) {
+            if ($descuento) { //descuento seleccionado
                 $descuento = $descuento->appDescuento($costo);
                 $costo = $costo - $descuento;
                 $costo = number_format($costo, 2, '.', ' ');
+                return response()->json(['data' => $costo], 200);
             }
 
             return response()->json(['data' => $costo], 200);
+
         }
     }
 

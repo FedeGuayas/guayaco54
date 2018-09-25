@@ -15,7 +15,7 @@
             <h4 class="text-info">Inscribir al Cliente</h4>
         </div>
 
-        @if (isset($error_email))
+        @if ($error_email)
             <div class="animated bounceIn delay-1s border-radius-10 box-shadow alert alert-danger col-md-7" role="alert"
                  style="position: fixed; right: 5%;top: 20%;width: 60%; z-index: 9999">
                 <i class="fa fa-exclamation-triangle"></i> El cliente no tiene un <strong>correo</strong> definido
@@ -24,7 +24,8 @@
         @endif
 
         {!! Form::open(['route'=>['admin.inscription.store'],'method' => 'post', 'autocomplete'=> 'off', 'class'=>'form_noEnter']) !!}
-        {!! Form::hidden('persona_id',$persona->id,['id'=>$persona->id]) !!}
+        {!! Form::hidden('persona_id',$persona->id,['id'=>'persona_id']) !!}
+        {!! Form::hidden('persona_edad',$persona->getEdad(),['id'=>'persona_edad']) !!}
         <div class="row clearfix justify-content-center">
 
             <div class="col-md-10 col-sm-12 mb-30">
@@ -267,6 +268,7 @@
 
         let token = $("input[name=token]").val();
 
+        let persona_edad = $("#persona_edad").val();
         let deporte = $("#deporte_id");
         let talla = $("#talla");
         let circuito = $("#circuito_id");
@@ -395,14 +397,17 @@ $("#categoria_id").change(function () {
                     headers: {'X-CSRF-TOKEN': token},
                     dataType: 'json',
                     data: {
+                        persona_edad: persona_edad,
                         descuento_id: descuento_id,
                         circuito_id: circuito_id,
                         categoria_id: categoria_id
                     },
                     success: (response) => {
+                        console.log(response)
                         resolve(response);
                     },
                     error: (error) => {
+                        console.log(error)
                         reject(error);
                     }
                 });

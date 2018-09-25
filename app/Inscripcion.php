@@ -40,7 +40,7 @@ class Inscripcion extends Model
     //en una inscripcion hay una talla
     public function talla()
     {
-        return $this->belongsTo('App\Persona');
+        return $this->belongsTo('App\Talla');
     }
     //en una inscripcion hay una factura si no es deportista que tiene costo 0 y no se genera factura
     public function factura()

@@ -8,6 +8,7 @@
         "php": ">=5.6.4",
         "brian2694/laravel-toastr": "^5.5",
         "davejamesmiller/laravel-breadcrumbs": "3.x",
+        "doctrine/dbal": "^2.5",
         "laravel/framework": "5.4.*",
         "laravel/tinker": "~1.0",
         "laravelcollective/html": "^5.4.0",
