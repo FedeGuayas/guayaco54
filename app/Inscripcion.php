@@ -48,4 +48,10 @@ class Inscripcion extends Model
         return $this->belongsTo('App\Factura');
     }
 
+    //
+    public function deporte()
+    {
+        return $this->belongsTo('App\Deporte');
+    }
+
 }

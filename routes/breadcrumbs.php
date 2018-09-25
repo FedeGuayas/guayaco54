@@ -256,13 +256,12 @@ Breadcrumbs::register('inscripcion-create', function($breadcrumbs)
     $breadcrumbs->parent('clientes');
     $breadcrumbs->push('Inscribir ', route('personas.index'));
 });
-//
-//// Home>Incripciones>Personas [EDIT]
-//Breadcrumbs::register('cliente-edit', function($breadcrumbs,$persona)
-//{
-//    $breadcrumbs->parent('clientes');
-//    $breadcrumbs->push('Editar cliente '.$persona->getFullName(), route('personas.index'));
-//});
+// Home>Incripciones>Personas [EDIT] backend
+Breadcrumbs::register('inscripcion-edit', function($breadcrumbs,$persona)
+{
+    $breadcrumbs->parent('inscripciones');
+    $breadcrumbs->push('Editar inscripción '.$persona->getFullName(), route('admin.inscription.index'));
+});
 
 
 

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Categoria;
+use App\Circuito;
 use App\Configuracion;
 use App\Deporte;
 use App\Descuento;
@@ -76,17 +77,19 @@ class InscripcionController extends Controller
                         <i class="fa fa-trash-o text-danger"></i> 
                     </a>
                 @endcan
-                @can(\'entregar_kit\')
-                @if ($kit!=\\App\\Inscripcion::KIT_ENTREGADO)                
+                @if ($kit!=\\App\\Inscripcion::KIT_ENTREGADO)   
+                    @can(\'entregar_kit\')
                     <a class="dropdown-item status_kit" href="#" data-id="{{$id}}" data-toggle="tooltip" data-placement="top" title="Entregar Kit">
                         <i class="fa fa-thumbs-o-up text-primary"></i> Entregar
                     </a>
+                    @endcan
                 @else
+                    @can(\'devolver_kit\')
                     <a class="dropdown-item status_kit" href="#" data-id="{{$id}}" data-toggle="tooltip" data-placement="top" title="Devolver Kit">
                         <i class="fa fa-thumbs-o-down text-danger"></i> Devolver
                     </a>
+                    @endcan
                 @endif
-                @endcan
                 </div>
             </div>
                 ';
@@ -148,7 +151,7 @@ class InscripcionController extends Controller
             ->where('persona_id', $persona->id)
             ->where('ejercicio_id', $ejercicio)
             ->first();
-//dd($inscription_true);
+
         if (count($inscription_true) > 0) {
 
             $notification = [
@@ -440,6 +443,19 @@ class InscripcionController extends Controller
         //
     }
 
+
+    /**
+     * Vista Editar inscripcion Back
+     *
+     * @param  \App\Inscripcion $inscripcion
+     * @return \Illuminate\Http\Response
+     */
+//    public function editBack(Request $request, $id)
+//    {
+//
+//    }
+
+
     /**
      * Show the form for editing the specified resource.
      *
@@ -448,7 +464,43 @@ class InscripcionController extends Controller
      */
     public function edit(Inscripcion $inscripcion)
     {
-        //
+//        dd($inscripcion);
+//        $inscripcion=Inscripcion::with('user', 'producto', 'persona', 'talla', 'factura')
+//            ->where('id',$id)
+//            ->first();
+
+
+        $edad = $inscripcion->persona->getEdad();
+
+        $cat_all = Categoria::where('status', Categoria::ACTIVO)
+            ->where([
+                ['edad_start', '<=', $edad],
+                ['edad_end', '>=', $edad],
+            ])->get();
+
+        $categorias = $cat_all->pluck('categoria', 'id');
+
+        $circuito=Circuito::where('id',$inscripcion->producto->circuito_id)->get();
+        $circuito_set=$circuito->pluck('circuito','id');
+
+        $tallas_all = Talla::where('status', Talla::ACTIVO)
+            ->where('stock', '>', 0)
+            ->select(DB::raw('concat (talla," - ",color) as talla,id'))
+            ->get();
+        $tallas = $tallas_all->pluck('talla', 'id');
+
+        $deporte_all = Deporte::where('status', Deporte::ACTIVO)->get();
+        $deportes = $deporte_all->pluck('deporte', 'id');
+
+        $descuentos_all = Descuento::where('status', Descuento::ACTIVO)
+            ->select(DB::raw('concat (porciento," % ",nombre) as nombre,id'))
+            ->get();
+        $descuentos = $descuentos_all->pluck('nombre', 'id');
+
+        $mp = Mpago::where('status', Mpago::ACTIVO)->get();
+        $formas_pago = $mp->pluck('nombre', 'id');
+
+        return view('inscripcion.interna.edit', compact('categorias', 'tallas', 'deportes', 'inscripcion', 'formas_pago', 'descuentos','circuito_set'));
     }
 
     /**

@@ -1,9 +1,9 @@
 @extends('layouts.back.master')
 
-@section('page_title','Inscribir cliente')
+@section('page_title','Editar inscripción')
 
 @section('breadcrumbs')
-    {!! Breadcrumbs::render('inscripcion-create') !!}
+    {!! Breadcrumbs::render('inscripcion-edit',$inscripcion->persona) !!}
 @stop
 
 
@@ -12,26 +12,26 @@
     <div class="pd-20 bg-white border-radius-4 box-shadow mb-30">
 
         <div class="clearfix mb-3">
-            <h4 class="text-info">Inscribir al Cliente</h4>
+            <h4 class="text-info">Editar inscripción</h4>
         </div>
 
-        @if (isset($error_email))
-            <div class="animated bounceIn delay-1s border-radius-10 box-shadow alert alert-danger col-md-7" role="alert"
-                 style="position: fixed; right: 5%;top: 20%;width: 60%; z-index: 9999">
-                <i class="fa fa-exclamation-triangle"></i> El cliente no tiene un <strong>correo</strong> definido
-                <strong> en Facturación. </strong> Debe indicar uno o seleccionar consumidor final
-            </div>
-        @endif
+        {{--@if (isset($error_email))--}}
+            {{--<div class="animated bounceIn delay-1s border-radius-10 box-shadow alert alert-danger col-md-7" role="alert"--}}
+                 {{--style="position: fixed; right: 5%;top: 20%;width: 60%; z-index: 9999">--}}
+                {{--<i class="fa fa-exclamation-triangle"></i> El cliente no tiene un <strong>correo</strong> definido--}}
+                {{--<strong> en Facturación. </strong> Debe indicar uno o seleccionar consumidor final--}}
+            {{--</div>--}}
+        {{--@endif--}}
 
-        {!! Form::open(['route'=>['admin.inscription.store'],'method' => 'post', 'autocomplete'=> 'off', 'class'=>'form_noEnter']) !!}
-        {!! Form::hidden('persona_id',$persona->id,['id'=>$persona->id]) !!}
+        {!! Form::model($inscripcion,['route'=>['admin.inscription.update',$inscripcion->id],'method' => 'put', 'autocomplete'=> 'off', 'class'=>'form_noEnter']) !!}
+{{--        {!! Form::hidden('persona_id',$persona->id,['id'=>$persona->id]) !!}--}}
         <div class="row clearfix justify-content-center">
 
             <div class="col-md-10 col-sm-12 mb-30">
 
                 <div class="pd-20 bg-white border-radius-4 box-shadow">
-                    <h5 class="weight-500 mb-20">{{$persona->getFullName()}}</h5>
-                    <p class="font-14 text-info">Edad : {{$persona->getEdad()}} años. </p>
+                    <h5 class="weight-500 mb-20">{{$inscripcion->persona->getFullName()}}</h5>
+                    <p class="font-14 text-info">Edad : {{$inscripcion->persona->getEdad()}} años. </p>
 
                     <div class="tab">
                         <ul class="nav nav-tabs" role="tablist">
@@ -58,13 +58,13 @@
                                             <div class="col-md-3 col-sm-12">
                                                 <div class="form-group">
                                                     {!! Form::label('categoria_id','Categorías: *',['class'=>'weight-600']) !!}
-                                                    {!! Form::select('categoria_id', $categorias,null, ['class'=>'selectpicker show-tick form-control','data-style'=>'btn-outline-primary','id'=>'categoria_id','data-container'=>'.main-container','placeholder'=>'Seleccione ...']) !!}
+                                                    {!! Form::select('categoria_id', $categorias,$inscripcion->producto->categoria_id, ['class'=>'selectpicker show-tick form-control','data-style'=>'btn-outline-primary','id'=>'categoria_id','data-container'=>'.main-container','placeholder'=>'Seleccione ...']) !!}
                                                 </div>
                                             </div>
                                             <div class="col-md-3 col-sm-12">
                                                 <div class="form-group">
                                                     {!! Form::label('circuito_id','Circuitos: *',['class'=>'weight-600']) !!}
-                                                    {!! Form::select('circuito_id',[] ,null, ['class'=>'selectpicker show-tick form-control','data-style'=>'btn-outline-primary','placeholder'=>'Seleccione ...','id'=>'circuito_id','data-container'=>'.main-container']) !!}
+                                                    {!! Form::select('circuito_id',$circuito_set ,$inscripcion->producto->circuito_id, ['class'=>'selectpicker show-tick form-control','data-style'=>'btn-outline-primary','placeholder'=>'Seleccione ...','id'=>'circuito_id','data-container'=>'.main-container']) !!}
                                                 </div>
                                             </div>
                                             <div class="col-md-3 col-sm-12">
@@ -73,13 +73,13 @@
                                                     <span class="badge badge-pill badge-primary pull-right"
                                                           id="stock-talla" data-toggle="tooltip" data-placement="top"
                                                           title="Stock">0</span>
-                                                    {!! Form::select('talla', $tallas,null, ['class'=>'selectpicker show-tick form-control','data-style'=>'btn-outline-primary','id'=>'talla','placeholder'=>'Seleccione ...', 'data-live-search'=>'true','data-container'=>'.main-container']) !!}
+                                                    {!! Form::select('talla', $tallas,$inscripcion->talla->id, ['class'=>'selectpicker show-tick form-control','data-style'=>'btn-outline-primary','id'=>'talla','placeholder'=>'Seleccione ...', 'data-live-search'=>'true','data-container'=>'.main-container']) !!}
                                                 </div>
                                             </div>
                                             <div class="col-md-3 col-sm-12">
                                                 <div class="form-group">
                                                     {!! Form::label('deporte_id','Deportes: ',['class'=>'weight-600']) !!}
-                                                    {!! Form::select('deporte_id', $deportes,null, ['class'=>'selectpicker show-tick form-control','data-style'=>'btn-outline-primary','id'=>'deporte_id', 'data-live-search'=>'true','data-container'=>'.main-container','placeholder'=>'Seleccione ...','disabled']) !!}
+                                                    {!! Form::select('deporte_id', $deportes,$inscripcion->deporte ? $inscripcion->talla->id: '', ['class'=>'selectpicker show-tick form-control','data-style'=>'btn-outline-primary','id'=>'deporte_id', 'data-live-search'=>'true','data-container'=>'.main-container','placeholder'=>'Seleccione ...','disabled']) !!}
                                                     <small class="form-text text-muted"> Solo si Categoría =
                                                         Deportista
                                                     </small>
@@ -96,7 +96,7 @@
                                             <div class="col-md-3 col-sm-12">
                                                 <div class="form-group">
                                                     {!! Form::label('mpago','Formas de Pago: *',['class'=>'weight-600']) !!}
-                                                    {!! Form::select('mpago', $formas_pago,null, ['class'=>'selectpicker show-tick form-control','data-style'=>'btn-outline-primary','id'=>'mpago','data-container'=>'.main-container','placeholder'=>'Seleccione ...']) !!}
+                                                    {!! Form::select('mpago', $formas_pago,$inscripcion->factura->mpago->id, ['class'=>'selectpicker show-tick form-control','data-style'=>'btn-outline-primary','id'=>'mpago','data-container'=>'.main-container','placeholder'=>'Seleccione ...']) !!}
                                                 </div>
                                             </div>
                                             <div class="col-md-3 col-sm-12">
@@ -121,16 +121,10 @@
                                 <div class="pd-20">
                                     <section>
                                         <div class="row">
-                                            <div class="col-md-6">
+                                            <div class="col-md-8">
                                                 <div class="form-group">
-                                                    {!! Form::label('nombres_fact','Nombres *') !!}
-                                                    {!! Form::text('nombres_fact',$persona->nombres,['class'=>'form-control','style'=>'text-transform: uppercase','required','id'=>'nombres_fact','required']) !!}
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="form-group">
-                                                    {!! Form::label('apellidos_fact','Apellidos *') !!}
-                                                    {!! Form::text('apellidos_fact',$persona->apellidos,['class'=>'form-control','style'=>'text-transform: uppercase','id'=>'apellidos_fact','required']) !!}
+                                                    {!! Form::label('nombres_fact','Nombres y Apellidos*') !!}
+                                                    {!! Form::text('nombres_fact',$inscripcion->factura->nombre,['class'=>'form-control','style'=>'text-transform: uppercase','required','id'=>'nombres_fact','required']) !!}
                                                 </div>
                                             </div>
                                         </div>
@@ -138,13 +132,13 @@
                                             <div class="col-md-6">
                                                 <div class="form-group">
                                                     {!! Form::label('num_doc_fact','Identificación *') !!}
-                                                    {!! Form::text('num_doc_fact',$persona->num_doc,['class'=>'form-control','style'=>'text-transform: uppercase','id'=>'num_doc_fact','required']) !!}
+                                                    {!! Form::text('num_doc_fact',$inscripcion->factura->identificacion,['class'=>'form-control','style'=>'text-transform: uppercase','id'=>'num_doc_fact','required']) !!}
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="form-group">
                                                     {!! Form::label('email_fact','Email *') !!}
-                                                    {!! Form::email('email_fact',$persona->email ? $persona->email : '',['class'=>'form-control','placeholder'=>'Email','style'=>'text-transform: lowercase','id'=>'email_fact','required']) !!}
+                                                    {!! Form::email('email_fact',$inscripcion->factura->email,['class'=>'form-control','placeholder'=>'Email','style'=>'text-transform: lowercase','id'=>'email_fact','required']) !!}
                                                 </div>
                                             </div>
                                         </div>
@@ -152,20 +146,19 @@
                                             <div class="col-md-6">
                                                 <div class="form-group">
                                                     {!! Form::label('telefono_fact','Teléfono *') !!}
-                                                    {!! Form::text('telefono_fact',$persona->telefono ? $persona->telefono : 'N/A',['class'=>'form-control','id'=>'telefono_fact','required']) !!}
+                                                    {!! Form::text('telefono_fact',$inscripcion->factura->telefono,['class'=>'form-control','id'=>'telefono_fact','required']) !!}
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="form-group">
                                                     {!! Form::label('direccion_fact','Dirección *') !!}
-                                                    {!! Form::text('direccion_fact',$persona->direccion ? $persona->direccion : 'N/A',['class'=>'form-control','style'=>'text-transform: uppercase','id'=>'direccion_fact','required']) !!}
+                                                    {!! Form::text('direccion_fact',$inscripcion->factura->direccion,['class'=>'form-control','style'=>'text-transform: uppercase','id'=>'direccion_fact','required']) !!}
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="custom-control custom-checkbox mb-15">
                                             <input type="checkbox" class="custom-control-input" id="consumidor_final">
-                                            <label class="custom-control-label" for="consumidor_final"> Consumidor
-                                                Final</label>
+                                            <label class="custom-control-label" for="consumidor_final">Editar Facturación                                                Final</label>
                                         </div>
                                         <small class="form-text text-danger"> * Campos obligatorios</small>
                                     </section>
@@ -180,25 +173,25 @@
                                             <div class="col-md-3">
                                                 <div class="form-group">
                                                     {!! Form::label('nombres','Nombres') !!}
-                                                    {!! Form::text('nombres',$persona->nombres,['class'=>'form-control form-control-sm','readonly']) !!}
+                                                    {!! Form::text('nombres',$inscripcion->persona->nombres,['class'=>'form-control form-control-sm','readonly']) !!}
                                                 </div>
                                             </div>
                                             <div class="col-md-3">
                                                 <div class="form-group">
                                                     {!! Form::label('apellidos','Apellidos') !!}
-                                                    {!! Form::text('apellidos',$persona->apellidos,['class'=>'form-control form-control-sm','readonly']) !!}
+                                                    {!! Form::text('apellidos',$inscripcion->persona->apellidos,['class'=>'form-control form-control-sm','readonly']) !!}
                                                 </div>
                                             </div>
                                             <div class="col-md-3">
                                                 <div class="form-group">
                                                     {!! Form::label('fecha_nac','Fecha de Nacimiento') !!}
-                                                    {!! Form::text('fecha_nac',$persona->fecha_nac,['class'=>'form-control form-control-sm','readonly']) !!}
+                                                    {!! Form::text('fecha_nac',$inscripcion->persona->fecha_nac,['class'=>'form-control form-control-sm','readonly']) !!}
                                                 </div>
                                             </div>
                                             <div class="col-md-3">
                                                 <div class="form-group">
                                                     {!! Form::label('edad','Edad') !!}
-                                                    {!! Form::text('edad',$persona->getEdad(), ['class'=>'form-control form-control-sm','readonly']) !!}
+                                                    {!! Form::text('edad',$inscripcion->persona->getEdad(), ['class'=>'form-control form-control-sm','readonly']) !!}
                                                 </div>
                                             </div>
                                         </div>
@@ -206,25 +199,25 @@
                                             <div class="col-md-3">
                                                 <div class="form-group">
                                                     {!! Form::label('gen','Género') !!}
-                                                    {!! Form::text('gen',$persona->gen, ['class'=>'form-control form-control-sm','readonly']) !!}
+                                                    {!! Form::text('gen',$inscripcion->persona->gen, ['class'=>'form-control form-control-sm','readonly']) !!}
                                                 </div>
                                             </div>
                                             <div class="col-md-3">
                                                 <div class="form-group">
                                                     {!! Form::label('num_doc','Identificación') !!}
-                                                    {!! Form::text('num_doc',$persona->num_doc,['class'=>'form-control form-control-sm','readonly']) !!}
+                                                    {!! Form::text('num_doc',$inscripcion->persona->num_doc,['class'=>'form-control form-control-sm','readonly']) !!}
                                                 </div>
                                             </div>
                                             <div class="col-md-3">
                                                 <div class="form-group">
                                                     {!! Form::label('email','Email') !!}
-                                                    {!! Form::text('email',$persona->email,['class'=>'form-control form-control-sm','readonly']) !!}
+                                                    {!! Form::text('email',$inscripcion->persona->email,['class'=>'form-control form-control-sm','readonly']) !!}
                                                 </div>
                                             </div>
                                             <div class="col-md-3">
                                                 <div class="form-group">
                                                     {!! Form::label('telefono','Teléfono') !!}
-                                                    {!! Form::text('telefono',$persona->telefono,['class'=>'form-control form-control-sm','readonly']) !!}
+                                                    {!! Form::text('telefono',$inscripcion->persona->telefono,['class'=>'form-control form-control-sm','readonly']) !!}
                                                 </div>
                                             </div>
                                         </div>
@@ -232,7 +225,7 @@
                                             <div class="col">
                                                 <div class="form-group">
                                                     {!! Form::label('direccion','Dirección') !!}
-                                                    {!! Form::text('direccion',$persona->direccion, ['class'=>'form-control form-control-sm','readonly']) !!}
+                                                    {!! Form::text('direccion',$inscripcion->persona->direccion, ['class'=>'form-control form-control-sm','readonly']) !!}
                                                 </div>
                                             </div>
                                         </div>

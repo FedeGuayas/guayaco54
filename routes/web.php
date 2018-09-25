@@ -117,8 +117,10 @@ Route::middleware(['auth', 'isVerified'])->group(function () {
         //Update cliente
         Route::put('cliente/{persona}/update', 'PersonaController@updateBack')->name('admin.cliente.update');
 
-        //vista para inscripcion de a un cliente backend
+        //vista para crear inscripcion de un cliente en backend
         Route::get('inscription/{persona}', 'InscripcionController@createBack')->name('admin.inscripcion.create');
+        //vista para editar inscripcion de un cliente en backend
+//        Route::get('inscription/{id}/edit', 'InscripcionController@editBack')->name('admin.inscripcion.edit');
         //Ajax para inscripciones obterner los circuitos para la categoria seleccionada
         Route::get('inscription/category/getCircuit', 'InscripcionController@getCatCir')->name('getCatCir');
         //Actualizar costo
