@@ -132,7 +132,14 @@ class ProductoController extends Controller
      */
     public function edit(Producto $producto)
     {
-        //
+        $categorias_all=Categoria::where('status',Categoria::ACTIVO)->get();
+        $categorias=$categorias_all->pluck('categoria','id');
+
+        $circuitos=Circuito::where('status',Circuito::ACTIVO)->get();
+
+        $config=Configuracion::with('ejercicio','impuesto')->where('status',Configuracion::ATIVO)->first();
+
+        return view('productos.edit',compact('categorias','circuitos','config','producto'));
     }
 
     /**
@@ -144,7 +151,65 @@ class ProductoController extends Controller
      */
     public function update(Request $request, Producto $producto)
     {
-        //
+        $rules = [
+            'ejercicio_id' => 'required',
+            'categoria_id' => 'required',
+            'circuito' => 'required',
+            'price' => 'required|numeric',
+        ];
+
+        $messages = [
+            'ejercicio_id.required' => 'El valor del campo ejercicio es requerido.',
+            'categoria_id.required' => 'El valor del campo categoría es requerido.',
+            'circuito.required' => 'El valor del campo circuito es requerido.',
+            'price.required' => 'El valor del campo costo es requerido.',
+            'price.numeric' => 'El valor del campo costo debe ser un número.',
+
+        ];
+
+        $validator = Validator::make($request->all(), $rules, $messages);
+
+        if ($validator->fails()) {
+            $notification = [
+                'message_toastr' => $validator->errors()->first(),
+                'alert-type' => 'error'];
+            return back()->with($notification)->withInput();
+        }
+
+        try {
+            DB::beginTransaction();
+
+            $ejercicio_id = $request->input('ejercicio_id');
+            $ejercicio = Ejercicio::findOrFail($ejercicio_id);
+            $categoria_id = $request->input('categoria_id');
+            $categoria = Categoria::findOrFail($categoria_id);
+            $circuito_id = $request->input('circuito');
+            $circuito = Circuito::findOrFail($circuito_id);
+
+            $producto->ejercicio()->associate($ejercicio);
+            $producto->categoria()->associate($categoria);
+            $producto->circuito()->associate($circuito);
+            $producto->description=$request->input('description');
+            $producto->price=$request->input('price');
+            $producto->image=null;
+            $producto->update();
+
+            DB::Commit();
+
+            $notification = [
+                'message_toastr' => 'Producto actualizado',
+                'alert-type' => 'success'];
+            return back()->with($notification)->withInput();
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+//            $message = $e->getMessage();
+            $message='Ocurrio un error y no se pudo actualizar los datos';
+            $notification = [
+                'message_toastr' => $message,
+                'alert-type' => 'error'];
+            return back()->with($notification)->withInput();
+        }
     }
 
     /**

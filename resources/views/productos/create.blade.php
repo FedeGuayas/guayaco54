@@ -1,6 +1,6 @@
 @extends('layouts.back.master')
 
-@section('page_title','Categorías / Circuitos')
+@section('page_title','Crear Producto Categorías / Circuitos')
 
 
 @push('styles')
@@ -41,8 +41,8 @@
                     @if(!$circuitos->isEmpty())
                         @foreach ($circuitos as $cir)
                             <div class="custom-control custom-radio mb-5">
-                                {{ Form::radio('circuito',  $cir->id,false, ['id'=>$cir->id,'class'=>'custom-control-input'] ) }}
-                                {{ Form::label($cir->id, ucfirst($cir->circuito),['class'=>'custom-control-label']) }}
+                                {!! Form::radio('circuito',  $cir->id,false, ['id'=>$cir->id,'class'=>'custom-control-input'] ) !!}
+                                {!!  Form::label($cir->id, ucfirst($cir->circuito),['class'=>'custom-control-label'])  !!}
                                 {{--<label class="custom-control-label" for="customRadio4">Toggle this custom radio</label>--}}
                             </div>
                         @endforeach
