@@ -265,3 +265,18 @@ Breadcrumbs::register('inscripcion-edit', function($breadcrumbs,$persona)
 
 
 
+//// Home>Comprobantes
+Breadcrumbs::register('comprobante', function($breadcrumbs)
+{
+    $breadcrumbs->parent('inscripciones');
+    $breadcrumbs->push('Comprobantes', route('facturas.index'));
+});
+// Home>Comprobantes> [EDIT] backend
+Breadcrumbs::register('comprobante-edit', function($breadcrumbs,$factura)
+{
+    $breadcrumbs->parent('comprobante');
+    $breadcrumbs->push('Editar comprobante '.$factura->id, route('facturas.index'));
+});
+
+
+

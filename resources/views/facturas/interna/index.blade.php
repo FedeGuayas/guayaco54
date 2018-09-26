@@ -1,9 +1,9 @@
 @extends('layouts.back.master')
 
-@section('page_title','Inscripciones')
+@section('page_title','Comprobantes')
 
 @section('breadcrumbs')
-    {!! Breadcrumbs::render('inscripciones') !!}
+    {!! Breadcrumbs::render('comprobante') !!}
 @stop
 
 @push('styles')
@@ -13,18 +13,6 @@
       href="{{asset('themes/back/src/plugins/datatables/media/css/dataTables.bootstrap4.css')}}">
 <link rel="stylesheet " type="text/css"
       href="{{asset('themes/back/src/plugins/datatables/media/css/responsive.dataTables.css')}}">
-
-<style>
-    .dataTables_wrapper {
-                                /*font-weight: bold;*/
-
-                                /*position: relative;*/
-                                /*clear: both;*/
-     }
-    .dataTables_wrapper th { font-size: 14px; color: blue }
-    .dataTables_wrapper td { font-size: 11px; }
-</style>
-
 @endpush
 
 @section('content')
@@ -32,18 +20,8 @@
     <div class="pd-20 bg-white border-radius-4 box-shadow mb-30">
         <div class="clearfix mb-20">
             <div class="pull-left">
-                <h5 class="text-blue">Todas las inscripciones</h5>
-                @can('add_inscripciones')
-                    <p class="font-14">para inscribir debe buscar al <a class="btn btn-sm btn-outline-primary"
-                                                                        href="{{route('personas.index')}}">cliente
-                            <i class="fa fa-user"></i>
-                        </a>
-                    </p>
-                @endcan
-            </div>
-            <div class="form-group pull-right">
-                <a href="{{ route('facturas.index') }}" class="btn btn-outline-danger"><i class="fa fa-money"></i>
-                    Comprobantes</a>
+                <h5 class="text-blue">Todas los Comprobantes</h5>
+
             </div>
         </div>
 
@@ -53,28 +31,23 @@
                     <thead>
                     <tr>
                         <th class="datatable-nosort">Acción</th>
-                        <th>Nombres</th>
+                        <th width="5">Comprobante</th>
+                        <th>Nombres Fac.</th>
                         <th>Num. Identidad</th>
-                        <th>Categoría</th>
-                        <th>Circuito</th>
-                        <th  width="5">Núm. Part.</th>
-                        <th>Kit</th>
-                        <th>Talla</th>
-                        {{--<th>Email</th>--}}
+                        <th>Email</th>
+                        <th>F. Pago</th>
+                        <th>Valor</th>
                     </tr>
                     </thead>
                     <tfoot>
                     <tr>
                         <th></th>
                         <th class="tfoot_search"></th>
-                        <th class="tfoot_search">Ced. / Pasapt</th>
-                        <th class="tfoot_select"></th>
-                        <th class="tfoot_select"></th>
                         <th class="tfoot_search"></th>
+                        <th class="tfoot_search"></th>
+                        <th class="tfoot_search"></th>
+                        <th class="tfoot_select"></th>
                         <th></th>
-                        <th></th>
-                        {{--<th class="tfoot_search"></th>--}}
-
                     </tr>
                     </tfoot>
                     <tbody>
@@ -84,10 +57,7 @@
         </div>
     </div>
 
-    {!! Form::open(['route'=>['admin.inscription.destroy',':ID'],'method'=>'DELETE','id'=>'form-delete']) !!}
-    {!! Form::close() !!}
-
-    {!! Form::open(['route'=>['admin.inscripcion.setKit',':ID'],'method'=>'post','id'=>'form-statusKit']) !!}
+    {!! Form::open(['route'=>['facturas.destroy',':ID'],'method'=>'DELETE','id'=>'form-delete']) !!}
     {!! Form::close() !!}
 
 @endsection
@@ -119,7 +89,7 @@
             $(this).html('<input type="text" class="form-control" placeholder="Buscar ' + title + '" />');
         });
         table = $(".data-table").DataTable({
-            lengthMenu: [[5, 25, 50], [5, 25, 50]],
+            lengthMenu: [[5, 25, 50,100,500, -1], [5, 25, 50,100,500, 'Todos']],
             scrollCollapse: true,
             autoWidth: false,
             responsive: true,
@@ -130,58 +100,41 @@
             "language": {
                 "url": '/guayaco-runner/plugins/DataTables/i18n/Spanish_original.lang'
             },
-            ajax: '{{route('admin.inscription.getAll')}}',
+            ajax: '{{route('admin.getAll.inside')}}',
             columns: [
                 {data: 'actions', name: 'opciones', orderable: false, searchable: false},
-                {data: 'nombres', name: 'nombres'},
-                {data: 'persona.num_doc', name: 'persona.num_doc'},
-                {data: 'producto.categoria.categoria', name: 'producto.categoria.categoria'},
-                {data: 'producto.circuito.circuito', name: 'producto.circuito.circuito'},
                 {data: 'numero', name: 'numero'},
-                {data: 'kit', name: 'kit'},
-                {data: 'tallas', name: 'tallas', orderable:false, searchable: false}
-
-//                {data: 'email', name: 'email', orderable: false},
-//                {data: 'gen', name: 'gen'},
-//                {data: 'fecha_nac', name: 'fecha_nac'},
-//                {data: 'direccion', name: 'direccion'},
-//                {data: 'telefono', name: 'telefono'}
-
+                {data: 'nombre', name: 'nombre'},
+                {data: 'identificacion', name: 'identificacion'},
+                {data: 'email', name: 'email', orderable: false},
+                {data: 'mpago.nombre', name: 'mpago.nombre', orderable:false},
+                {data: 'total', name: 'total'}
             ],
             columnDefs: [
                 {
-                    targets: 6,
-                    render: function (data, type, row, meta) {
-                        if (row.deporte_id==''){
-                            if (type === 'display' && data=='1') {
-                                data = '<i class="fa fa-thumbs-o-up fa-2x text-primary" data-toggle="tooltip" data-placement="top" title="Entregado"></i>';
-                            }else {
-                                data = '<i class="fa fa-thumbs-o-down fa-2x text-danger" data-toggle="tooltip" data-placement="top" title="Por Entregar"></i>';
-                            }
-                        }
-
-                        return data;
-                    }
+                    targets: [6],
+                    className: "text-right text-blue",
+                    render:  $.fn.dataTable.render.number(' ', '.', 2, '$ ')
                 }
-//                {
-//                    targets: [8,9,10,11],
-//                    className: "text-right",
-//                    render:  $.fn.dataTable.render.number(' ', '.', 2, '$ ')
-//                }
-//                { //Dar color a los datos de todas las columnas
-//                    targets: '_all',
-//                    render: function (data, type, row) {
-////
-//                        var color = 'black';
-//                        return '<strong style="color:' + color + '">' + data + '</strong>';
-//                    }
-//                }
             ],
             "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
-//                console.log(aData);
+                console.log(aData);
             },
             drawCallback: function (settings) {
                 $('[data-toggle="tooltip"]').tooltip();//para que funcionen los tooltips en cada fila
+            },
+            "footerCallback": function (row, data, start, end, display) {
+                var api = this.api(), data;
+                // formatear los datos para sumar
+                var intVal = function (i) {
+                    return typeof i === 'string' ? i.replace(/[\$,]/g, '') * 1 : typeof i === 'number' ? i : 0;
+                };
+                // Total en la pagina actual
+                pageTotal = api.column(6, {page: 'current'}).data().reduce(function (a, b) {
+                    return (intVal(a) + intVal(b)).toFixed(2);
+                }, 0);
+                // actualzar total en el pie de tabla
+                $(api.column(6).footer()).html('<p> <b>$' + pageTotal + '</b>' );
             },
             initComplete: function (settings, json) {
                 $('.data-table').fadeIn();
@@ -212,17 +165,11 @@
                                     .search(val ? '^' + val + '$' : '', true, false)
                                     .draw();
                             });
-//                        column.data().unique().sort().each(function (d, j) {
-//                            select.append('<option value="' + d + '">' + d + '</option>')
-//                        });
-
-                        // Capturar los datos del JSON para llenar el select con las opciones
+//                         Capturar los datos del JSON para llenar el select con las opciones
                         let extraData = (function (i) {
                             switch (i) {
-                                case 3:
-                                    return json.allCategorias;
-                                case 4:
-                                    return json.allCircuitos;
+                                case 5:
+                                    return json.allMPago;
                             }
                         })(column.index());
 ////                        // Draw select options

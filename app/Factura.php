@@ -55,9 +55,7 @@ class Factura extends Model
     //una factura la realiza un empleado sino es inscripcion online
     public function user()
     {
-        if  (!isNull($this->attributes['user_id'])){ //user_id=>empleado
-            return $this->belongsTo('App\User');
-        }
+        return $this->belongsTo('App\User');
     }
 
     //una factura se le hace a una persona

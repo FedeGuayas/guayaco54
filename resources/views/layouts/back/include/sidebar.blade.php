@@ -36,20 +36,20 @@
                 @hasanyrole(['admin','employee'])
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle">
-                        <span class="fa fa-archive"></span><span class="mtext">Inscripciones</span>
+                        <span class="fa fa-archive"></span><span class="mtext">Inscripciones FDG</span>
                     </a>
                     <ul class="submenu">
                         <li><a href="{{route('personas.index')}}">Clientes a Inscribir</a></li>
                         <li><a href="{{route('admin.inscription.index')}}">Inscripciones</a></li>
-                        <li class="dropdown">
-                            <a href="#" class="dropdown-toggle">
-                                <span class="fa fa-money"></span><span class="mtext">Facturación</span>
-                            </a>
-                            <ul class="submenu child">
-                                <li><a href="#">Comprobantes</a></li>
-                                <li><a href="#">Cuadre</a></li>
-                            </ul>
-                        </li>
+                    </ul>
+                </li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle">
+                        <span class="fa fa-money"></span><span class="mtext">Comprobantes FDG</span>
+                    </a>
+                    <ul class="submenu">
+                        <li><a href="{{route('facturas.index')}}">Comprobantes</a></li>
+                        <li><a href="#">Cuadre</a></li>
                     </ul>
                 </li>
                 @endhasanyrole

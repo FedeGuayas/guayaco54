@@ -119,8 +119,6 @@ Route::middleware(['auth', 'isVerified'])->group(function () {
 
         //vista para crear inscripcion de un cliente en backend
         Route::get('inscription/{persona}', 'InscripcionController@createBack')->name('admin.inscripcion.create');
-        //vista para editar inscripcion de un cliente en backend
-//        Route::get('inscription/{id}/edit', 'InscripcionController@editBack')->name('admin.inscripcion.edit');
         //Ajax para inscripciones obterner los circuitos para la categoria seleccionada
         Route::get('inscription/category/getCircuit', 'InscripcionController@getCatCir')->name('getCatCir');
         //Actualizar costo
@@ -139,6 +137,8 @@ Route::middleware(['auth', 'isVerified'])->group(function () {
         //Entregar Kit
         Route::post('inscription/{inscripcion}/setKit', 'InscripcionController@setKit')->name('admin.inscripcion.setKit');
 
+        //Todos los comprobantes ajax
+        Route::get('facturas/getAllInside', 'FacturaController@getAll')->name('admin.getAll.inside');
 
 
         Route::resource('users', 'UserController');
@@ -152,6 +152,7 @@ Route::middleware(['auth', 'isVerified'])->group(function () {
         Route::resource('taxes', 'ImpuestoController', ['except' => ['show', 'destroy']]);
         Route::resource('categoria-circuito', 'CategoriaCircuitoController', ['except' => ['show', 'destroy']]);
         Route::resource('productos', 'ProductoController');
+        Route::resource('facturas', 'FacturaController');
 
         Route::resource('roles', 'RoleController');
         Route::resource('permissions', 'PermissionController');

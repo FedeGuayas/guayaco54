@@ -82,13 +82,13 @@ class InscripcionController extends Controller
                     @if ($kit!=\\App\\Inscripcion::KIT_ENTREGADO)   
                         @can(\'entregar_kit\')
                         <a class="dropdown-item status_kit" href="#" data-id="{{$id}}" data-toggle="tooltip" data-placement="top" title="Entregar Kit">
-                            <i class="fa fa-thumbs-o-up text-primary"></i> Entregar
+                            <i class="fa fa-thumbs-o-up fa-2x text-primary"></i> Entregar
                         </a>
                         @endcan
                     @else
                         @can(\'devolver_kit\')
                         <a class="dropdown-item status_kit" href="#" data-id="{{$id}}" data-toggle="tooltip" data-placement="top" title="Devolver Kit">
-                            <i class="fa fa-thumbs-o-down text-danger"></i> Devolver
+                            <i class="fa fa-thumbs-o-down fa-2x text-danger"></i> Devolver
                         </a>
                         @endcan
                     @endif
@@ -116,11 +116,6 @@ class InscripcionController extends Controller
                             return $inscripcion->talla->talla.'/'.$inscripcion->talla->color;
                         }
                     })
-
-//                ->addColumn('role', function ($usuario) {
-//                    return $usuario->getRoleNames();
-//                })
-
                     ->rawColumns(['actions'])
                     ->setRowId('id');
                 //Agregar variables a a la respuesta json del datatables
@@ -741,7 +736,6 @@ class InscripcionController extends Controller
                 'message_toastr' => $message,
                 'alert-type' => 'error'];
             return redirect()->back()->with($notification);
-
         }
 
     }
