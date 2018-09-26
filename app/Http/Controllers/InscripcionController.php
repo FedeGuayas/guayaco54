@@ -19,6 +19,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Yajra\Datatables\Datatables;
+use Facades\App\Classes\LogActivity;
 
 class InscripcionController extends Controller
 {
@@ -351,7 +352,9 @@ class InscripcionController extends Controller
                 $factura->total = $costo; //el subtotaL -descuento
                 $factura->user_id = $user->id;
                 $factura->persona()->associate($persona);
-                $factura->descuento()->associate($descuento);
+                if ($descuento){
+                    $factura->descuento()->associate($descuento);
+                }
                 $factura->nombre = $nombres_fact . ' ' . $apellidos_fact;
                 $factura->email = $email_fact;
                 $factura->direccion = $direccion_fact;
@@ -420,11 +423,8 @@ class InscripcionController extends Controller
             $notification = [
                 'message_toastr' => $message,
                 'alert-type' => 'error'];
-            return redirect()->back()->with($notification)->withInput();
-
+            return redirect()->back()->with($notification);
         }
-
-
     }
 
     /**
@@ -447,11 +447,6 @@ class InscripcionController extends Controller
      */
     public function edit(Inscripcion $inscripcion)
     {
-//        dd($inscripcion);
-//        $inscripcion=Inscripcion::with('user', 'producto', 'persona', 'talla', 'factura')
-//            ->where('id',$id)
-//            ->first();
-
         $edad = $inscripcion->persona->getEdad();
 
         $cat_all = Categoria::where('status', Categoria::ACTIVO)
@@ -497,7 +492,237 @@ class InscripcionController extends Controller
      */
     public function update(Request $request, Inscripcion $inscripcion)
     {
-        //
+        dd($inscripcion);
+        $user = $request->user(); //usuario logueado que edita
+
+        $ahora = Carbon::now();
+
+        $rules = [
+            'categoria_id' => 'required',
+            'circuito_id' => 'required',
+            'talla' => 'required_without:deporte_id',
+            'mpago' => 'required',
+            'costo' => 'required',
+            'nombres_fact' => 'required',
+            'apellidos_fact' => 'required',
+            'num_doc_fact' => 'required',
+            'email_fact' => 'required|email',
+            'telefono_fact' => 'required',
+            'direccion_fact' => 'required'
+        ];
+//
+        $messages = [
+            'categoria_id.required' => 'El campo categoría es obligatorio.',
+            'circuito_id.required' => 'El campo circuito es obligatorio.',
+            'talla.required' => 'El campo talla es obligatorio cuando deportes no está presente.',
+            'mpago.required' => 'El campo método de pago es obligatorio.',
+            'costo.required' => 'El campo costo es obligatorio.',
+            'nombres_fact.required' => 'El campo Nombres para Facturación es obligatorio.',
+            'apellidos_fact.required' => 'El campo Apellidos para Facturación es obligatorio.',
+            'num_doc_fac.required' => 'El campo Identificación para Facturación es obligatorio.',
+            'email_fact.required' => 'El campo Email para Facturación es obligatorio. De lo contrario seleccione consumidor final',
+            'email_fact.email' => 'El campo Email para Facturación no tiene un formato de correo correcto.',
+            'telefono_fact.required' => 'El campo Teléfono para Facturación es obligatorio.',
+            'direccion_fact.required' => 'El campo Dirección para Facturación es obligatorio.'
+        ];
+
+        $validator = Validator::make($request->all(), $rules, $messages);
+
+        if ($validator->fails()) {
+            $notification = [
+                'message_toastr' => $validator->errors()->first(),
+                'alert-type' => 'error'];
+            return back()->with($notification)->withInput($notification);
+        }
+
+        try {
+
+            DB::beginTransaction();
+
+            $ejercicio = Configuracion::where('status', Configuracion::ATIVO)
+                ->select('ejercicio_id')
+                ->first();
+
+            $categoria_id = $request->input('categoria_id');
+            $circuito_id = $request->input('circuito_id');
+            $producto = Producto::where('categoria_id', $categoria_id)
+                ->where('circuito_id', $circuito_id)
+                ->where('ejercicio_id', $ejercicio->ejercicio_id)
+                ->first();
+
+            $talla_id = $request->input('talla');
+            $talla = Talla::where('id', $talla_id)->first();
+
+            $mpago_id = $request->input('mpago');
+            $mpago = Mpago::where('status', Mpago::ACTIVO)->where('id', $mpago_id)->first();
+
+            $persona_id = $inscripcion->persona_id;
+            $persona = Persona::where('id', $persona_id)->first();
+
+            //con descuento aplicado si lo hay
+            $costo = number_format($request->input('costo'), 2, '.', '');
+            $descuento = Descuento::where('status', Descuento::ACTIVO)
+                ->where('id', $request->input('descuentos'))
+                ->first();
+            $desc = 0; //descuento aplicado
+            if ($descuento || $costo !== $producto->price) {
+                $desc = ($producto->price) - ($costo);
+            }
+
+            $deporte = Deporte::where('id', $request->input('deporte_id'))->where('status', Deporte::ACTIVO)->first();
+
+            $nombres_fact = $request->input('nombres_fact');
+            $apellidos_fact = $request->input('apellidos_fact');
+            $email_fact = $request->input('email_fact');
+            $direccion_fact = $request->input('direccion_fact');
+            $telefono_fact = $request->input('telefono_fact');
+            $num_doc_fact = $request->input('num_doc_fact');
+
+            //Ahora no se ecogio deporte pero anteriormente (era deportista y no tenia factura)
+            if (!isset($deporte) && ($inscripcion->deporte_id && !$inscripcion->factura_id )){ //CAMBIO DE INSCRIPCION DE DEPORTISTA A CORREDOR NORMAL
+
+                //CREAR NUMERO DE FACTURA
+                $maxnumFact = DB::table('facturas')->max('numero'); //maximo valor en la columna numero
+                if (is_numeric($maxnumFact)) {
+                    $nextNum = $maxnumFact + 1;
+                } else {
+                    $maxnumFact = 0;
+                    $nextNum = 1;
+                }
+
+                //CRER NUEVA FACTURA
+                $factura = new  Factura();
+                $factura->numero = $nextNum;
+                $factura->fecha_edit = $ahora; //Inicialmente es la misma que la de creacion
+                $factura->descuento = $desc; //descuento que se hizo
+                $factura->subtotal = $producto->price; //El costo normal
+                $factura->total = $costo; //el subtotaL -descuento
+                $factura->user_id = $user->id; //usuario que la crea
+                $factura->persona()->associate($persona);
+                if ($descuento){
+                    $factura->descuento()->associate($descuento);
+                }
+                $factura->nombre = $nombres_fact . ' ' . $apellidos_fact;
+                $factura->email = $email_fact;
+                $factura->direccion = $direccion_fact;
+                $factura->telefono = $telefono_fact;
+                $factura->identificacion = $num_doc_fact;
+                $factura->mpago()->associate($mpago);
+                $factura->payment_id = NULL; //solo para pago con tarjeta online
+                $factura->status = Factura::ACTIVA;
+                $factura->save();
+
+                //Editar INSCRIPCION
+                $inscripcion->producto()->associate($producto);
+                $inscripcion->user_edit = $user->id;
+                $inscripcion->deporte_id = NULL; //no se escogio deporte
+                $inscripcion->factura()->associate($factura); //se genero factura nueva
+                if (!isset($deporte) && isset($talla)) { //no es deportista y se escogio la talla
+                    $inscripcion->talla()->associate($talla);
+                }
+                $inscripcion->costo = $costo;
+                $inscripcion->ejercicio_id = $ejercicio->ejercicio_id;
+                $inscripcion->status = Inscripcion::PAGADA;
+                $inscripcion->update();
+
+                //ACTUALIZAR STOCK DE TALLAS
+                $talla->decrement('stock');
+                $talla->stock > 0 ? $talla->status = Talla::ACTIVO : $talla->status = Talla::INACTIVO;
+                $talla->update();
+
+
+            } else { //CAMBIO EN INSCRIPCION DE CORREDOR NORMAL
+
+                $factura = Factura::where('id',$inscripcion->factura_id)->first();
+                $old_costo=$factura->costo;
+
+                if (!isset($deporte)) {//Cambio de Corredor normal a normal
+                    //la factura se actualizara solo sino es DEPORTISTA
+                    $factura->fecha_edit = $ahora; //fecha en que se edita
+                    $factura->descuento = $desc; //descuento que se hizo
+                    $factura->subtotal = $producto->price; //El costo normal
+                    $factura->total = $costo; //el subtotal - descuento
+                    if ($descuento){
+                        $factura->descuento()->associate($descuento);
+                    }
+                    $factura->nombre = $nombres_fact . ' ' . $apellidos_fact;
+                    $factura->email = $email_fact;
+                    $factura->direccion = $direccion_fact;
+                    $factura->telefono = $telefono_fact;
+                    $factura->identificacion = $num_doc_fact;
+                    $factura->mpago()->associate($mpago);
+                    $factura->update();
+                    LogActivity::addToLog('Factura editada por trabajador', $user,$old_costo,$factura->costo);
+                    //ACTUALIZAR STOCK DE TALLAS
+                    //se cambio de talla
+                    if ( isset($talla) && ($talla->id!=$inscripcion->talla_id) ) {
+                        //incrementar la talla anterior
+                        $talla_anterior=Talla::where('id',$inscripcion->talla_id)->first();
+                        $talla_anterior->increment('stock');
+                        $talla_anterior > 0 ? $talla_anterior->status = Talla::ACTIVO : $talla_anterior->status = Talla::INACTIVO;
+                        $talla_anterior->update();
+                        //decrementrar talla actual
+                        $talla->decrement('stock');
+                        $talla->stock > 0 ? $talla->status = Talla::ACTIVO : $talla->status = Talla::INACTIVO;
+                        $talla->update();
+                    }
+                    //EDITAR INSCRIPCION
+                    $inscripcion->producto()->associate($producto);
+                    $inscripcion->user_edit = $user->id; //usuario que edita
+                    $inscripcion->deporte_id = NULL;
+                    //si se cambia de talla
+                    if ( isset($talla) && ($talla->id!=$inscripcion->talla_id) ) {
+                        $inscripcion->talla()->associate($talla);
+                    }
+                    $inscripcion->costo = $costo;
+                    $inscripcion->update();
+
+
+                } else { //se cambio de corredor normal a deportista
+                    //se cancela la factura,
+                    $factura->status=Factura::CANCELADA;
+                    $factura->update();
+                    LogActivity::addToLog('Factura cancelada, cambio de corredor a deportista', $user);
+                    //ACTUALIZAR STOCK DE TALLAS
+                    //se cambio de talla, se deselecciono la anterior al cambiarse a deportista
+                    if ( !isset($talla)) {
+                        //incrementar la talla anterior
+                        $talla_anterior=Talla::where('id',$inscripcion->talla_id)->first();
+                        $talla_anterior->increment('stock');
+                        $talla_anterior > 0 ? $talla_anterior->status = Talla::ACTIVO : $talla_anterior->status = Talla::INACTIVO;
+                        $talla_anterior->update();
+                    }
+                    //EDITAR INSCRIPCION
+                    $inscripcion->producto()->associate($producto);
+                    $inscripcion->user_edit = $user->id; //usuario que edita
+                    $inscripcion->deporte_id = $deporte->id;
+                    $inscripcion->factura_id = NULL; //se anula la factura
+                    //deportista, no hay talla
+                    $inscripcion->talla_id=NULL;
+                    $inscripcion->costo = $costo;
+                    $inscripcion->update();
+
+                }
+            }
+
+            DB::Commit();
+
+            $notification = [
+                'message_toastr' => 'Inscripción actualizada correctamente.',
+                'alert-type' => 'success'];
+            return redirect()->route('admin.inscription.index')->with($notification);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            $message =  $e->getMessage();
+//            $e->getCode() == '23000' ? $message = 'El cliente ya se encuentra inscrito en la carrera' : $message = 'Lo sentimos! Ocurrio un error y no se pudo crear la inscripción.';
+            $notification = [
+                'message_toastr' => $message,
+                'alert-type' => 'error'];
+            return redirect()->back()->with($notification);
+
+        }
+
     }
 
     /**

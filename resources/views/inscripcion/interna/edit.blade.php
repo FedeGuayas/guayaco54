@@ -228,8 +228,7 @@
                             <!-- FIN Datos Perfil-->
                             <div class="row pt-2">
                                 <div class="col-md-3">
-                                    <button type="submit" class="btn btn-block btn-primary" id="guardar_inscripcion"
-                                            disabled>Guardar Inscripción
+                                    <button type="submit" class="btn btn-block btn-primary" id="guardar_inscripcion">Guardar Inscripción
                                     </button>
                                 </div>
                             </div>
