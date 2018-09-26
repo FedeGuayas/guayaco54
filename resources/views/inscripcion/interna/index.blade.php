@@ -13,6 +13,18 @@
       href="{{asset('themes/back/src/plugins/datatables/media/css/dataTables.bootstrap4.css')}}">
 <link rel="stylesheet " type="text/css"
       href="{{asset('themes/back/src/plugins/datatables/media/css/responsive.dataTables.css')}}">
+<style>
+    .dataTables_wrapper {
+
+                                /*font-weight: bold;*/
+
+                                /*position: relative;*/
+                                /*clear: both;*/
+     }
+    .dataTables_wrapper th { font-size: 14px; color: blue }
+    .dataTables_wrapper td { font-size: 11px; }
+
+</style>
 @endpush
 
 @section('content')
@@ -43,7 +55,7 @@
                         <th>Circuito</th>
                         <th>Número</th>
                         <th>Kit</th>
-                        {{--<th>Teléfono</th>--}}
+                        <th>Talla</th>
                         {{--<th>Email</th>--}}
                     </tr>
                     </thead>
@@ -56,7 +68,7 @@
                         <th class="tfoot_select"></th>
                         <th class="tfoot_search"></th>
                         <th></th>
-                        {{--<th class="tfoot_search"></th>--}}
+                        <th></th>
                         {{--<th class="tfoot_search"></th>--}}
 
                     </tr>
@@ -122,7 +134,8 @@
                 {data: 'producto.categoria.categoria', name: 'producto.categoria.categoria'},
                 {data: 'producto.circuito.circuito', name: 'producto.circuito.circuito'},
                 {data: 'numero', name: 'numero'},
-                {data: 'kit', name: 'kit'}
+                {data: 'kit', name: 'kit'},
+                {data: 'tallas', name: 'tallas', orderable:false, searchable: false}
 
 //                {data: 'email', name: 'email', orderable: false},
 //                {data: 'gen', name: 'gen'},
@@ -135,11 +148,14 @@
                 {
                     targets: 6,
                     render: function (data, type, row, meta) {
-                        if (type === 'display' && data=='1') {
-                            data = '<i class="fa fa-thumbs-o-up text-primary" data-toggle="tooltip" data-placement="top" title="Entregado"></i>';
-                        }else {
-                            data = '<i class="fa fa-thumbs-o-down text-danger" data-toggle="tooltip" data-placement="top" title="Por Entregar"></i>';
+                        if (row.deporte_id==''){
+                            if (type === 'display' && data=='1') {
+                                data = '<i class="fa fa-thumbs-o-up text-primary" data-toggle="tooltip" data-placement="top" title="Entregado"></i>';
+                            }else {
+                                data = '<i class="fa fa-thumbs-o-down text-danger" data-toggle="tooltip" data-placement="top" title="Por Entregar"></i>';
+                            }
                         }
+
                         return data;
                     }
                 }
@@ -151,6 +167,7 @@
 //                { //Dar color a los datos de todas las columnas
 //                    targets: '_all',
 //                    render: function (data, type, row) {
+////
 //                        var color = 'black';
 //                        return '<strong style="color:' + color + '">' + data + '</strong>';
 //                    }

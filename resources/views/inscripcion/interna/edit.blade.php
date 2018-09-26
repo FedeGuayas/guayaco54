@@ -65,14 +65,15 @@
                                                     <span class="badge badge-pill badge-primary pull-right"
                                                           id="stock-talla" data-toggle="tooltip" data-placement="top"
                                                           title="Stock">0</span>
-                                                    {!! Form::select('talla', $tallas, $inscripcion->talla->id, ['class'=>'selectpicker show-tick form-control','data-style'=>'btn-outline-primary','id'=>'talla','placeholder'=>'Seleccione ...', 'data-live-search'=>'true','data-container'=>'.main-container']) !!}
-                                                    @if ($talla_agotada) <small class="form-text text-danger">La talla ({{$inscripcion->talla->talla.'/'.$inscripcion->talla->color}}) de esta inscripción esta agotada. Si no desea cambiar de talla no es necesario que escoja ninguna</small> @endif
+                                                    {!! Form::select('talla', $tallas, $inscripcion->talla ? $inscripcion->talla->id : '', ['class'=>'selectpicker show-tick form-control','data-style'=>'btn-outline-primary','id'=>'talla','placeholder'=>'Seleccione ...', 'data-live-search'=>'true','data-container'=>'.main-container']) !!}
+                                                    @if ($talla_agotada) <small class="form-text text-danger">La talla ({{$inscripcion->talla->talla.'/'.$inscripcion->talla->color}}) de esta inscripción esta agotada. Si no desea cambiar de talla no es necesario que escoja ninguna</small>
+                                                    @endif
                                                 </div>
                                             </div>
                                             <div class="col-md-3 col-sm-12">
                                                 <div class="form-group">
                                                     {!! Form::label('deporte_id','Deportes: ',['class'=>'weight-600']) !!}
-                                                    {!! Form::select('deporte_id', $deportes,$inscripcion->deporte ? $inscripcion->talla->id: '', ['class'=>'selectpicker show-tick form-control','data-style'=>'btn-outline-primary','id'=>'deporte_id', 'data-live-search'=>'true','data-container'=>'.main-container','placeholder'=>'Seleccione ...','disabled']) !!}
+                                                    {!! Form::select('deporte_id', $deportes,$inscripcion->deporte ? $inscripcion->deporte->id: '', ['class'=>'selectpicker show-tick form-control','data-style'=>'btn-outline-primary','id'=>'deporte_id', 'data-live-search'=>'true','data-container'=>'.main-container','placeholder'=>'Seleccione ...','disabled']) !!}
                                                     <small class="form-text text-muted"> Solo si Categoría =
                                                         Deportista
                                                     </small>
@@ -83,13 +84,13 @@
                                             <div class="col-md-3 col-sm-12">
                                                 <div class="form-group">
                                                     {!! Form::label('descuentos','Descuentos:',['class'=>'weight-600']) !!}
-                                                    {!! Form::select('descuentos', $descuentos,$inscripcion->factura->descuento_id, ['class'=>'selectpicker show-tick form-control','data-style'=>'btn-outline-primary','id'=>'descuentos','data-container'=>'.main-container','placeholder'=>'Seleccione ...']) !!}
+                                                    {!! Form::select('descuentos', $descuentos,$inscripcion->factura ? $inscripcion->factura->descuento_id : '', ['class'=>'selectpicker show-tick form-control','data-style'=>'btn-outline-primary','id'=>'descuentos','data-container'=>'.main-container','placeholder'=>'Seleccione ...']) !!}
                                                 </div>
                                             </div>
                                             <div class="col-md-3 col-sm-12">
                                                 <div class="form-group">
                                                     {!! Form::label('mpago','Formas de Pago: *',['class'=>'weight-600']) !!}
-                                                    {!! Form::select('mpago', $formas_pago,$inscripcion->factura->mpago->id, ['class'=>'selectpicker show-tick form-control','data-style'=>'btn-outline-primary','id'=>'mpago','data-container'=>'.main-container','placeholder'=>'Seleccione ...']) !!}
+                                                    {!! Form::select('mpago', $formas_pago, $inscripcion->factura ? $inscripcion->factura->mpago->id : '', ['class'=>'selectpicker show-tick form-control','data-style'=>'btn-outline-primary','id'=>'mpago','data-container'=>'.main-container','placeholder'=>'Seleccione ...']) !!}
                                                 </div>
                                             </div>
                                             <div class="col-md-3 col-sm-12">
@@ -117,7 +118,7 @@
                                             <div class="col-md-8">
                                                 <div class="form-group">
                                                     {!! Form::label('nombres_fact','Nombres y Apellidos*') !!}
-                                                    {!! Form::text('nombres_fact',$inscripcion->factura->nombre,['class'=>'form-control','style'=>'text-transform: uppercase','required','id'=>'nombres_fact','required']) !!}
+                                                    {!! Form::text('nombres_fact',$inscripcion->factura ? $inscripcion->factura->nombre : 'N/A',['class'=>'form-control','style'=>'text-transform: uppercase','required','id'=>'nombres_fact','required']) !!}
                                                 </div>
                                             </div>
                                         </div>
@@ -125,13 +126,13 @@
                                             <div class="col-md-6">
                                                 <div class="form-group">
                                                     {!! Form::label('num_doc_fact','Identificación *') !!}
-                                                    {!! Form::text('num_doc_fact',$inscripcion->factura->identificacion,['class'=>'form-control','style'=>'text-transform: uppercase','id'=>'num_doc_fact','required']) !!}
+                                                    {!! Form::text('num_doc_fact', $inscripcion->factura ? $inscripcion->factura->identificacion : 'N/A',['class'=>'form-control','style'=>'text-transform: uppercase','id'=>'num_doc_fact','required']) !!}
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="form-group">
                                                     {!! Form::label('email_fact','Email *') !!}
-                                                    {!! Form::email('email_fact',$inscripcion->factura->email,['class'=>'form-control','placeholder'=>'Email','style'=>'text-transform: lowercase','id'=>'email_fact','required']) !!}
+                                                    {!! Form::email('email_fact',$inscripcion->factura ? $inscripcion->factura->email : 'consumidor@final.mail',['class'=>'form-control','placeholder'=>'Email','style'=>'text-transform: lowercase','id'=>'email_fact','required']) !!}
                                                 </div>
                                             </div>
                                         </div>
@@ -139,13 +140,13 @@
                                             <div class="col-md-6">
                                                 <div class="form-group">
                                                     {!! Form::label('telefono_fact','Teléfono *') !!}
-                                                    {!! Form::text('telefono_fact',$inscripcion->factura->telefono,['class'=>'form-control','id'=>'telefono_fact','required']) !!}
+                                                    {!! Form::text('telefono_fact',$inscripcion->factura ? $inscripcion->factura->telefono : 'N/A',['class'=>'form-control','id'=>'telefono_fact','required']) !!}
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="form-group">
                                                     {!! Form::label('direccion_fact','Dirección *') !!}
-                                                    {!! Form::text('direccion_fact',$inscripcion->factura->direccion,['class'=>'form-control','style'=>'text-transform: uppercase','id'=>'direccion_fact','required']) !!}
+                                                    {!! Form::text('direccion_fact',$inscripcion->factura ? $inscripcion->factura->direccion : 'N/A',['class'=>'form-control','style'=>'text-transform: uppercase','id'=>'direccion_fact','required']) !!}
                                                 </div>
                                             </div>
                                         </div>
