@@ -11,6 +11,12 @@ use Yajra\Datatables\Datatables;
 
 class FacturaController extends Controller
 {
+    public function __construct()
+    {
+//        setlocale(LC_TIME, 'es_ES.utf8');
+    }
+
+
     /**
      * Display a listing of the resource.
      *
@@ -41,7 +47,7 @@ class FacturaController extends Controller
                 <a class="btn btn-outline-primary dropdown-toggle" href="#" role="button" data-toggle="dropdown"><i class="fa fa-ellipsis-h"></i></a>
                 <div class="dropdown-menu dropdown-menu-left">
                  @can(\'view_comprobantes\')
-                    <a class="dropdown-item" href="#" data-toggle="tooltip" data-placement="top" title="Imprimir Comprobante">
+                    <a class="dropdown-item" href="{{route(\'admin.printComprobante\',[$id])}}" data-toggle="tooltip" data-placement="top" title="Imprimir Comprobante">
                         <i class="fa fa-print fa-2x text-dark"></i> Imprimir
                     </a>
                 @endcan
@@ -203,5 +209,11 @@ class FacturaController extends Controller
     public function destroy(Factura $factura)
     {
         //
+    }
+
+    public  function printComprobante(Factura $factura){
+        setlocale(LC_ALL, 'es');
+//        dd($factura);
+        return view('facturas.interna.comprobante_pdf',compact('factura'));
     }
 }
