@@ -190,6 +190,8 @@ return [
         Brian2694\Toastr\ToastrServiceProvider::class,
         //Laravel-Datatables
         Yajra\Datatables\DatatablesServiceProvider::class,
+        //Laravel-excel
+        Maatwebsite\Excel\ExcelServiceProvider::class,
 
     ],
 
@@ -256,6 +258,8 @@ return [
         'LogActivity' => 'Facades\App\Classes\LogActivity',
         //Laravel-Datatables
         'Datatables' => Yajra\Datatables\Facades\Datatables::class,
+        //Laravel-excel
+        'Excel' => Maatwebsite\Excel\Facades\Excel::class,
     ],
 
 ];

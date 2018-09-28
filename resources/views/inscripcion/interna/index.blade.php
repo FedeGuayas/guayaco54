@@ -13,18 +13,8 @@
       href="{{asset('themes/back/src/plugins/datatables/media/css/dataTables.bootstrap4.css')}}">
 <link rel="stylesheet " type="text/css"
       href="{{asset('themes/back/src/plugins/datatables/media/css/responsive.dataTables.css')}}">
-
-<style>
-    .dataTables_wrapper {
-                                /*font-weight: bold;*/
-
-                                /*position: relative;*/
-                                /*clear: both;*/
-     }
-    .dataTables_wrapper th { font-size: 14px; color: blue }
-    .dataTables_wrapper td { font-size: 11px; }
-</style>
-
+<link rel="stylesheet " type="text/css"
+      href="{{asset('css/my_datatable.css')}}">
 @endpush
 
 @section('content')
@@ -140,13 +130,6 @@
                 {data: 'numero', name: 'numero'},
                 {data: 'kit', name: 'kit'},
                 {data: 'tallas', name: 'tallas', orderable:false, searchable: false}
-
-//                {data: 'email', name: 'email', orderable: false},
-//                {data: 'gen', name: 'gen'},
-//                {data: 'fecha_nac', name: 'fecha_nac'},
-//                {data: 'direccion', name: 'direccion'},
-//                {data: 'telefono', name: 'telefono'}
-
             ],
             columnDefs: [
                 {

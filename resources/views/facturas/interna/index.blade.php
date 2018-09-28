@@ -13,6 +13,8 @@
       href="{{asset('themes/back/src/plugins/datatables/media/css/dataTables.bootstrap4.css')}}">
 <link rel="stylesheet " type="text/css"
       href="{{asset('themes/back/src/plugins/datatables/media/css/responsive.dataTables.css')}}">
+<link rel="stylesheet " type="text/css"
+      href="{{asset('css/my_datatable.css')}}">
 @endpush
 
 @section('content')
@@ -27,6 +29,27 @@
 
         <div class="row">
             <div class="table-responsive">
+                <div class="dataTables_wrapper container-fluid dt-bootstrap4">
+                    <div class="dt-buttons btn-group pull-right">
+                        <form class="" action="" autocomplete="off">
+                            <div class="form-group row">
+                                <div class="col">
+                                    <input type="text" pattern="(?:19|20)[0-9]{2}-(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1[0-9]|2[0-9])|(?:(?!02)(?:0[1-9]|1[0-2])-(?:30))|(?:(?:0[13578]|1[02])-31))" class="form-control date-picker" placeholder="YYYY-MM-DD" name="desde" id="desde"/>
+                                    <small class="form-text text-muted">Desde (año-mes-dia)</small>
+                                </div>
+                                <div class="col">
+                                    <input type="text" pattern="(?:19|20)[0-9]{2}-(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1[0-9]|2[0-9])|(?:(?!02)(?:0[1-9]|1[0-2])-(?:30))|(?:(?:0[13578]|1[02])-31))" class="form-control date-picker" placeholder="YYYY-MM-DD" name="hasta" id="hasta"/>
+                                    <small class="form-text text-muted">Hasta (año-mes-dia)</small>
+                                </div>
+                                <div class="col">
+                                    <button type="submit" class="btn btn-outline-primary" id="facturacion_masiva"><i class="fa fa-file-excel-o"></i> Facturación Masiva</button>
+                                </div>
+
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
                 <table class="data-table stripe hover nowrap compact" style="display:none;">
                     <thead>
                     <tr>
@@ -37,6 +60,7 @@
                         <th>Email</th>
                         <th>F. Pago</th>
                         <th>Valor</th>
+                        <th>Fecha</th>
                     </tr>
                     </thead>
                     <tfoot>
@@ -47,6 +71,7 @@
                         <th class="tfoot_search"></th>
                         <th class="tfoot_search"></th>
                         <th class="tfoot_select"></th>
+                        <th></th>
                         <th></th>
                     </tr>
                     </tfoot>
@@ -66,10 +91,83 @@
 <script src="{{asset('themes/back/src/plugins/datatables/media/js/jquery.dataTables.min.js')}}"></script>
 <script src="{{asset('themes/back/src/plugins/datatables/media/js/dataTables.bootstrap4.js')}}"></script>
 <script src="{{asset('themes/back/src/plugins/datatables/media/js/dataTables.responsive.js')}}"></script>
+<!-- buttons for Export datatable -->
+<script src="{{asset('themes/back/src/plugins/datatables/media/js/button/dataTables.buttons.js')}}"></script>
+<script src="{{asset('themes/back/src/plugins/datatables/media/js/button/buttons.bootstrap4.js')}}"></script>
+<script src="{{asset('themes/back/src/plugins/datatables/media/js/button/buttons.print.js')}}"></script>
+<script src="{{asset('themes/back/src/plugins/datatables/media/js/button/buttons.html5.js')}}"></script>
+<script src="{{asset('themes/back/src/plugins/datatables/media/js/button/buttons.flash.js')}}"></script>
+<script src="{{asset('themes/back/src/plugins/datatables/media/js/button/pdfmake.min.js')}}"></script>
+<script src="{{asset('themes/back/src/plugins/datatables/media/js/button/vfs_fonts.js')}}"></script>
+
 <script src="{{ asset('js/toastr_message.js') }}"></script>
 <script>
 
+    $.fn.dataTable.ext.search.push(
+        function( settings, data, dataIndex ) {
+            console.log(data)
+//            var min = parseInt( $('#min').val(), 10 );
+//            var max = parseInt( $('#max').val(), 10 );
+//            var age = parseFloat( data[3] ) || 0; // use data for the age column
+//
+//            if ( ( isNaN( min ) && isNaN( max ) ) ||
+//                ( isNaN( min ) && age <= max ) ||
+//                ( min <= age   && isNaN( max ) ) ||
+//                ( min <= age   && age <= max ) )
+//            {
+//                return true;
+//            }
+//            return false;
+        }
+    );
+
+
+    //        $.fn.dataTable.ext.search.push(
+    //            function( settings, data, dataIndex ) {
+    ////            var min = parseInt( $('#min').val(), 10 );
+    ////            var max = parseInt( $('#max').val(), 10 );
+    ////            var age = parseFloat( data[3] ) || 0; // use data for the age column
+    //                var desde = $('#desde').val();
+    //                var hasta = document.getElementById('hasta').value;
+    //                var fecha =  data[7]; // use data for the age column
+    //                console.log(desde);
+    //                if ( desde === "" && hasta === "" )
+    //                {
+    //                    return true;
+    //                }
+    //                else if ( desde <= fecha && hasta === "")
+    //                {
+    //                    return true;
+    //                }
+    //                else if ( hasta >= fecha && desde === "")
+    //                {
+    //                    return true;
+    //                }
+    //                else if (desde <= fecha && hasta >= fecha)
+    //                {
+    //                    return true;
+    //                }
+    //                return false;
+    //                var startDate = new Date(aData[7]);
+    //                if (dateStart == null && dateEnd == null) { return true; }
+    //                if (dateStart == null && startDate <= dateEnd) { return true;}
+    //                if(dateEnd == null && startDate >= dateStart) {return true;}
+    //                if (startDate <= dateEnd && startDate >= dateStart) { return true; }
+    //                return false;
+    //
+    //            if ( ( isNaN( desde ) && isNaN( hasta ) ) ||
+    //                ( isNaN( desde ) && age <= hasta ) ||
+    //                ( desde <= age   && isNaN( hasta ) ) ||
+    //                ( desde <= age   && age <= max ) )
+    //            {
+    //                return true;
+    //            }
+    //            return false;
+    //            }
+    //        );
+
     $(document).ready(function () {
+
 
         cargarDatatables();
 
@@ -78,10 +176,60 @@
 //                return false;
 //            }
 //        });
+        
+
+        $('#desde').datepicker({
+            language: 'es',
+            dateFormat: 'yyyy-mm-dd',
+            position: 'right bottom',
+//            maxDate: new Date()
+            maxDate:0,
+            onSelect: function onSelect(fd, date) {
+//                table.columns(7).search(fd).draw();
+               let desde = fd;
+                table.column($(this).parent().index() + ':visible').search(desde).draw();
+
+//                let val = $.fn.dataTable.util.escapeRegex(
+//                    $(this).val()
+//                );
+//                column
+//                    .search(val ? '^' + val + '$' : '', true, false)
+//                    .draw();
+
+//                table.draw();
+
+            }
+        }).change(function() {
+              // getting search input value
+            let desde= $(this).val();
+            table.draw();
+        });
+
+        $('#hasta').datepicker({
+            language: 'es',
+            dateFormat: 'yyyy-mm-dd',
+            position: 'right bottom',
+//            maxDate: new Date()
+            maxDate:0,
+            onSelect: function onSelect(fd, date) {
+//                table.columns(7).search(fd).draw();
+                let hasta = fd;
+                table.draw();
+            }
+        }).change(function() {
+            // getting search input value
+            let hasta = $(this).val();
+            table.draw();
+        });
+
 
     });
 
-    let  table;
+    $(document).on('click', '#facturacion_masiva', function (event) {
+        event.preventDefault();
+    });
+
+    let table;
     function cargarDatatables() {
 
         $('.tfoot_search').each(function () {
@@ -89,7 +237,7 @@
             $(this).html('<input type="text" class="form-control" placeholder="Buscar ' + title + '" />');
         });
         table = $(".data-table").DataTable({
-            lengthMenu: [[5, 25, 50,100,500, -1], [5, 25, 50,100,500, 'Todos']],
+            lengthMenu: [[5, 25, 50, 100, 500, -1], [5, 25, 50, 100, 500, 'Todos']],
             scrollCollapse: true,
             autoWidth: false,
             responsive: true,
@@ -107,21 +255,60 @@
                 {data: 'nombre', name: 'nombre'},
                 {data: 'identificacion', name: 'identificacion'},
                 {data: 'email', name: 'email', orderable: false},
-                {data: 'mpago.nombre', name: 'mpago.nombre', orderable:false},
-                {data: 'total', name: 'total'}
+                {data: 'mpago.nombre', name: 'mpago.nombre', orderable: false},
+                {data: 'total', name: 'total'},
+                {data: 'created_at', name: 'created_at'}
             ],
             columnDefs: [
                 {
                     targets: [6],
                     className: "text-right text-blue",
-                    render:  $.fn.dataTable.render.number(' ', '.', 2, '$ ')
+                    render: $.fn.dataTable.render.number(' ', '.', 2, '$ ')
                 }
             ],
             "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
-                console.log(aData);
+//                console.log(aData);
+//                var iFini = document.getElementById('desde').value;
+//                var iFfin = document.getElementById('hasta').value;
+//                var iStartDateCol = 7;
+//                var iEndDateCol = 7;
+
+
+//                iFini=iFini.substring(6,10) + iFini.substring(3,5)+ iFini.substring(0,2);
+//                iFfin=iFfin.substring(6,10) + iFfin.substring(3,5)+ iFfin.substring(0,2);
+
+
+//
+//                var datofini=aData[iStartDateCol].substring(6,10) + aData[iStartDateCol].substring(3,5)+ aData[iStartDateCol].substring(0,2);
+//                var datoffin=aData[iEndDateCol].substring(6,10) + aData[iEndDateCol].substring(3,5)+ aData[iEndDateCol].substring(0,2);
+//console.log(datofini+' / '+datoffin);
+//                if ( iFini === "" && iFfin === "" )
+//                {
+//                    return true;
+//                }
+//                else if ( iFini <= datofini && iFfin === "")
+//                {
+//                    return true;
+//                }
+//                else if ( iFfin >= datoffin && iFini === "")
+//                {
+//                    return true;
+//                }
+//                else if (iFini <= datofini && iFfin >= datoffin)
+//                {
+//                    return true;
+//                }
+//                return false;
+//                var startDate = new Date(aData[7]);
+//                if (dateStart == null && dateEnd == null) { return true; }
+//                if (dateStart == null && startDate <= dateEnd) { return true;}
+//                if(dateEnd == null && startDate >= dateStart) {return true;}
+//                if (startDate <= dateEnd && startDate >= dateStart) { return true; }
+//                return false;
             },
             drawCallback: function (settings) {
                 $('[data-toggle="tooltip"]').tooltip();//para que funcionen los tooltips en cada fila
+
             },
             "footerCallback": function (row, data, start, end, display) {
                 var api = this.api(), data;
@@ -134,7 +321,7 @@
                     return (intVal(a) + intVal(b)).toFixed(2);
                 }, 0);
                 // actualzar total en el pie de tabla
-                $(api.column(6).footer()).html('<p> <b>$' + pageTotal + '</b>' );
+                $(api.column(6).footer()).html('<p> <b>$' + pageTotal + '</b>');
             },
             initComplete: function (settings, json) {
                 $('.data-table').fadeIn();
@@ -150,7 +337,6 @@
                                     that.search(this.value).draw();
                                 }
                             });
-
                     }
                     else if ($(column.footer()).hasClass('tfoot_select')) { //select
                         // Generar select
