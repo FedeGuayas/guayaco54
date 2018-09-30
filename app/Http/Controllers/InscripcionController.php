@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Yajra\Datatables\Datatables;
 use Facades\App\Classes\LogActivity;
+use Barryvdh\DomPDF\Facade as PDF;
 
 class InscripcionController extends Controller
 {
@@ -49,7 +50,7 @@ class InscripcionController extends Controller
                 with('user', 'producto', 'producto.categoria', 'producto.circuito', 'persona', 'talla', 'factura')
                     ->join('personas', 'personas.id', '=', 'inscripcions.persona_id')
                     ->leftJoin('registros', 'registros.inscripcion_id', '=', 'inscripcions.id')
-//                ->where('first_name','!=','admin') //no mostrar el admin
+                ->where('status','!=',Inscripcion::CANCELADA) //no mostrar las canceladas
 //                ->whereHas('roles', function($q){ //con rol=employee
 //                    $q->where('name', '=', 'employee');
 //                })
@@ -64,8 +65,8 @@ class InscripcionController extends Controller
                 <a class="btn btn-outline-primary dropdown-toggle" href="#" role="button" data-toggle="dropdown"><i class="fa fa-ellipsis-h"></i></a>
                 <div class="dropdown-menu dropdown-menu-left">
                  @can(\'view_comprobantes\')
-                    <a class="dropdown-item" href="#" data-toggle="tooltip" data-placement="top" title="Imprimir Comprobante">
-                        <i class="fa fa-print text-primary"></i> Imprimir
+                    <a class="dropdown-item" href="{{route(\'admin.inscripcion.recibo\',[$id])}}" data-toggle="tooltip" data-placement="top" title="Imprimir Recibo" target="_blank">
+                        <i class="fa fa-file-pdf-o text-danger"></i> Imprimir
                     </a>
                 @endcan
                 @can(\'edit_inscripciones\')
@@ -75,7 +76,7 @@ class InscripcionController extends Controller
                 @endcan
                 @can(\'delete_inscripciones\')
                     <a class="dropdown-item delete" href="#" data-id="{{$id}}" data-toggle="tooltip" data-placement="top" title="Eliminar">
-                        <i class="fa fa-trash-o text-danger"></i> 
+                        <i class="fa fa-trash-o text-danger"></i>  Eliminar
                     </a>
                 @endcan
                 @if ($deporte_id==\'\')  
@@ -420,7 +421,7 @@ class InscripcionController extends Controller
             $notification = [
                 'message_toastr' => 'Inscripción creada correctamente. Debe imprimir el comprobante de pago con el cuál se podrá retirar el Kit.',
                 'alert-type' => 'success'];
-            return redirect()->route('admin.inscription.index')->with($notification);
+            return redirect()->route('facturas.inscription.index')->with($notification);
 
         } catch (\Exception $e) {
             DB::rollBack();
@@ -746,9 +747,47 @@ class InscripcionController extends Controller
      * @param  \App\Inscripcion $inscripcion
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Inscripcion $inscripcion)
+    public function destroy(Request $request,Inscripcion $inscripcion)
     {
-        //
+        if ($request->user()->can('delete_inscripciones') && $request->ajax()) {
+
+            try {
+
+                DB::beginTransaction();
+
+                if (isset($inscripcion->talla)) {
+
+                    $talla = $inscripcion->talla;
+                    $talla->increment('stock');
+                    $talla->stock > 0 ? $talla->status = Talla::ACTIVO : $talla->status = Talla::INACTIVO;
+                    $talla->update();
+                }
+
+                $registro=Registro::where('inscripcion_id',$inscripcion->id)->first();
+                $registro ? $registro->delete() : $registro=false;
+                LogActivity::addToLog('Registro eliminado (No. inscripcion, No. corredor) ', $request->user(),$inscripcion->id,$inscripcion->num_corredor);
+
+                $factura=$inscripcion->factura;
+                if ($factura){
+                    $factura->status=Factura::CANCELADA;
+                    $factura->update();
+                    LogActivity::addToLog('Inscripcion cancelada, Factura cancelada (Inscripcion->id, Factura->id) ', $request->user(),$inscripcion->id,$factura->id);
+                }
+
+                $inscripcion->status=Inscripcion::CANCELADA;
+                $inscripcion->update();
+                LogActivity::addToLog('Inscripcion cancelada,(inscripcion->id) ', $request->user(),$inscripcion->id);
+
+                DB::Commit();
+
+                return response()->json(['data' => $inscripcion], 200);
+
+            }catch (\Exception $e) {
+                DB:: rollBack();
+                return response()->json(['data' => $inscripcion]);
+
+            }
+        } else  return response()->json(['data' => $inscripcion], 403);
     }
 
     /**
@@ -889,6 +928,19 @@ class InscripcionController extends Controller
 
             return response()->json(['data' => $stock], 200);
         }
+
+    }
+
+    /**BACK
+     * Imprimir recibo de inscripcion comprobante de pago
+     * @param Factura $factura
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public  function reciboInscripcion(Inscripcion $inscripcion){
+        setlocale(LC_ALL, 'es');
+//dd($inscripcion);
+        $pdf = PDF::loadView('inscripcion.interna.recibo', compact('inscripcion'));
+        return $pdf->stream('Recibo de Inscripcion No-'.$inscripcion->id.'.pdf');
 
     }
 

@@ -41,17 +41,13 @@ class FacturaController extends Controller
 
                 $comprobantes = Factura::
                 with('user', 'persona', 'mpago', 'descuento')
+                    ->where('status','!=',Factura::CANCELADA) //no mostrar las canceladas
                     ->select('facturas.*');
 
                 $action_buttons = '
             <div class="dropdown">
                 <a class="btn btn-outline-primary dropdown-toggle" href="#" role="button" data-toggle="dropdown"><i class="fa fa-ellipsis-h"></i></a>
                 <div class="dropdown-menu dropdown-menu-left">
-                 @can(\'view_comprobantes\')
-                    <a class="dropdown-item" href="{{route(\'admin.printComprobante\',[$id])}}" data-toggle="tooltip" data-placement="top" title="Imprimir Comprobante">
-                        <i class="fa fa-print fa-2x text-dark"></i> Imprimir
-                    </a>
-                @endcan
                 @can(\'edit_comprobantes\')
                     <a class="dropdown-item" href="{{ route(\'facturas.edit\',[$id]) }}" data-toggle="tooltip" data-placement="top" title="Editar Comprobante">    
                         <i class="fa fa-pencil text-success"></i> Editar
@@ -212,18 +208,9 @@ class FacturaController extends Controller
         //
     }
 
-
     /**
-     * Imprimir un comprobante de pago
-     * @param Factura $factura
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @param Request $request
      */
-    public  function printComprobante(Factura $factura){
-        setlocale(LC_ALL, 'es');
-//        dd($factura);
-        return view('facturas.interna.comprobante_pdf',compact('factura'));
-    }
-
     public function comprobantesExcel(Request $request)
     {
         $escenarioSelect = ['' => 'Seleccione el escenario'] + Escenario::lists('escenario', 'id')->all();

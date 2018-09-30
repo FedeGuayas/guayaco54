@@ -136,11 +136,11 @@ Route::middleware(['auth', 'isVerified'])->group(function () {
         Route::delete('inscription/{inscripcion}', 'InscripcionController@destroy')->name('admin.inscription.destroy');
         //Entregar Kit
         Route::post('inscription/{inscripcion}/setKit', 'InscripcionController@setKit')->name('admin.inscripcion.setKit');
+        //Print recibo inscripcion backend
+        Route::get('inscription/{inscripcion}/print', 'InscripcionController@reciboInscripcion')->name('admin.inscripcion.recibo');
 
         //Todos los comprobantes ajax
         Route::get('facturas/getAllInside', 'FacturaController@getAll')->name('admin.getAll.inside');
-        //Print comprobante
-        Route::get('facturas/{factura}/print', 'FacturaController@printComprobante')->name('admin.printComprobante');
 
 
         Route::resource('users', 'UserController');

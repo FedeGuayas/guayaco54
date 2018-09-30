@@ -47,6 +47,11 @@ class Inscripcion extends Model
     {
         return $this->belongsTo('App\Factura');
     }
+    //punto de cobro de la inscripcion, online =null
+    public function escenario()
+    {
+        return $this->belongsTo('App\Escenario');
+    }
 
     //
     public function deporte()

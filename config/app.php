@@ -192,6 +192,8 @@ return [
         Yajra\Datatables\DatatablesServiceProvider::class,
         //Laravel-excel
         Maatwebsite\Excel\ExcelServiceProvider::class,
+        //DOMPDF Wrapper for Laravel
+        Barryvdh\DomPDF\ServiceProvider::class,
 
     ],
 
@@ -260,6 +262,8 @@ return [
         'Datatables' => Yajra\Datatables\Facades\Datatables::class,
         //Laravel-excel
         'Excel' => Maatwebsite\Excel\Facades\Excel::class,
+        //DOMPDF Wrapper for Laravel
+        'PDF' => Barryvdh\DomPDF\Facade::class,
     ],
 
 ];

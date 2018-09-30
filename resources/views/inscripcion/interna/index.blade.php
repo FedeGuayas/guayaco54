@@ -43,19 +43,21 @@
                     <thead>
                     <tr>
                         <th class="datatable-nosort">Acción</th>
+                        <th>Reg.</th>
                         <th>Nombres</th>
                         <th>Num. Identidad</th>
                         <th>Categoría</th>
                         <th>Circuito</th>
-                        <th  width="5">Núm. Part.</th>
+                        <th  width="5">Corredor   No.</th>
                         <th>Kit</th>
                         <th>Talla</th>
-                        {{--<th>Email</th>--}}
+                        <th>Email</th>
                     </tr>
                     </thead>
                     <tfoot>
                     <tr>
                         <th></th>
+                        <th class="tfoot_search"></th>
                         <th class="tfoot_search"></th>
                         <th class="tfoot_search">Ced. / Pasapt</th>
                         <th class="tfoot_select"></th>
@@ -63,7 +65,7 @@
                         <th class="tfoot_search"></th>
                         <th></th>
                         <th></th>
-                        {{--<th class="tfoot_search"></th>--}}
+                        <th class="tfoot_search"></th>
 
                     </tr>
                     </tfoot>
@@ -116,24 +118,26 @@
             processing: true,
             select: true,
             serverSide: true,
-//            order: [[0, 'desc']],
+            order: [[1, 'desc']],
             "language": {
                 "url": '/guayaco-runner/plugins/DataTables/i18n/Spanish_original.lang'
             },
             ajax: '{{route('admin.inscription.getAll')}}',
             columns: [
                 {data: 'actions', name: 'opciones', orderable: false, searchable: false},
+                {data: 'id', name: 'id'},
                 {data: 'nombres', name: 'nombres'},
                 {data: 'persona.num_doc', name: 'persona.num_doc'},
                 {data: 'producto.categoria.categoria', name: 'producto.categoria.categoria'},
                 {data: 'producto.circuito.circuito', name: 'producto.circuito.circuito'},
                 {data: 'numero', name: 'numero'},
                 {data: 'kit', name: 'kit'},
-                {data: 'tallas', name: 'tallas', orderable:false, searchable: false}
+                {data: 'tallas', name: 'tallas', orderable:false, searchable: false},
+                {data: 'persona.email', name: 'persona.email', orderable:false}
             ],
             columnDefs: [
                 {
-                    targets: 6,
+                    targets: 7,
                     render: function (data, type, row, meta) {
                         if (row.deporte_id==''){
                             if (type === 'display' && data=='1') {
@@ -142,26 +146,12 @@
                                 data = '<i class="fa fa-thumbs-o-down fa-2x text-danger" data-toggle="tooltip" data-placement="top" title="Por Entregar"></i>';
                             }
                         }
-
                         return data;
                     }
                 }
-//                {
-//                    targets: [8,9,10,11],
-//                    className: "text-right",
-//                    render:  $.fn.dataTable.render.number(' ', '.', 2, '$ ')
-//                }
-//                { //Dar color a los datos de todas las columnas
-//                    targets: '_all',
-//                    render: function (data, type, row) {
-////
-//                        var color = 'black';
-//                        return '<strong style="color:' + color + '">' + data + '</strong>';
-//                    }
-//                }
             ],
             "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
-//                console.log(aData);
+                console.log(aData);
             },
             drawCallback: function (settings) {
                 $('[data-toggle="tooltip"]').tooltip();//para que funcionen los tooltips en cada fila
@@ -202,9 +192,9 @@
                         // Capturar los datos del JSON para llenar el select con las opciones
                         let extraData = (function (i) {
                             switch (i) {
-                                case 3:
-                                    return json.allCategorias;
                                 case 4:
+                                    return json.allCategorias;
+                                case 5:
                                     return json.allCircuitos;
                             }
                         })(column.index());
@@ -225,7 +215,7 @@
     }
 
 
-    //eliminar usuario
+    //Entrega/ devolucion de kit
     $(document).on('click', '.status_kit', function (e) {
         e.preventDefault();
         let id = $(this).attr('data-id');
@@ -255,7 +245,6 @@
                         headers: {'X-CSRF-TOKEN': token},
                         type: "post",
                         success: function (response) {
-                            console.log(response)
                             resolve(response);
                         },
                         error: function (error) {
@@ -278,9 +267,6 @@
 
                     if (resp.value) { //recargar al dar en ok
                         table.ajax.reload();
-//                        window.setTimeout(function () {
-//                            location.reload()
-//                        }, 1);
                     }
                 })
                 //cancelo la eliminacion
@@ -292,7 +278,7 @@
                 )
             }
         }).catch((error) => { //error en la respuesta ajax
-            console.log(error)
+//            console.log(error)
             swal(
                 ':( Lo sentimos ocurrio un error durante su petición',
                 '' + error.status + ' ' + error.statusText + '',
@@ -373,8 +359,79 @@
         });
     });
 
+    //Eliminar inscripcion
+    $(document).on('click', '.delete', function (e) {
+        e.preventDefault();
+        let id = $(this).attr('data-id');
+        let token = $("input[name=_token]").val();
+        let form = $("#form-delete");
+        let url = form.attr('action').replace(':ID', id);
+        let data = form.serialize();
+        swal({
+            title: 'Confirme la acción',
+            text: "Se eliminará la inscripción, esta acción no se podrá deshacer!",
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Si, proceder! <i class="fa fa-trash-o"></i>',
+            cancelButtonText: 'No, cancelar! <i class="fa fa-ban"></i>',
+            showCloseButton: true,
+            confirmButtonClass: 'btn btn-outline-danger m5',
+            cancelButtonClass: 'btn btn-outline-secondary m-5',
+            buttonsStyling: false,
+            showLoaderOnConfirm: true,
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            preConfirm: function () {
+                return new Promise((resolve, reject) => {
+                    $.ajax({
+                        url: url,
+                        data: data,
+                        headers: {'X-CSRF-TOKEN': token},
+                        type: "post",
+                        success: function (response) {
+                            resolve(response);
+                        },
+                        error: function (error) {
+                            reject(error)
+                        }
+                    });
+                })
+            },
+        }).then((response) => { //respuesta ajax
+            //confirmo la acción
+            if (response.value) {
+//                console.log(response)
+                swal({
+                    title: ':)',
+                    text: 'Inscripción eliminada',
+                    type: 'success',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false
+                }).then((resp) => {
+                    if (resp.value) { //recargar al dar en ok
+                        table.ajax.reload();
+                    }
+                })
+                //cancelo la eliminacion
+            } else if (response.dismiss === swal.DismissReason.cancel) {// 'cancel', 'overlay', 'close', and 'timer'
+                swal(
+                    'Acción cancelada',
+                    'Ud canceló la acción, no se realizaron cambios :)',
+                    'error'
+                )
+            }
+        }).catch((error) => { //error en la respuesta ajax
+            swal(
+                ':( Lo sentimos ocurrio un error durante su petición',
+                '' + error.status + ' ' + error.statusText + '',
+                'error'
+            )
+        });
+    });
 
-            {{--Alertas con Toastr--}}
+
+
+    {{--Alertas con Toastr--}}
             @if(Session::has('message_toastr'))
     var type = "{{ Session::get('alert-type') }}";
     var text_toastr = "{{ Session::get('message_toastr') }}";
