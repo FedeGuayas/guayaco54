@@ -17,6 +17,7 @@ use App\Talla;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 use Yajra\Datatables\Datatables;
 use Facades\App\Classes\LogActivity;
@@ -942,6 +943,27 @@ class InscripcionController extends Controller
         $pdf = PDF::loadView('inscripcion.interna.recibo', compact('inscripcion'));
         return $pdf->stream('Recibo de Inscripcion No-'.$inscripcion->id.'.pdf');
 
+    }
+
+
+    /////////////////////////Reservas////////////////////////////////////
+
+    /**
+     * Muestra las inscripciones pendientes de pago, Western Union, Inscripcion Online (Contado)
+     * @return mixed
+     */
+    public function reservas()
+    {
+        $inscripciones = Inscripcion::
+            with('user', 'producto', 'persona', 'talla', 'factura')
+            ->where('inscripcions.status','=',Inscripcion::RESERVADA)
+            ->get();
+
+        $cantidad_reservas = $inscripciones->count();
+
+        Session::put('reservas', $cantidad_reservas);
+//        dd(Session::get('$cantidad_reservas'));
+        return view('inscripcion.reservas.reservas', ['inscripciones' => $inscripciones]);
     }
 
 

@@ -145,6 +145,23 @@ Route::middleware(['auth', 'isVerified'])->group(function () {
         Route::get('facturas/arqueo', 'FacturaController@getCuadre')->name('admin.facturacion.arqueo');
 
 
+        //RESERVAS
+//    Route::group(array('middleware' => 'forceSSL'), function() {
+        Route::get('pre-inscripcion/reservas', 'InscripcionController@reservas')->name('admin.inscripcions.reservas');
+//    });
+        //cancelar reserva
+        Route::get('pre-inscripcion/reserva/{id}/cancel','InscripcionController@reservaCancel')->name('admin.reserva.cancel');
+        //confirmar reserva
+        Route::get('pre-inscripcion/reserva/{id}/confirm','InscripcionController@reservaConfirm')->name('admin.reserva.confirm');
+        //editar reserva
+        Route::get('pre-inscripcion/reserva/{id}/edit','InscripcionController@reservaEdit')->name('admin.reserva.edit');
+        //actualizar forma pago de reserva
+        Route::put('pre-inscripcion/reserva/{id}/update','InscripcionController@reservaUpdate')->name('admin.reserva.update');
+        //exportar reservas
+        Route::post('pre-inscripcion/reserva/export','InscripcionsController@reservasExport')->name('admin.reserva.export');
+
+
+
         Route::resource('users', 'UserController');
         Route::resource('categorias', 'CategoriaController', ['except' => ['show', 'destroy']]);
         Route::resource('circuitos', 'CircuitoController', ['except' => ['show', 'destroy']]);

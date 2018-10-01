@@ -39,7 +39,7 @@
             <a href="#" class="btn btn-outline-dark" data-toggle="tooltip" id="print_cuadre" title="Imprimir"><i class="fa fa-print"></i></a>
         </div>
 
-        <section id="pintable">
+        <section id="printable">
 
         <div class="pd-20 bg-white border-radius-4 box-shadow">
 
@@ -97,7 +97,7 @@
                 pto_cobro=escenario;
             }
             let fecha=$("#fecha").val();
-            $("#pintable").printThis({
+            $("#printable").printThis({
                 importCSS: true,
                 importStyle: true,
                 removeInline: false,

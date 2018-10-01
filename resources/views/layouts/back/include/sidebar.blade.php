@@ -53,14 +53,10 @@
                     </ul>
                 </li>
                 <li>
-                <a href="" class="dropdown-toggle no-arrow">
-                <span class="fa fa-comments-o"></span><span class="mtext">Chat <span
-                class="fi-burst-new text-danger new"></span></span>
-                </a>
-                </li>
-                <li>
-                    <a href="#">
-                        <span class="fa fa-pencil-square"></span><span class="mtext">Insc. Pendientes</span>
+                    <a href="{{route('admin.inscripcions.reservas')}}" class="dropdown-toggle no-arrow">
+                        <span class="fa fa-pencil-square"></span><span class="mtext">Insc. Pendientes <span
+                                    class="badge-pill badge-danger ">{{ Session::has('reservas') ?  Session::get('reservas') : ''}}</span>
+                        </span>
                     </a>
                 </li>
                 @endhasanyrole
@@ -72,10 +68,12 @@
                     <ul class="submenu">
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle">
-                                <i class="fas fa-users-cog"></i><span class="mtext"><i class="fa fa-users" aria-hidden="true"></i> Usuarios </span>
+                                <i class="fas fa-users-cog"></i><span class="mtext"><i class="fa fa-users"
+                                                                                       aria-hidden="true"></i> Usuarios </span>
                             </a>
                             <ul class="submenu child">
-                                <li><a href="{{route('users.index')}}">Activos <i class="icon-copy fa fa-check-circle-o" aria-hidden="true"></i></a> </li>
+                                <li><a href="{{route('users.index')}}">Activos <i class="icon-copy fa fa-check-circle-o"
+                                                                                  aria-hidden="true"></i></a></li>
                                 <li><a href="#">Inactivos <i class="fa fa-user-times" aria-hidden="true"></i></a></li>
                             </ul>
                         </li>
@@ -95,10 +93,10 @@
                 </li>
                 @endrole
                 {{--<li>--}}
-                    {{--<a href="chat.php" class="dropdown-toggle no-arrow">--}}
-                        {{--<span class="fa fa-comments-o"></span><span class="mtext">Chat <span--}}
-                                    {{--class="fi-burst-new text-danger new"></span></span>--}}
-                    {{--</a>--}}
+                {{--<a href="chat.php" class="dropdown-toggle no-arrow">--}}
+                {{--<span class="fa fa-comments-o"></span><span class="mtext">Chat <span--}}
+                {{--class="fi-burst-new text-danger new"></span></span>--}}
+                {{--</a>--}}
                 {{--</li>--}}
 
                 @role('client')
@@ -107,7 +105,8 @@
                         <span class="fa fa-user-o"></span><span class="mtext">Menú Usuario</span>
                     </a>
                     <ul class="submenu">
-                        <li><a href="{{route('user.inscripcion.create')}}">Nueva Inscripción <i class="fa fa-pencil-square-o"></i></a>
+                        <li><a href="{{route('user.inscripcion.create')}}">Nueva Inscripción <i
+                                        class="fa fa-pencil-square-o"></i></a>
                         <li><a href="#">Comprobantes <i class="fa fa-sticky-note-o"></i></a>
                     </ul>
                 </li>
