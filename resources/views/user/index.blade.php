@@ -97,7 +97,7 @@
             serverSide: true,
             order: [[0, 'desc']],
             "language": {
-                "url": '/guayaco-runner/plugins/DataTables/i18n/Spanish_original.lang'
+                "url": '/plugins/DataTables/i18n/Spanish_original.lang'
             },
             ajax: '{{route('getAllUsers')}}',
             columns: [

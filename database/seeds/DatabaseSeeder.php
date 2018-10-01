@@ -80,7 +80,8 @@ class DatabaseSeeder extends Seeder
         $this->call(EscenariosTableSeeder::class);
         //formas de pago
         $this->call(MPagosTableSeeder::class);
-
+        //deportes
+        $this->call(DeportesTableSeeder::class);
         $this->command->warn('Completado :)');
 
     } //fin run

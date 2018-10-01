@@ -87,7 +87,7 @@
             }],
             "lengthMenu": [[5, 10, -1], [5, 10, "Todos"]],
             "language": {
-                "url": '/guayaco-runner/plugins/DataTables/i18n/Spanish_original.lang'
+                "url": '/plugins/DataTables/i18n/Spanish_original.lang'
             }
         });
     });

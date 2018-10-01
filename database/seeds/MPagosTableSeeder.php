@@ -19,13 +19,13 @@ class MPagosTableSeeder extends Seeder
 
         DB::table('mpagos')->insert([
             'nombre'=>'contado',
-            'descripcion'=>'efectivo en instalaciones de la fedeguayas',
+            'descripcion'=>'efectivo en instalaciones de fedeguayas',
             'status'=>\App\Mpago::ACTIVO
         ]);
 
         DB::table('mpagos')->insert([
             'nombre'=>'tarjeta',
-            'descripcion'=>'pago online mediante tarjeta de creito/debito',
+            'descripcion'=>'pago online mediante tarjeta de crédito / débito',
             'status'=>\App\Mpago::ACTIVO
         ]);
     }

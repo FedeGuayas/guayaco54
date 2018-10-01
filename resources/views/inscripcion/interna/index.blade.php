@@ -120,7 +120,7 @@
             serverSide: true,
             order: [[1, 'desc']],
             "language": {
-                "url": '/guayaco-runner/plugins/DataTables/i18n/Spanish_original.lang'
+                "url": '/plugins/DataTables/i18n/Spanish_original.lang'
             },
             ajax: '{{route('admin.inscription.getAll')}}',
             columns: [

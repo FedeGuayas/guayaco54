@@ -104,7 +104,7 @@
                                         {{--<a class="dropdown-item" href="{{route('categorias.edit',$cat->id)}}"><i--}}
                                         {{--class="fa fa-pencil text-success"></i> Editar</a>--}}
                                         @hasanyrole(['admin','employee'])
-                                        @can('delete_reserva')
+                                        @can('delete_reservas')
                                             <a class="dropdown-item"
                                                href="{{ route('admin.reserva.cancel', $insc->id ) }}"
                                                data-position="top" data-toggle="tooltip"
@@ -113,7 +113,7 @@
                                                 Cancelar
                                             </a>
                                         @endcan
-                                        @can('edit_reserva')
+                                        @can('edit_reservas')
                                             <a class="dropdown-item"
                                                href="{{ route('admin.reserva.confirm', $insc->id ) }}"
                                                data-position="top" data-toggle="tooltip" data-tooltip="Aprobar Reserva">
@@ -190,7 +190,7 @@
                 }],
                 "lengthMenu": [[5, 10, -1], [5, 10, "Todos"]],
                 "language": {
-                    "url": '/guayaco-runner/plugins/DataTables/i18n/Spanish_original.lang'
+                    "url": '/plugins/DataTables/i18n/Spanish_original.lang'
                 }
             });
 

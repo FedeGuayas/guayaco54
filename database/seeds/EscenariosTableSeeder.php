@@ -35,5 +35,10 @@ class EscenariosTableSeeder extends Seeder
             'escenario'=>'polideportivo huancavilca',
             'status'=>\App\Escenario::ACTIVO
         ]);
+
+        DB::table('escenarios')->insert([
+            'escenario'=>'samanes',
+            'status'=>\App\Escenario::ACTIVO
+        ]);
     }
 }

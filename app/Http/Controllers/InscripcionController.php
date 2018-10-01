@@ -866,7 +866,7 @@ class InscripcionController extends Controller
 
             //edad de persona a inscribir
             $edad=intval($request->input('persona_edad'));
-            if ($edad >= 66 ) { //adulto mayor 50% descuento
+            if ($edad >= 65 ) { //adulto mayor 50% descuento
                 $descuento = $costo* 0.50 ;
                 $costo = $costo - $descuento;
                 $costo = number_format($costo, 2, '.', ' ');

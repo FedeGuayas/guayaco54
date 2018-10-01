@@ -21,68 +21,66 @@
 
             <div class="col-md-10 col-sm-12 mb-30 pd-20 bg-white border-radius-4 box-shadow">
 
-                            <section>
-                                <div class="row">
-                                    <div class="col">
-                                        <div class="form-group">
-                                            {!! Form::label('nombre','Nombres y Apellidos*') !!}
-                                            {!! Form::text('nombre',null,['class'=>'form-control','style'=>'text-transform: uppercase','required','id'=>'nombre','required']) !!}
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            {!! Form::label('identificacion','Identificación *') !!}
-                                            {!! Form::text('identificacion', null,['class'=>'form-control','style'=>'text-transform: uppercase','id'=>'identificacion','required']) !!}
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            {!! Form::label('email','Email *') !!}
-                                            {!! Form::email('email',null ,['class'=>'form-control','placeholder'=>'Email','style'=>'text-transform: lowercase','id'=>'email','required']) !!}
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            {!! Form::label('telefono','Teléfono *') !!}
-                                            {!! Form::text('telefono',null,['class'=>'form-control','id'=>'telefono','required']) !!}
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            {!! Form::label('direccion','Dirección *') !!}
-                                            {!! Form::text('direccion',null,['class'=>'form-control','style'=>'text-transform: uppercase','id'=>'direccion','required']) !!}
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="custom-control custom-checkbox mb-15">
-                                    <input type="checkbox" class="custom-control-input" id="consumidor_final">
-                                    <label class="custom-control-label" for="consumidor_final">Editar Facturación                                                Final</label>
-                                </div>
-                                <small class="form-text text-danger"> * Campos obligatorios</small>
-                            </section>
-
-
-
-                    <div class="row pt-2">
-                        <div class="col-md-3">
-                            <button type="submit" class="btn btn-block btn-primary">Guardar
-                                Comprobante
-                            </button>
+                <section>
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group">
+                                {!! Form::label('nombre','Nombres y Apellidos*') !!}
+                                {!! Form::text('nombre',null,['class'=>'form-control','style'=>'text-transform: uppercase','required','id'=>'nombre','required']) !!}
+                            </div>
                         </div>
                     </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                {!! Form::label('identificacion','Identificación *') !!}
+                                {!! Form::text('identificacion', null,['class'=>'form-control','style'=>'text-transform: uppercase','id'=>'identificacion','required']) !!}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                {!! Form::label('email','Email *') !!}
+                                {!! Form::email('email',null ,['class'=>'form-control','placeholder'=>'Email','style'=>'text-transform: lowercase','id'=>'email','required']) !!}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                {!! Form::label('telefono','Teléfono *') !!}
+                                {!! Form::text('telefono',null,['class'=>'form-control','id'=>'telefono','required']) !!}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                {!! Form::label('direccion','Dirección *') !!}
+                                {!! Form::text('direccion',null,['class'=>'form-control','style'=>'text-transform: uppercase','id'=>'direccion','required']) !!}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="custom-control custom-checkbox mb-15">
+                        <input type="checkbox" class="custom-control-input" id="consumidor_final">
+                        <label class="custom-control-label" for="consumidor_final">Editar Facturación Final</label>
+                    </div>
+                    <small class="form-text text-danger"> * Campos obligatorios</small>
+                </section>
+
+
+                <div class="row pt-2">
+                    <div class="col-md-3">
+                        <button type="submit" class="btn btn-block btn-primary">Guardar
+                            Comprobante
+                        </button>
+                    </div>
+                </div>
 
             </div><!-- ./ tab -->
         </div>
+
+        {!! Form::close() !!}
+
     </div>
 
-    {!! Form::close() !!}
-
-    </div>
-    </div>
 
 @endsection
 
