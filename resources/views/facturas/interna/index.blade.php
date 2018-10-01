@@ -22,8 +22,7 @@
     <div class="pd-20 bg-white border-radius-4 box-shadow mb-30">
         <div class="clearfix mb-20">
             <div class="pull-left">
-                <h5 class="text-blue">Todas los Comprobantes</h5>
-
+                <h5 class="text-blue">Todos los Comprobantes</h5>
             </div>
         </div>
 

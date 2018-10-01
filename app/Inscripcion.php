@@ -11,6 +11,9 @@ class Inscripcion extends Model
     const PAGADA = 'p';
     const CANCELADA = 'c';
 
+    const INSCRIPCION_ONLINE='1';
+    const INSCRIPCION_PRESENCIAL='0';
+
     const KIT_ENTREGADO = '1';
     const KIT_POR_ENTREGAR =null;
 

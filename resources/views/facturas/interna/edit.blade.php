@@ -16,7 +16,7 @@
         </div>
 
         {!! Form::model($factura,['route'=>['facturas.update',$factura->id],'method' => 'put', 'autocomplete'=> 'off', 'class'=>'form_noEnter']) !!}
-        {{--        {!! Form::hidden('persona_id',$persona->id,['id'=>$persona->id]) !!}--}}
+
         <div class="row clearfix justify-content-center">
 
             <div class="col-md-10 col-sm-12 mb-30 pd-20 bg-white border-radius-4 box-shadow">

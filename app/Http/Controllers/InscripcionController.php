@@ -19,12 +19,21 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
+use Maatwebsite\Excel\Facades\Excel;
 use Yajra\Datatables\Datatables;
 use Facades\App\Classes\LogActivity;
 use Barryvdh\DomPDF\Facade as PDF;
 
 class InscripcionController extends Controller
 {
+    /**
+     * InscripcionController constructor.
+     */
+    public function __construct()
+    {
+        setlocale(LC_TIME, 'es_ES.utf8');
+    }
+
     /**
      *
      * @return \Illuminate\Http\Response
@@ -156,6 +165,7 @@ class InscripcionController extends Controller
         $inscription_true = Inscripcion::with('producto')
             ->where('persona_id', $persona->id)
             ->where('ejercicio_id', $ejercicio)
+            ->where('status','!=',Inscripcion::CANCELADA) //por si se inscribio antes y se borro la inscripcion
             ->first();
 
         if (count($inscription_true) > 0) {
@@ -422,12 +432,12 @@ class InscripcionController extends Controller
             $notification = [
                 'message_toastr' => 'Inscripción creada correctamente. Debe imprimir el comprobante de pago con el cuál se podrá retirar el Kit.',
                 'alert-type' => 'success'];
-            return redirect()->route('facturas.inscription.index')->with($notification);
+            return redirect()->route('admin.inscription.index')->with($notification);
 
         } catch (\Exception $e) {
             DB::rollBack();
-//            $message =  $e->getMessage();
-            $e->getCode() == '23000' ? $message = 'El cliente ya se encuentra inscrito en la carrera' : $message = 'Lo sentimos! Ocurrio un error y no se pudo crear la inscripción.';
+            $message =  $e->getMessage();
+//            $e->getCode() == '23000' ? $message = 'El cliente ya se encuentra inscrito en la carrera' : $message = 'Lo sentimos! Ocurrio un error y no se pudo crear la inscripción.';
             $notification = [
                 'message_toastr' => $message,
                 'alert-type' => 'error'];
@@ -772,12 +782,10 @@ class InscripcionController extends Controller
                 if ($factura){
                     $factura->status=Factura::CANCELADA;
                     $factura->update();
-                    LogActivity::addToLog('Inscripcion cancelada, Factura cancelada (Inscripcion->id, Factura->id) ', $request->user(),$inscripcion->id,$factura->id);
+                    LogActivity::addToLog('Inscripcion eliminada, Factura cancelada (Inscripcion->id, Factura->id) ', $request->user(),$inscripcion->id,$factura->id);
                 }
 
-                $inscripcion->status=Inscripcion::CANCELADA;
-                $inscripcion->update();
-                LogActivity::addToLog('Inscripcion cancelada,(inscripcion->id) ', $request->user(),$inscripcion->id);
+                $inscripcion->delete();
 
                 DB::Commit();
 
@@ -954,6 +962,7 @@ class InscripcionController extends Controller
      */
     public function reservas()
     {
+        Carbon::setLocale(config('app.locale'));
         $inscripciones = Inscripcion::
             with('user', 'producto', 'persona', 'talla', 'factura')
             ->where('inscripcions.status','=',Inscripcion::RESERVADA)
@@ -964,6 +973,266 @@ class InscripcionController extends Controller
         Session::put('reservas', $cantidad_reservas);
 //        dd(Session::get('$cantidad_reservas'));
         return view('inscripcion.reservas.reservas', ['inscripciones' => $inscripciones]);
+    }
+
+
+    /**
+     * Cancelar reserva
+     * @return mixed
+     */
+    public function reservaCancel(Request $request,$id)
+    {
+        if ($request->user()->can('delete_reservas')) {
+
+            try {
+
+                DB::beginTransaction();
+
+                $inscripcion = Inscripcion::where('id', $id)->with('factura', 'user','talla')->first();
+
+                //actualizar el stock y status de la talla
+                $talla=$inscripcion->talla;
+                $talla->increment('stock');
+                $talla->stock > 0 ? $talla->status = Talla::ACTIVO : $talla->status = Talla::INACTIVO;
+                $talla->update();
+
+                $registro=Registro::where('inscripcion_id',$inscripcion->id)->first();
+                $registro ? $registro->delete() : $registro=false;
+                LogActivity::addToLog('Reserva eliminada, Registro eliminado (No. inscripcion, No. corredor) ', $request->user(),$inscripcion->id,$inscripcion->num_corredor);
+
+                $factura=$inscripcion->factura;
+                if ($factura){
+                    $factura->status=Factura::CANCELADA;
+                    $factura->update();
+                    LogActivity::addToLog('Reserva eliminada, Factura cancelada (Inscripcion->id, Factura->id) ', $request->user(),$inscripcion->id,$factura->id);
+                }
+
+                $inscripcion->delete();
+
+                DB::commit();
+
+                $notification = [
+                    'message_toastr' => 'Reserva eliminada correctamente.',
+                    'alert-type' => 'success'];
+                return redirect()->route('admin.inscripcions.reservas')->with($notification);
+
+            } catch (\Exception $e) { //en caso de error viro al estado anterior
+                DB::rollback();
+//                $message=$e->getMessage();
+                $message='Ocurrio un error al cancelar la reserva';
+                $notification = [
+                    'message_toastr' => $message,
+                    'alert-type' => 'error'];
+                return redirect()->route('admin.inscripcions.reservas')->with($notification);
+            }
+
+        } else return abort(403);
+
+    }
+
+    /**
+     * Confirmar reserva
+     * @param $id
+     * @return mixed
+     */
+    public function reservaConfirm(Request $request,$id)
+    {
+        if ($request->user()->can('add_reservas')) {
+
+            try {
+
+                DB::beginTransaction();
+                $user=$request->user();
+
+                $inscripcion = Inscripcion::where('id', $id)->with('factura','user')->first();
+                $inscripcion->status = Inscripcion::PAGADA;
+                $inscripcion->inscripcion_type=Inscripcion::INSCRIPCION_PRESENCIAL; //aunque se haya hecho online se pago en fedeguayas
+                $inscripcion->user_edit=$user->id; //usuario que confirmo la reserva
+                $inscripcion->fecha=Carbon::now(); //fecha de aprobada
+                $inscripcion->escenario_id=$user->escenario_id; //escenario donde se confirmo la reserva
+                $inscripcion->update();
+
+                $factura=Factura::where('id',$inscripcion->factura_id)->first();
+                $factura->status=Factura::ACTIVA;
+                $factura->fecha_edit=Carbon::now();
+                $factura->update();
+
+                LogActivity::addToLog('Reserva confirmada,(inscripcion->id) ', $request->user(),$inscripcion->id);
+
+                DB::commit();
+
+                $notification = [
+                    'message_toastr' => 'Reserva de Inscripción confirmada correctamente.',
+                    'alert-type' => 'success'];
+                return redirect()->route('admin.inscripcions.reservas')->with($notification);
+
+            } catch (\Exception $e) { //en caso de error viro al estado anterior
+                DB::rollback();
+//              $message=$e->getMessage();
+                $message='Ocurrio un error y no se pudo aprobar la reserva';
+                $notification = [
+                    'message_toastr' => $message,
+                    'alert-type' => 'error'];
+                return redirect()->route('admin.inscripcions.reservas')->with($notification);
+            }
+
+        } else return abort(403);
+    }
+
+    /**
+     * Editar reserva
+     *
+     * @param  int $id
+     * @return \Illuminate\Http\Response
+     */
+    public function reservaEdit($id)
+    {
+
+        $inscripcion = Inscripcion::where('id', $id)->with('factura', 'user')->first();
+
+        $fpagos_coll = Mpago::where('status',Mpago::ACTIVO)->get();
+        //filtro las formas de pago
+        $fp = $fpagos_coll->filter(function ($fp) {   //solo muestro los pagos CONTADO o WESTERN UNION
+            if (strpos($fp->forma, 'CONTADO') !== false || strpos($fp->forma, 'WESTERN') !== false || strpos($fp->forma, 'TARJETA') !== false) {
+                return true; // true, el elemento se incluye, si retorna false, no se incluye
+            }
+        });
+        $fpago = $fp->pluck('forma', 'id');
+
+        return view('inscripcion.reservas.reserva-edit', compact( 'inscripcion', 'fpago'));
+
+    }
+
+
+    /**
+     * Actualizar la forma de pago de la reserva
+     *
+     * @param  \Illuminate\Http\Request $request
+     * @param  int $id
+     * @return \Illuminate\Http\Response
+     */
+    public function reservaUpdate(Request $request, $inscripcion_id)
+    {
+        if ($request->user()->can('edit_reservas')) {
+
+            try {
+
+                $mpago_id=$request->input('mpago_id');
+
+                DB::beginTransaction();
+
+                $mpago = Mpago::findOrFail($mpago_id);
+
+                //inscripcion a modificar
+                $inscripcion = Inscripcion::where('id', $inscripcion_id)->first();
+
+                //usuario logueado que modifico
+                $inscripcion->user_edit = $request->user()->id;
+                $inscripcion->update();
+
+                $factura=Factura::where('id',$inscripcion->factura_id)->first();
+                $factura->mpago()->associate($mpago);
+                $factura->update();
+
+                LogActivity::addToLog('Modificado la forma de pago de la Reserva,(inscripcion->id) ', $request->user(),$inscripcion->id);
+
+                DB::commit();
+
+                $notification = [
+                    'message_toastr' => 'Se actualizó la forma de pago de la reserva correctamente.',
+                    'alert-type' => 'success'];
+                return redirect()->route('admin.inscripcions.reservas')->with($notification);
+
+            } catch (\Exception $e) {
+                DB::rollback();
+//              $message=$e->getMessage();
+                $message='Ocurrio un error y no se modificar la forma de pago de la reserva';
+                $notification = [
+                    'message_toastr' => $message,
+                    'alert-type' => 'error'];
+                return redirect()->route('admin.inscripcions.reservas')->with($notification);
+            }
+        } else
+            return abort(403);
+
+    }
+
+
+    /**
+     * Exportar reservas al formato de Western Union
+     * @param Request $request
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function reservasExport(Request $request)
+    {
+        // rango de fechas
+        $desde = $request->input('desde');
+        $hasta = $request->input('hasta');
+
+        $inscripciones = Inscripcion::with('factura','user', 'persona')
+//            ->whereBetween('id', [$queryD, $queryH])
+            ->where('status', Inscripcion::RESERVADA)
+            ->orderBy('id');
+
+        if (isset($desde)) {
+            $start = Carbon::parse($desde)->startOfDay();
+        }
+        if (isset($hasta)){
+            $end = Carbon::parse($hasta)->endOfDay();
+        }
+
+        if (!isset($desde) && !isset($hasta)) {
+            $inscripciones=$inscripciones->get();
+        }
+        if (isset($desde) && !isset($hasta)) {
+            $inscripciones=$inscripciones->where('inscripcions.created_at', '>=', $desde)->get();
+        }
+        if ($desde == '' && $hasta) {
+            $inscripciones=$inscripciones->where('inscripcions.created_at', '<=', $hasta)->get();
+        }
+
+        if ($desde && $hasta) {
+
+            $inscripciones=$inscripciones->whereBetween('inscripcions.created_at', [$start, $end])->get();
+        }
+
+        $arrayExp =[];
+
+        foreach ($inscripciones as $insc) {
+
+            $arrayExp[] = [
+                'identificacion_fact'=>$insc->factura->identificacion,
+                'nombre_fact'=>$insc->factura->nombre,
+                'valor1'=>number_format($insc->factura->total, 2, '.', ''),
+                'valor2'=>number_format($insc->factura->total, 2, '.', ''),
+                'valor3'=>number_format($insc->factura->total, 2, '.', ''),
+                'cobrar_hasta'=>str_replace('-','',$insc->created_at->addDay()->toDateString()),
+                'insc_id'=>$insc->id,
+                'corredor'=>$insc->persona->getFullName(),
+            ];
+        }
+
+        Excel::create('Formato Excel Western Union- ' . Carbon::now() . '', function ($excel) use ($arrayExp) {
+
+            $excel->sheet('WU', function ($sheet) use ($arrayExp) {
+
+                $sheet->setColumnFormat(array(
+                    'A'=>'@',
+                    'B'=>'@',
+                    'C'=>'@',
+                    'D'=>'@',
+                    'E' => '@',
+                    'F' => '@',
+                    'G'=>'@',
+                    'H'=>'@'
+                ));
+
+                $sheet->fromArray($arrayExp, null, 'A1', false, false);
+
+            });
+        })->export('xls');
+
+        return view('admin.inscripcions.reservas', compact('desde','hasta'));
     }
 
 
