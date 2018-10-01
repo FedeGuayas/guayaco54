@@ -2,13 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Escenario;
 use App\Factura;
+use App\Inscripcion;
+use App\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Yajra\Datatables\Datatables;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Helpers\ValidaRUC\ValidaRUC as ValidarRUC;
+
 
 class FacturaController extends Controller
 {
@@ -41,7 +46,7 @@ class FacturaController extends Controller
 
                 $comprobantes = Factura::
                 with('user', 'persona', 'mpago', 'descuento')
-                    ->where('status','!=',Factura::CANCELADA) //no mostrar las canceladas
+                    ->where('facturas.status', '!=', Factura::CANCELADA)//no mostrar las canceladas
                     ->select('facturas.*');
 
                 $action_buttons = '
@@ -71,8 +76,29 @@ class FacturaController extends Controller
                     ]);
                 }
 
-                return $datatable->make(true);
+                // rango de fechas
+                $desde = $datatable->request->get('desde');
+                $hasta = $datatable->request->get('hasta');
 
+                if ($desde == '' && $hasta == '') {
+                    return $datatable->make(true);
+                }
+                if ($desde && $hasta == '') {
+                    $datatable->where('facturas.created_at', 'like', "$desde%");
+                }
+                if ($desde == '' && $hasta) {
+                    $datatable->where('facturas.created_at', 'like', "$hasta%");
+                }
+
+                if ($desde && $hasta) {
+                    //para que incluya los dias desde el comienzo hasta el fin del dia
+                    $start = Carbon::parse($desde)->startOfDay();
+                    $end = Carbon::parse($hasta)->endOfDay();
+
+                    $datatable->whereBetween('facturas.created_at', [$start, $end]);
+                }
+
+                return $datatable->make(true);
             }
 
         } else abort(403);
@@ -208,131 +234,238 @@ class FacturaController extends Controller
         //
     }
 
+
     /**
      * @param Request $request
      */
-    public function comprobantesExcel(Request $request)
+    public function facturacionMasiva(Request $request)
     {
-        $escenarioSelect = ['' => 'Seleccione el escenario'] + Escenario::lists('escenario', 'id')->all();
-        $usuarioSelect = ['' => 'Seleccione el usuario'] + User::lists('nombre', 'id')->all();
-        if ($request) {
-            $fecha = $request->get('fecha');
-            $escenario = $request->get('escenario');
-            $usuario = $request->get('usuario');
-            $comprobantes = DB::table('comprobantes as c')
-                ->join('users as u', 'u.id', '=', 'c.user_id')
-                ->join('escenarios as e', 'e.id', '=', 'u.escenario_id')
-                ->join('inscripciones as i', 'i.id', '=', 'c.inscripcion_id')
-                ->select('c.id as comp_id', 'c.nombres', 'c.apellidos', 'c.num_doc', 'c.email', 'c.telefono', 'c.direccion', 'e.id', 'u.id', 'i.costo',
-                    'c.created_at as fecha1', 'i.form_pago', 'i.escenario', 'u.nombre as usuario', 'i.num_corredor as numero', 'c.user_id', 'c.cuenta_id')
-                ->where('c.created_at', 'LIKE', '%' . $fecha . '%')
-                ->where('e.id', 'LIKE', '%' . $escenario . '%')
-                ->where('u.id', 'LIKE', '%' . $usuario . '%')
-                ->where('form_pago', '<>', '')
-                ->get();
+        $desde = $request->get('fecha_desde');
+        $hasta = $request->get('fecha_hasta');
 
-//            $comprobantesArray[] = ['Número', 'Nombres', 'Apellidos', 'CI', 'Correo', 'Teléfono', 'Dirección', 'Costo', 'Forma Pago', 'Escenario', 'Usuario', 'Fecha'];
+        $start = false;
+        $end = false;
+        if (isset($desde)) {
+            $start = Carbon::parse($desde)->startOfDay();
+        }
+        if (isset($hasta)) {
+            $end = Carbon::parse($hasta)->endOfDay();
+        }
 
-            $comprobantesArray[] = ['codigopadre', 'codigo', 'nombre', 'nombrecomercial', 'RUC', 'Fecha', 'Referencia', 'Comentario',
-                'CtaIngreso', 'Cantidad', 'Valor', 'Iva', 'DIRECCION', 'division', 'TipoCli', 'actividad', 'codvend', 'recaudador',
-                'formadepago', 'estado', 'diasplazo', 'precio', 'telefono', 'fax', 'celular', 'e_mail', 'pais', 'provincia', 'ciudad',
-                'CtaxCob', 'CtaxAnt', 'cupo', 'empresasri'
-            ];
 
-            foreach ($comprobantes as $comp) {
-//                $comprobantesArray[] = [
-//                    'num' => $comp->numero,
-//                    'nombres' => $comp->nombres,
-//                    'apellidos' => $comp->apellidos,
-//                    'ci' => $comp->num_doc,
-//                    'email' => $comp->email,
-//                    'telefono' => $comp->telefono,
-//                    'direccion' => $comp->direccion,
-//                    'valor' => $comp->costo,
-//                    'forma_pago' => $comp->form_pago,
-//                    'escenario' => $comp->escenario,
-//                    'usuario' => $comp->usuario,
-//                    'fecha_i' => $comp->fecha1,
-//                ];
+        $comprobantes = Factura::with('user', 'persona', 'mpago', 'descuento', 'inscripciones')
+            ->where('status', Factura::ACTIVA);
 
-                $ruc = $comp->num_doc;
+        if (!$start && !$end) { //no se escogio fecha
+            //todos los comprobantes
+            $comprobantes = $comprobantes->get();
+        } elseif ($start && !$end) { //se escogio desde pero no hasta
+            //todos los comprobantes superior a la fecha indicadad en desde
+            $comprobantes = $comprobantes->where('created_at', '>=', $start)->get();
+        } elseif (!$start && $end) { //no se escogio desde, solo hasta
+            //todos los comprobantes con fecha menor o igual a la indicada en hasta
+            $comprobantes = $comprobantes->where('created_at', '<=', $end)->get();
+        } elseif ($start && $end) { //se escogio feche desde y fecha hasta
+            //todos los comprobantes comprendidos entre las fechas
+            $comprobantes = $comprobantes->whereBetween('created_at', [$start, $end])->get();
+        }
 
-                if ( validaRUC($ruc) === "OK") {
-                    $ruc = $comp->num_doc;
-                } elseif ( validaRUC($ruc) === "CF" || validaRUC($ruc) == "El formato es incorrecto") {
-                    $ruc=999999999;
-                }
+        $comprobantesArray[] = ['codigopadre', 'codigo', 'nombre', 'nombrecomercial', 'RUC', 'Fecha', 'Referencia', 'Comentario',
+            'CtaIngreso', 'Cantidad', 'Valor', 'Iva', 'DIRECCION', 'division', 'TipoCli', 'actividad', 'codvend', 'recaudador',
+            'formadepago', 'estado', 'diasplazo', 'precio', 'telefono', 'fax', 'celular', 'e_mail', 'pais', 'provincia', 'ciudad',
+            'CtaxCob', 'CtaxAnt', 'cupo', 'empresasri'
+        ];
 
-                $comprobantesArray[] = [
-                    'codigopadre' => '',
-                    'codigo' => '',
-                    'nombre' => $comp->nombres . ' ' . $comp->apellidos,
-                    'nombrecomercial' => $comp->nombres . ' ' . $comp->apellidos,
-                    'RUC' => floatval($ruc),
-//                    'Fecha' => substr(str_replace('-','/',$comp->fecha1), 0, 10),
-                    'Fecha' => $comp->fecha1,
-                    'Referencia' => 'PAGO POR INSCRIPCIÓN EN CARRERA GUAYACO RUNNER 2017',
-                    'Comentario' => 'GUAYACORUNNER',
-                    'CtaIngreso' => '6252499004001',//Actualizar esto 6252499004001
-                    'Cantidad' => 1,
-                    'Valor' => (float)$comp->costo,
-                    'Iva' => 'S',
-                    'DIRECCION' => 'GUAYAQUIL',
-                    'division' => 2004,
-                    'TipoCli' => 1,
-                    'actividad' => 1,
-                    'codvend' => '',
-                    'recaudador' => '',
-                    'formadepago' => $comp->form_pago,
-                    'estado' => 'A',
-                    'diasplazo' => 1,
-                    'precio' => 1,
-                    'telefono' => 'NO',
-                    'fax' => '',
-                    'celular' => '',
-                    'e_mail' => $comp->email,
-                    'pais' => 1,
-                    'provincia' => 1,
-                    'ciudad' => 4,
-                    'CtaxCob' => '1110101001',
-                    'CtaxAnt' => '210307999',
-                    'cupo' => 500,
-                    'empresasri' => 'PERSONAS NO OBLIGADAS A LLEVAR CONTABILIDAD, FACTURA',
-                ];
+        foreach ($comprobantes as $comp) {
+
+            $ruc = $comp->identificacion;
+            $email = $comp->email;
+
+            if (ValidarRUC::valida_ruc($ruc) === "OK") {
+                $ruc = $comp->identificacion;
+
+            } elseif (ValidarRUC::valida_ruc($ruc) === "CF" || ValidarRUC::valida_ruc($ruc) == "El formato es incorrecto") {
+                $ruc = 999999999;
+                $email = 'consumidor@final.mail';
             }
 
-            Excel::create('Comprobantes Excel', function ($excel) use ($comprobantesArray) {
+            $comprobantesArray[] = [
+                'codigopadre' => '',
+                'codigo' => '',
+                'nombre' => $comp->nombre,
+                'nombrecomercial' => $comp->nombre,
+                'RUC' => $ruc,
+//                'RUC' => floatval($ruc),
+//                    'Fecha' => substr(str_replace('-','/',$comp->fecha1), 0, 10),
+                'Fecha' => $comp->created_at,
+                'Referencia' => 'PAGO POR INSCRIPCIÓN EN CARRERA GUAYACO RUNNER 2018',
+                'Comentario' => 'GUAYACORUNNER',
+                'CtaIngreso' => '6252499004001',//Actualizar esto 6252499004001
+                'Cantidad' => 1,
+                'Valor' => (float)$comp->total,
+                'Iva' => 'S',
+                'DIRECCION' => 'GUAYAQUIL',
+                'division' => 2004,
+                'TipoCli' => 1,
+                'actividad' => 1,
+                'codvend' => '',
+                'recaudador' => '',
+                'formadepago' => $comp->mpago->nombre,
+                'estado' => 'A',
+                'diasplazo' => 1,
+                'precio' => 1,
+                'telefono' => 'NO',
+                'fax' => '',
+                'celular' => '',
+                'e_mail' => $email,
+                'pais' => 1,
+                'provincia' => 1,
+                'ciudad' => 4,
+                'CtaxCob' => '1110101001',
+                'CtaxAnt' => '210307999',
+                'cupo' => 500,
+                'empresasri' => 'PERSONAS NO OBLIGADAS A LLEVAR CONTABILIDAD, FACTURA',
+            ];
 
-                $excel->sheet('Comprobantes', function ($sheet) use ($comprobantesArray) {
-
-                    $sheet->setColumnFormat([
-                        'A' => 'General',
-                        'B' => 'General',
-                        'C' => 'General',
-                        'D' => 'General',
-                        'E' => '0',
-                        'F' => 'dd/mm/yyyy;@',
-                        'I' => '@',
-                        'K' => '#,##0.00_-',
-                        'N' => '0',
-                        'O' => '0',
-                        'P' => '0',
-                        'U' => '0',
-                        'V' => '0',
-                        'AA' => '0',
-                        'AB' => '0',
-                        'AC' => '0',
-                        'AF' => '#,##0.00_-',
-                        'AD' => 'General',
-                        'AE' => 'General'
-                    ]);
-
-                    $sheet->fromArray($comprobantesArray, null, 'A1', false, false);
-
-                });
-            })->export('xlsx');
-
-//            return view('runner.comprobantes.index', compact('comprobantes', 'fechaD', 'fechaH', 'escenario', 'escenarioSelect'));
         }
+
+        Excel::create('Facturación Masiva', function ($excel) use ($comprobantesArray) {
+
+            $excel->sheet('Comprobantes', function ($sheet) use ($comprobantesArray) {
+
+                $sheet->setColumnFormat([
+                    'A' => 'General',
+                    'B' => 'General',
+                    'C' => 'General',
+                    'D' => 'General',
+                    'E' => '0',
+                    'F' => 'dd/mm/yyyy;@',
+                    'I' => '@',
+                    'K' => '#,##0.00_-',
+                    'N' => '0',
+                    'O' => '0',
+                    'P' => '0',
+                    'U' => '0',
+                    'V' => '0',
+                    'AA' => '0',
+                    'AB' => '0',
+                    'AC' => '0',
+                    'AF' => '#,##0.00_-',
+                    'AD' => 'General',
+                    'AE' => 'General'
+                ]);
+
+                $sheet->fromArray($comprobantesArray, null, 'A1', false, false);
+
+            });
+        })->export('xlsx');
+
     }
+
+
+
+    public function getCuadre(Request $request){
+
+        $escenarioSelect = Escenario::all();
+        $escenarios=$escenarioSelect->pluck('escenario','id');
+
+        $usuarioSelect = User::
+            whereHas('roles', function($q){ //con rol=employee
+                    $q->where('name', '=', 'employee');
+                })
+            ->select(DB::raw('concat (upper(first_name)," ",upper(last_name)) as nombres,id'))->get();
+        $usuarios = $usuarioSelect->pluck('nombres', 'id');
+
+        $fecha = $request->input('fecha');
+        $escenario = $request->input('escenario');
+        $usuario = $request->input('usuario');
+
+        $cuadre = Factura::from('facturas as f')
+            ->join('inscripcions as i', 'i.factura_id', '=', 'f.id')
+            ->join('users as u', 'u.id', '=', 'i.user_id')
+            ->join('mpagos as p', 'p.id', '=', 'f.mpago_id')
+            ->select('f.total', 'i.factura_id', 'i.user_id as uid', 'u.first_name', 'u.last_name', 'i.escenario_id', 'i.created_at', 'i.id', 'i.status', 'p.id as pagoID', 'p.nombre as forma','f.status as fstatus')
+            ->where('i.status', Inscripcion::PAGADA)
+            ->where('f.status', Factura::ACTIVA)
+            ->groupBy('i.factura_id');//agrupo por facturas de la tabla inscripciones xk hay varias insccripciones con una misma factura
+
+        if (!$fecha && !isset($escenario)){
+            $cuadre=$cuadre->get();
+        }elseif ($fecha && !isset($escenario)){
+//            dd($fecha);
+            $cuadre=$cuadre->where('f.created_at','like', "%$fecha%")->get();
+        }elseif (!$fecha && isset($escenario)){
+            $cuadre=$cuadre->where('i.escenario_id',$escenario)->get();
+        }elseif ( $fecha && isset($escenario)){
+            $cuadre=$cuadre->where('f.created_at','like', "$fecha%")
+                ->where('i.escenario_id',$escenario)
+                ->get();
+        }
+
+        $group = [];
+
+        //crear array agrupando por el nombre de usuario  y agregar los valores de las facturas
+        foreach ($cuadre as $c) {
+            $user = $c->first_name . ' ' . $c->last_name;
+            $i = $c->total;
+            $forma = $c->forma;
+            $group[$user][] = [
+                "Nombre" => $user,
+                "precio" => $i,
+                "fpago" => $forma,
+            ];
+        }
+        //sumar columnas para total por usuario y Total general
+        $cuadreArray = [];
+        $valorFinal = 0;
+        $totalContado = 0;
+        $totalTarjeta = 0;
+        $totalWestern = 0;
+        foreach ($group as $nombre => $fp) {
+            $valorUsuario = 0;
+            $valorContado = 0;
+            $valorTarjeta = 0;
+            $valorWestern = 0;
+            foreach ($group[$nombre] as $key => $value) { // agrupar los valores de las facturas por usuario
+                //acumulados
+                if (stristr($value['fpago'], 'contado')) {
+                    $valorContado += $value['precio']; //acumulado de contado para el usuario
+                    $totalContado += $value['precio']; //acumulado total de contado
+                }
+                if (stristr($value['fpago'], 'tarjeta')) {
+                    $valorTarjeta += $value['precio'];
+                    $totalTarjeta += $value['precio'];
+                }
+                if (stristr($value['fpago'], 'western')) {
+                    $valorWestern += $value['precio'];
+                    $totalWestern += $value['precio'];
+                }
+                $valorUsuario += $value['precio']; //acumulado para el usuario actual
+                $valorFinal += $value['precio']; //acumulado total
+            }
+            $cuadreArray [] = [
+                "valor" => $valorUsuario,
+                "usuario" => $nombre,
+                "contado" => $valorContado,
+                "tarjeta" => $valorTarjeta,
+                "western" => $valorWestern
+            ];
+        }
+
+        $total = [
+            "totalWestern" => $totalWestern,
+            "totalContado" => $totalContado,
+            "totalTarjeta" => $totalTarjeta,
+            "totalGeneral" => $valorFinal,
+        ];
+
+
+//return view('campamentos.reportes.cuadre', compact('escenarioSelect', 'usuarioSelect', 'escenario', 'usuario',
+//'fecha', 'cuadreArray', 'total', 'cuadre'));
+
+        return view('facturas.interna.cuadre', compact('escenarios', 'usuarios', 'escenario', 'usuario', 'fecha', 'cuadreArray','total','cuadre'));
+
+
+    }
+
 }

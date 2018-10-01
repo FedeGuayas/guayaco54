@@ -194,6 +194,8 @@ return [
         Maatwebsite\Excel\ExcelServiceProvider::class,
         //DOMPDF Wrapper for Laravel
         Barryvdh\DomPDF\ServiceProvider::class,
+        //Mi service provider para el  helper validar ruc
+        App\Providers\ValidaRUCServiceProvider::class,
 
     ],
 
@@ -264,6 +266,8 @@ return [
         'Excel' => Maatwebsite\Excel\Facades\Excel::class,
         //DOMPDF Wrapper for Laravel
         'PDF' => Barryvdh\DomPDF\Facade::class,
+        //Alias para el serviceprovider mi helper personalizado validarRuc
+        'ValidarRUC' => App\Helpers\ValidaRUC\ValidaRUC::class,
     ],
 
 ];

@@ -50,7 +50,7 @@ class InscripcionController extends Controller
                 with('user', 'producto', 'producto.categoria', 'producto.circuito', 'persona', 'talla', 'factura')
                     ->join('personas', 'personas.id', '=', 'inscripcions.persona_id')
                     ->leftJoin('registros', 'registros.inscripcion_id', '=', 'inscripcions.id')
-                ->where('status','!=',Inscripcion::CANCELADA) //no mostrar las canceladas
+                ->where('inscripcions.status','!=',Inscripcion::CANCELADA) //no mostrar las canceladas
 //                ->whereHas('roles', function($q){ //con rol=employee
 //                    $q->where('name', '=', 'employee');
 //                })

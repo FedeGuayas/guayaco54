@@ -151,7 +151,7 @@
                 }
             ],
             "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
-                console.log(aData);
+//                console.log(aData);
             },
             drawCallback: function (settings) {
                 $('[data-toggle="tooltip"]').tooltip();//para que funcionen los tooltips en cada fila
@@ -433,15 +433,15 @@
 
     {{--Alertas con Toastr--}}
             @if(Session::has('message_toastr'))
-    var type = "{{ Session::get('alert-type') }}";
-    var text_toastr = "{{ Session::get('message_toastr') }}";
+    let type = "{{ Session::get('alert-type') }}";
+    let text_toastr = "{{ Session::get('message_toastr') }}";
     showAlert(type, text_toastr);
             @endif
             {{-- FIN Alertas con Toastr--}}
             {{--errorres de validacion--}}
             @if ($errors->any())
-    var errors = [];
-    var error = '';
+    let errors = [];
+    let error = '';
     @foreach ($errors->all() as $error)
 errors.push("{{$error}}");
     @endforeach

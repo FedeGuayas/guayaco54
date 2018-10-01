@@ -75,4 +75,9 @@ class Factura extends Model
     {
         return $this->belongsTo('App\Descuento');
     }
+
+    //un fcatura puede estar en  muchas inscripciones
+    public function inscripciones(){
+        return $this->hasMany('App\Inscripcion');
+    }
 }

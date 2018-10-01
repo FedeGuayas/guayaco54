@@ -49,8 +49,19 @@
                     </a>
                     <ul class="submenu">
                         <li><a href="{{route('facturas.index')}}">Comprobantes</a></li>
-                        <li><a href="#">Cuadre</a></li>
+                        <li><a href="{{route('admin.facturacion.arqueo')}}">Arqueo</a></li>
                     </ul>
+                </li>
+                <li>
+                <a href="" class="dropdown-toggle no-arrow">
+                <span class="fa fa-comments-o"></span><span class="mtext">Chat <span
+                class="fi-burst-new text-danger new"></span></span>
+                </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <span class="fa fa-pencil-square"></span><span class="mtext">Insc. Pendientes</span>
+                    </a>
                 </li>
                 @endhasanyrole
                 @role('admin')

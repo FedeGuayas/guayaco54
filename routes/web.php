@@ -141,6 +141,8 @@ Route::middleware(['auth', 'isVerified'])->group(function () {
 
         //Todos los comprobantes ajax
         Route::get('facturas/getAllInside', 'FacturaController@getAll')->name('admin.getAll.inside');
+        Route::post('facturas/facturacion-masiva', 'FacturaController@facturacionMasiva')->name('admin.facturacion.masiva');
+        Route::get('facturas/arqueo', 'FacturaController@getCuadre')->name('admin.facturacion.arqueo');
 
 
         Route::resource('users', 'UserController');

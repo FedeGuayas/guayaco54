@@ -27,28 +27,31 @@
             </div>
         </div>
 
+        @include('facturas.interna.before-modal')
+
         <div class="row">
             <div class="table-responsive">
                 <div class="dataTables_wrapper container-fluid dt-bootstrap4">
                     <div class="dt-buttons btn-group pull-right">
-                        <form class="" action="" autocomplete="off">
-                            <div class="form-group row">
-                                <div class="col">
-                                    <input type="text" pattern="(?:19|20)[0-9]{2}-(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1[0-9]|2[0-9])|(?:(?!02)(?:0[1-9]|1[0-2])-(?:30))|(?:(?:0[13578]|1[02])-31))" class="form-control date-picker" placeholder="YYYY-MM-DD" name="desde" id="desde"/>
-                                    <small class="form-text text-muted">Desde (año-mes-dia)</small>
-                                </div>
-                                <div class="col">
-                                    <input type="text" pattern="(?:19|20)[0-9]{2}-(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1[0-9]|2[0-9])|(?:(?!02)(?:0[1-9]|1[0-2])-(?:30))|(?:(?:0[13578]|1[02])-31))" class="form-control date-picker" placeholder="YYYY-MM-DD" name="hasta" id="hasta"/>
-                                    <small class="form-text text-muted">Hasta (año-mes-dia)</small>
-                                </div>
-                                <div class="col">
-                                    <button type="submit" class="btn btn-outline-primary" id="facturacion_masiva"><i class="fa fa-file-excel-o"></i> Facturación Masiva</button>
-                                </div>
-
+                        {!! Form::open() !!}
+                        <div class="form-group row">
+                            <div class="col">
+                                <input type="text" class="form-control date-picker" name="desde" id="desde" readonly/>
+                                <small class="form-text text-muted">Desde</small>
                             </div>
-                        </form>
+                            <div class="col">
+                                <input type="text" class="form-control date-picker" name="hasta" id="hasta" readonly/>
+                                <small class="form-text text-muted">Hasta</small>
+                            </div>
+                            <div class="col">
+                                <a href="#facturacionMasiva" data-toggle="modal" data-backdrop="static" data-keyboard="false" class="btn btn-outline-primary"
+                                   id="facturacion_masiva"><i class="fa fa-file-excel-o"></i> Facturación Masiva</a>
+                            </div>
+                        </div>
+                        {!! Form::close() !!}
                     </div>
                 </div>
+
 
                 <table class="data-table stripe hover nowrap compact" style="display:none;">
                     <thead>
@@ -91,142 +94,48 @@
 <script src="{{asset('themes/back/src/plugins/datatables/media/js/jquery.dataTables.min.js')}}"></script>
 <script src="{{asset('themes/back/src/plugins/datatables/media/js/dataTables.bootstrap4.js')}}"></script>
 <script src="{{asset('themes/back/src/plugins/datatables/media/js/dataTables.responsive.js')}}"></script>
-<!-- buttons for Export datatable -->
-<script src="{{asset('themes/back/src/plugins/datatables/media/js/button/dataTables.buttons.js')}}"></script>
-<script src="{{asset('themes/back/src/plugins/datatables/media/js/button/buttons.bootstrap4.js')}}"></script>
-<script src="{{asset('themes/back/src/plugins/datatables/media/js/button/buttons.print.js')}}"></script>
-<script src="{{asset('themes/back/src/plugins/datatables/media/js/button/buttons.html5.js')}}"></script>
-<script src="{{asset('themes/back/src/plugins/datatables/media/js/button/buttons.flash.js')}}"></script>
-<script src="{{asset('themes/back/src/plugins/datatables/media/js/button/pdfmake.min.js')}}"></script>
-<script src="{{asset('themes/back/src/plugins/datatables/media/js/button/vfs_fonts.js')}}"></script>
 
 <script src="{{ asset('js/toastr_message.js') }}"></script>
 <script>
 
-    $.fn.dataTable.ext.search.push(
-        function( settings, data, dataIndex ) {
-            console.log(data)
-//            var min = parseInt( $('#min').val(), 10 );
-//            var max = parseInt( $('#max').val(), 10 );
-//            var age = parseFloat( data[3] ) || 0; // use data for the age column
-//
-//            if ( ( isNaN( min ) && isNaN( max ) ) ||
-//                ( isNaN( min ) && age <= max ) ||
-//                ( min <= age   && isNaN( max ) ) ||
-//                ( min <= age   && age <= max ) )
-//            {
-//                return true;
-//            }
-//            return false;
-        }
-    );
-
-
-    //        $.fn.dataTable.ext.search.push(
-    //            function( settings, data, dataIndex ) {
-    ////            var min = parseInt( $('#min').val(), 10 );
-    ////            var max = parseInt( $('#max').val(), 10 );
-    ////            var age = parseFloat( data[3] ) || 0; // use data for the age column
-    //                var desde = $('#desde').val();
-    //                var hasta = document.getElementById('hasta').value;
-    //                var fecha =  data[7]; // use data for the age column
-    //                console.log(desde);
-    //                if ( desde === "" && hasta === "" )
-    //                {
-    //                    return true;
-    //                }
-    //                else if ( desde <= fecha && hasta === "")
-    //                {
-    //                    return true;
-    //                }
-    //                else if ( hasta >= fecha && desde === "")
-    //                {
-    //                    return true;
-    //                }
-    //                else if (desde <= fecha && hasta >= fecha)
-    //                {
-    //                    return true;
-    //                }
-    //                return false;
-    //                var startDate = new Date(aData[7]);
-    //                if (dateStart == null && dateEnd == null) { return true; }
-    //                if (dateStart == null && startDate <= dateEnd) { return true;}
-    //                if(dateEnd == null && startDate >= dateStart) {return true;}
-    //                if (startDate <= dateEnd && startDate >= dateStart) { return true; }
-    //                return false;
-    //
-    //            if ( ( isNaN( desde ) && isNaN( hasta ) ) ||
-    //                ( isNaN( desde ) && age <= hasta ) ||
-    //                ( desde <= age   && isNaN( hasta ) ) ||
-    //                ( desde <= age   && age <= max ) )
-    //            {
-    //                return true;
-    //            }
-    //            return false;
-    //            }
-    //        );
-
     $(document).ready(function () {
-
 
         cargarDatatables();
 
-//        $(".form_noEnter").keypress(function (e) {
-//            if (e.which === 13) {
-//                return false;
-//            }
-//        });
-        
-
-        $('#desde').datepicker({
-            language: 'es',
-            dateFormat: 'yyyy-mm-dd',
-            position: 'right bottom',
-//            maxDate: new Date()
-            maxDate:0,
-            onSelect: function onSelect(fd, date) {
-//                table.columns(7).search(fd).draw();
-               let desde = fd;
-                table.column($(this).parent().index() + ':visible').search(desde).draw();
-
-//                let val = $.fn.dataTable.util.escapeRegex(
-//                    $(this).val()
-//                );
-//                column
-//                    .search(val ? '^' + val + '$' : '', true, false)
-//                    .draw();
-
-//                table.draw();
-
+        $(".form_noEnter").keypress(function (e) {
+            if (e.which === 13) {
+                return false;
             }
-        }).change(function() {
-              // getting search input value
-            let desde= $(this).val();
-            table.draw();
         });
 
-        $('#hasta').datepicker({
+        desde = '';
+        hasta = '';
+        $('.date-picker').datepicker({
             language: 'es',
             dateFormat: 'yyyy-mm-dd',
             position: 'right bottom',
-//            maxDate: new Date()
-            maxDate:0,
-            onSelect: function onSelect(fd, date) {
+            clearButton: true,
+//            todayButton:true,
+            todayButton: new Date(),
+            maxDate: new Date(),
+            onSelect: function onSelect(fd, date, event) {
 //                table.columns(7).search(fd).draw();
-                let hasta = fd;
+                if (event.el.id == 'desde') {
+                    desde = fd;
+                } else if (event.el.id == 'hasta') {
+                    hasta = fd
+                }
                 table.draw();
-            }
-        }).change(function() {
-            // getting search input value
-            let hasta = $(this).val();
-            table.draw();
-        });
+                //table.column(7).search(desde).draw();
 
+            }
+        });
 
     });
 
     $(document).on('click', '#facturacion_masiva', function (event) {
         event.preventDefault();
+        console.log('Desde: ' + desde + ' Hasta: ' + hasta)
     });
 
     let table;
@@ -248,7 +157,13 @@
             "language": {
                 "url": '/guayaco-runner/plugins/DataTables/i18n/Spanish_original.lang'
             },
-            ajax: '{{route('admin.getAll.inside')}}',
+            ajax: {
+                url: "{{route('admin.getAll.inside')}}",
+                data: function (d) {
+                    d.desde = desde;
+                    d.hasta = hasta;
+                }
+            },
             columns: [
                 {data: 'actions', name: 'opciones', orderable: false, searchable: false},
                 {data: 'numero', name: 'numero'},
@@ -262,49 +177,12 @@
             columnDefs: [
                 {
                     targets: [6],
-                    className: "text-right text-blue",
+                    className: "text-center text-blue",
                     render: $.fn.dataTable.render.number(' ', '.', 2, '$ ')
                 }
             ],
             "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
 //                console.log(aData);
-//                var iFini = document.getElementById('desde').value;
-//                var iFfin = document.getElementById('hasta').value;
-//                var iStartDateCol = 7;
-//                var iEndDateCol = 7;
-
-
-//                iFini=iFini.substring(6,10) + iFini.substring(3,5)+ iFini.substring(0,2);
-//                iFfin=iFfin.substring(6,10) + iFfin.substring(3,5)+ iFfin.substring(0,2);
-
-
-//
-//                var datofini=aData[iStartDateCol].substring(6,10) + aData[iStartDateCol].substring(3,5)+ aData[iStartDateCol].substring(0,2);
-//                var datoffin=aData[iEndDateCol].substring(6,10) + aData[iEndDateCol].substring(3,5)+ aData[iEndDateCol].substring(0,2);
-//console.log(datofini+' / '+datoffin);
-//                if ( iFini === "" && iFfin === "" )
-//                {
-//                    return true;
-//                }
-//                else if ( iFini <= datofini && iFfin === "")
-//                {
-//                    return true;
-//                }
-//                else if ( iFfin >= datoffin && iFini === "")
-//                {
-//                    return true;
-//                }
-//                else if (iFini <= datofini && iFfin >= datoffin)
-//                {
-//                    return true;
-//                }
-//                return false;
-//                var startDate = new Date(aData[7]);
-//                if (dateStart == null && dateEnd == null) { return true; }
-//                if (dateStart == null && startDate <= dateEnd) { return true;}
-//                if(dateEnd == null && startDate >= dateStart) {return true;}
-//                if (startDate <= dateEnd && startDate >= dateStart) { return true; }
-//                return false;
             },
             drawCallback: function (settings) {
                 $('[data-toggle="tooltip"]').tooltip();//para que funcionen los tooltips en cada fila
@@ -325,6 +203,7 @@
             },
             initComplete: function (settings, json) {
                 $('.data-table').fadeIn();
+
                 this.api().columns().every(function () {
                     let column = this;
                     //input text
@@ -358,7 +237,7 @@
                                     return json.allMPago;
                             }
                         })(column.index());
-////                        // Draw select options
+                        // Draw select options
                         extraData.forEach(function (d, j) {
                             if (column.search() === d) {
                                 select.append('<option value="' + d + '" selected="selected">' + d + '</option>')
@@ -367,12 +246,33 @@
                             }
                         });
                     }
+
+
                 });
             }
 
         });
 
     }
+
+
+
+
+    //enviar info al modal antes de cargarlo
+    $('#facturacionMasiva').on('show.bs.modal', function (event) {
+        let modal = $(this);
+        let diaDesde = desde;
+        let diaHasta = hasta;
+        modal.find('.modal-content #fecha_desde').val(diaDesde);
+        modal.find('.modal-content #fecha_hasta').val(diaHasta);
+    });
+    //enviar el form del modal
+    $(document).on('click', '#send_facturacion', function (e) {
+        e.preventDefault();
+        let form = $("#facturacion-form");
+        form.submit();
+    });
+
 
 
     //eliminar usuario
