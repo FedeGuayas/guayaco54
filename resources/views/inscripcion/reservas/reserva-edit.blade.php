@@ -1,99 +1,118 @@
-@extends('layouts.admin.index')
+@extends('layouts.back.master')
 
-@section('title', 'Inscripción')
+@section('page_title','Reservas')
+
+@section('breadcrumbs')
+    {!! Breadcrumbs::render('reserva-edit',$inscripcion) !!}
+@stop
 
 @section('content')
 
-    <div class="row">
-        <h5 class="header teal-text text-darken-2">Editar Reserva No. {{$inscripcion->id}}</h5>
-        @include('alert.request')
-        @include('alert.success')
-    </div><!--/.row-->
+    <div class="col-md-12 mb-30">
+        <div class="pd-20 bg-white border-radius-4 mb-30">
+            <div class="clearfix mb-20">
+                <div class="pull-left">
+                    <h5 class="text-blue">Detalles de la reserva No. {{sprintf("%'.04d", $inscripcion->id)}}</h5>
+                </div>
 
-    <div class="row">
+            </div>
+            <div class="row">
 
-        <div class="col s12 m8">
+                <div class="col-md-6 col-sm-12 mb-30">
+                    <div class="pd-20 bg-light text-danger border-dark border-radius-4 box-shadow">
+                        <div class="table-responsive">
+                            <table class="data-table table">
+                                <tr>
+                                    <td>Categoría</td>
+                                    <th>{{ $inscripcion->producto->categoria->categoria }}</th>
+                                </tr>
+                                <tr>
+                                    <td>Circuito</td>
+                                    <th>{{ $inscripcion->producto->circuito->circuito }}</th>
+                                </tr>
+                                <tr>
+                                    <td>Fecha Insc.</td>
+                                    <th>{{ $inscripcion->created_at->formatLocalized('%d %B %Y')}}</th>
+                                </tr>
+                                <tr>
+                                    <td>Corredo</td>
+                                    <th>{{ $inscripcion->persona->getFUllName()}}</th>
+                                </tr>
+                                <tr>
+                                    <td>Identificación</td>
+                                    <th>{{ $inscripcion->persona->num_doc }}</th>
+                                </tr>
+                                <tr>
+                                    <td>Costo</td>
+                                    <th>$ {{ number_format($inscripcion->factura->total, 2, '.', ' ') }}</th>
+                                </tr>
+                                <tr>
+                                    <td>Hace</td>
+                                    <th>{{$inscripcion->created_at->diffForHumans()}}</th>
+                                </tr>
+                                <tr>
+                                    <td>Vence</td>
+                                    <th>{{ $inscripcion->created_at->addDay()->formatLocalized('%d %B %Y') }}</th>
+                                </tr>
+                                <tr>
+                                    <td>F. Pago</td>
+                                    <th>{{$inscripcion->factura->mpago->nombre}}</th>
+                                </tr>
+                            </table>
 
-            <table class="table table-striped  table-condensed table-hover highlight responsive-table">
-                <tr>
-                    <th>Escenario</th>
-                    <th>{{ $inscripcion->calendar->program->escenario->escenario }}</th>
-                </tr>
-                <tr>
-                    <th>Modulo</th>
-                    <th>{{ $inscripcion->calendar->program->modulo->modulo }}</th>
-                </tr>
-                <tr>
-                    <th>Fecha (Inicio / Fin)</th>
-                    <th>{{ $inscripcion->calendar->program->modulo->inicio }} / {{ $inscripcion->calendar->program->modulo->fin }}</th>
-                </tr>
-                <tr>
-                    <th>Disciplina</th>
-                    <th>{{ $inscripcion->calendar->program->disciplina->disciplina }}</th>
-                </tr>
-                <tr>
-                    <th>Representante</th>
-                    <th>{{ $inscripcion->factura->representante->persona->getNombreAttribute() }}  (Tel: {{ $inscripcion->factura->representante->persona->telefono }})</th>
-                </tr>
-                <tr>
-                    <th>CI Rep.</th>
-                    <th>{{ $inscripcion->factura->representante->persona->num_doc }}</th>
-                </tr>
-                <tr>
-                    <th>Alumno</th>
-                    <th>
-                        @if ($inscripcion->alumno_id == 0)
-                            {{$inscripcion->factura->representante->persona->getNombreAttribute()}}
-                        @else
-                            {{ $inscripcion->alumno->persona->getNombreAttribute()}}
-                        @endif
-                    </th>
-                </tr>
-                <tr>
-                    <th>Valor</th>
-                    <th>$ {{ number_format($inscripcion->factura->total, 2, '.', ' ') }}</th>
-                </tr>
-                <tr>
-                    <th>Creada</th>
-                    <th>{{$inscripcion->created_at->diffForHumans()}}</th>
-                </tr>
-                <tr>
-                    <th>Vence</th>
-                    <th>{{ $inscripcion->created_at->addDay()->toDateString() }}</th>
-                </tr>
-                <tr>
-                    <th>F. Pago</th>
-                    <th>{{$inscripcion->factura->pago->forma}}</th>
-                </tr>
-            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+
+                    <h5 class="text-info mb-20" >Cambiar la forma de pago</h5>
+
+                    {!! Form::model($inscripcion,['route'=>['admin.reserva.update',$inscripcion->id], 'method'=>'PUT'])  !!}
+
+                    <div class="col">
+                        <div class="form-group">
+
+                            {!! Form::select('mpago_id', $mpago,$inscripcion->factura->mpago_id, ['class'=>'selectpicker show-tick form-control','data-style'=>'btn-outline-primary','id'=>'mpago_id','data-container'=>'.main-container','placeholder'=>'Seleccione Forma de pago']) !!}
+                            <small class="form-text text-muted"> Modifique la forma de pago</small>
+                        </div>
+                    </div>
+
+                    <div class="col mt-15">
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-outline-primary" data-toggle="tooltip" data-placement="top" title="Actualizar">
+                                <i class="fa fa-save"></i>
+                            </button>
+                            <a href="{{ route('admin.inscripcions.reservas') }}" class="btn btn-outline-secondary" data-toggle="tooltip" data-placement="top" title="Regresar">
+                                <i class="fa fa-arrow-left"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    {!! Form::close() !!}
+                </div>
+
+            </div>
+
+
         </div>
     </div>
-
-    <div class="row">
-        <h5 class="header teal-text text-darken-2">Cambiar la forma de pago</h5>
-        {!! Form::model($inscripcion,['route'=>['admin.reserva.update',$inscripcion], 'method'=>'PUT'])  !!}
-        <div class="input-field col s4 ">
-            {!! Form::select('mpago_id', $fpago,$inscripcion->factura->pago_id,['placeholder'=>'selec']) !!}
-            {!! Form::label('mpago_id','Forma de Pago:') !!}
-        </div>
-        <div class="col s6">
-            {!! Form::button('Actualizar<i class="fa fa-check right"></i>', ['class'=>'btn waves-effect waves-light','type' => 'submit']) !!}
-            <a href="{{ route('admin.inscripcions.reservas') }}" class="tooltipped" data-position="top" data-delay="50"
-               data-tooltip="Regresar">
-                {!! Form::button('<i class="fa fa-arrow-left"></i>',['class'=>'btn waves-effect waves-light darken-1']) !!}
-            </a>
-        </div>
-        {!! Form::close() !!}
     </div>
+
 
 @endsection
 
-@section('scripts')
+@push('scripts')
 
-    <script>
-        $(document).ready(function () {
-            $("#fpago_id").material_select();
-        });
-    </script>
+<script>
 
-@endsection
+            {{--Alertas con Toastr--}}
+            @if(Session::has('message_toastr'))
+    let type = "{{ Session::get('alert-type') }}";
+    let text_toastr = "{{ Session::get('message_toastr') }}";
+    showAlert(type, text_toastr);
+    @endif
+    {{-- FIN Alertas con Toastr--}}
+</script>
+
+@endpush

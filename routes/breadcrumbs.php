@@ -280,3 +280,19 @@ Breadcrumbs::register('comprobante-edit', function($breadcrumbs,$factura)
 
 
 
+
+//// Home>Inscripciones pendientes (Reservas)
+Breadcrumbs::register('reserva', function($breadcrumbs)
+{
+    $breadcrumbs->parent('inscripciones');
+    $breadcrumbs->push('Reservas', route('admin.inscripcions.reservas'));
+});
+// Home>Inscripciones pendientes [EDIT]
+Breadcrumbs::register('reserva-edit', function($breadcrumbs,$inscripcion)
+{
+    $breadcrumbs->parent('reserva');
+    $breadcrumbs->push('Editar reserva '.$inscripcion->id, route('admin.inscripcions.reservas'));
+});
+
+
+

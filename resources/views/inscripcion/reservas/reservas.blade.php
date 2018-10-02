@@ -3,7 +3,7 @@
 @section('page_title','Reservas')
 
 @section('breadcrumbs')
-    {!! Breadcrumbs::render('inscripciones') !!}
+    {!! Breadcrumbs::render('reserva') !!}
 @stop
 
 @push('styles')
@@ -24,33 +24,28 @@
                 <h5 class="text-blue">Inscripciones pendientes</h5>
             </div>
 
-            {{--@if ( Entrust::hasRole(['export_reserva','administrator']) )--}}
-
-            <div class="col-md-6 pull-right">
-
-                {!! Form::open (['route' => 'admin.reserva.export',	'method' => 'POST', 'autocomplete'=> 'off', 'role' => 'search' ])!!}
-                <div class="form-group row">
-                    <div class="col">
-                        {!! Form::label('desde','Desde',['class'=>'weight-600']) !!}
-                        {!! Form::text('desde',null,['class'=>'form-control date-picker','placeholder'=>'YYYY-MM-DD','value'=>'{{ old("fecha") }}', 'data-language'=>'es','data-date-format'=> 'yyyy-mm-dd','data-clear-button'=>' true','data-position'=>'right top','id'=>'desde','readonly']) !!}
+            @can('add_reservas')
+                <div class="col-md-6 pull-right">
+                    {!! Form::open (['route' => 'admin.reserva.export',	'method' => 'POST', 'autocomplete'=> 'off', 'role' => 'search' ])!!}
+                    <div class="form-group row">
+                        <div class="col">
+                            {!! Form::label('desde','Desde',['class'=>'weight-600']) !!}
+                            {!! Form::text('desde',null,['class'=>'form-control date-picker','placeholder'=>'YYYY-MM-DD','value'=>'{{ old("fecha") }}', 'data-language'=>'es','data-date-format'=> 'yyyy-mm-dd','data-clear-button'=>' true','data-position'=>'right top','id'=>'desde','readonly']) !!}
+                        </div>
+                        <div class="col">
+                            {!! Form::label('hasta','Hasta',['class'=>'weight-600']) !!}
+                            {!! Form::text('hasta',null,['class'=>'form-control date-picker','placeholder'=>'YYYY-MM-DD','value'=>'{{ old("fecha") }}', 'data-language'=>'es','data-date-format'=> 'yyyy-mm-dd','data-clear-button'=>' true','data-position'=>'right top','id'=>'hasta','readonly']) !!}
+                        </div>
+                        <div class="col">
+                            <button type="submit" class="btn btn-outline-success" data-toggle="tooltip"
+                                    data-placement="left" title="Formato Western"><i class="fa fa-file-excel-o"></i>
+                                Exportar
+                            </button>
+                        </div>
                     </div>
-                    <div class="col">
-                        {!! Form::label('hasta','Hasta',['class'=>'weight-600']) !!}
-                        {!! Form::text('hasta',null,['class'=>'form-control date-picker','placeholder'=>'YYYY-MM-DD','value'=>'{{ old("fecha") }}', 'data-language'=>'es','data-date-format'=> 'yyyy-mm-dd','data-clear-button'=>' true','data-position'=>'right top','id'=>'hasta','readonly']) !!}
-                    </div>
-                    <div class="col">
-                        <button type="submit" class="btn btn-outline-success" data-toggle="tooltip" data-placement="left" title="Formato Western"><i class="fa fa-file-excel-o"></i>
-                            Exportar
-                        </button>
-                    </div>
+                    {!! Form::close() !!}
                 </div>
-
-                {!! Form::close() !!}
-
-
-                {{--@endif--}}
-
-            </div>
+            @endcan
 
         </div>
 
@@ -111,7 +106,7 @@
                                                 Eliminar
                                             </a>
                                         @endcan
-                                        @can('edit_reservas')
+                                        @can('add_reservas')
                                             <a class="dropdown-item"
                                                href="{{ route('admin.reserva.confirm', $insc->id ) }}"
                                                data-toggle="tooltip" data-placement="top" data-delay="50"
@@ -119,6 +114,8 @@
                                                 <i class="fa fa-check text-primary" aria-hidden="true"></i>
                                                 Confirmar
                                             </a>
+                                        @endcan
+                                        @can('edit_reservas')
                                             <a class="dropdown-item"
                                                href="{{ route('admin.reserva.edit', $insc->id ) }}"
                                                data-placement="top" data-toggle="tooltip" data-delay="50"
@@ -132,7 +129,7 @@
                                 </div>
                             </td>
 
-                            <td>{{ sprintf("%'.05d",$insc->id) }}</td>
+                            <td>{{ sprintf("%'.04d",$insc->id) }}</td>
                             <td>{{ $insc->persona->getFullName() }}</td>
                             <td>{{ $insc-> persona->num_doc}}</td>
                             <td>{{$insc->factura->mpago->nombre}}</td>
@@ -140,11 +137,11 @@
                             <td>{{ $insc->producto->circuito->circuito }}</td>
                             <td>{{$insc->created_at}}</td>
                             <td>{{$insc->created_at->diffForHumans()}}</td>
-
                             <td>
                                 @role('admin')
-                                {{ $insc->created_at->addDay()->toDateString() }}</td>
-                            @endrole
+                                    {{ $insc->created_at->addDay()->toDateString() }}
+                                @endrole
+                            </td>
                             <td>
                                 @if (\Carbon\Carbon::now()->diffInHours($insc->created_at)>48)
                                     <span class="text-danger" data-toggle="tooltip" data-placement="left"

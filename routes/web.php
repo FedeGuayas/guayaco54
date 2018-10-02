@@ -156,7 +156,7 @@ Route::middleware(['auth', 'isVerified'])->group(function () {
         //editar reserva
         Route::get('pre-inscripcion/reserva/{id}/edit','InscripcionController@reservaEdit')->name('admin.reserva.edit');
         //actualizar forma pago de reserva
-        Route::put('pre-inscripcion/reserva/{id}/update','InscripcionController@reservaUpdate')->name('admin.reserva.update');
+        Route::put('pre-inscripcion/reserva/{inscripcion}/update','InscripcionController@reservaUpdate')->name('admin.reserva.update');
         //exportar reservas
         Route::post('pre-inscripcion/reserva/export','InscripcionController@reservasExport')->name('admin.reserva.export');
 
