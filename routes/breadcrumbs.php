@@ -280,7 +280,6 @@ Breadcrumbs::register('comprobante-edit', function($breadcrumbs,$factura)
 
 
 
-
 //// Home>Inscripciones pendientes (Reservas)
 Breadcrumbs::register('reserva', function($breadcrumbs)
 {

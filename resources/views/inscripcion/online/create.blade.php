@@ -9,12 +9,14 @@
 
 @push('styles')
 <link rel="stylesheet" type="text/css" href="{{asset('themes/back/src/plugins/jquery-steps/jquery.steps.css')}}">
+<link rel="stylesheet" type="text/css" href="{{asset('css/my_paymentez.css')}}">
+<link href="https://cdn.paymentez.com/js/ccapi/stg/paymentez.min.css" rel="stylesheet" type="text/css"/>
 
-<style>
-    .error {
-        color: #a94442;
-    }
-</style>
+{{--<style>--}}
+    {{--.error {--}}
+        {{--color: #a94442;--}}
+    {{--}--}}
+{{--</style>--}}
 @endpush
 
 @section('content')
@@ -26,18 +28,20 @@
         </div>
 
         <div class="form-text text-info small">Si desea inscribir a un amigo
-            <a href="{{route('getProfile')}}#asociados" class="weight-600"><i class="ion-man"></i>, click aqui
+            <a href="{{route('getProfile')}}#asociados.tab('show')" class="weight-600"><i class="ion-man"></i>, click
+                aqui
             </a> para cargar al Asociado
         </div>
 
-
         <div class="wizard-content">
+
             {!! Form::open(['method' => 'post', 'autocomplete'=> 'off', 'class'=>'tab-wizard wizard-circle wizard','id'=>'form-wizard' ]) !!}
             {!! Form::hidden('asociado_id',null,['id'=>'asociado_id']) !!}
 
             {{--Paso 1--}}
             <h5>Carrera</h5>
             <section>
+
                 <div class="row">
                     <div class="col-md-3 col-sm-12">
                         <div class="form-group">
@@ -56,8 +60,9 @@
                     <div class="col-md-3 col-sm-12">
                         <div class="form-group">
                             <label for="categoria_id" class="weight-600">Talla camiseta: </label>
-                            <span class="badge badge-pill badge-primary pull-right" id="stock-talla" data-toggle="tooltip" data-placement="top" title="Stock">0</span>
-                                {!! Form::select('talla', $tallas,null, ['class'=>'selectpicker show-tick form-control required','data-style'=>'btn-outline-primary','id'=>'talla','value'=>'{{ old("talla") }}','placeholder'=>'Seleccione ...', 'data-live-search'=>'true','data-container'=>'.main-container','required']) !!}
+                            <span class="badge badge-pill badge-primary pull-right" id="stock-talla"
+                                  data-toggle="tooltip" data-placement="top" title="Stock">0</span>
+                            {!! Form::select('talla', $tallas,null, ['class'=>'selectpicker show-tick form-control required','data-style'=>'btn-outline-primary','id'=>'talla','value'=>'{{ old("talla") }}','placeholder'=>'Seleccione ...', 'data-live-search'=>'true','data-container'=>'.main-container','required']) !!}
                         </div>
                     </div>
                     <div class="col-md-3 col-sm-12">
@@ -79,7 +84,7 @@
             {{--Paso 2--}}
             <h5>Facturación</h5>
             <section>
-
+                <h5 class="text-primary">Información para la Facturación</h5>
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-group">
@@ -144,15 +149,39 @@
                         <label class="weight-600">Términos y Condiciones</label>
                         <div class="custom-control custom-checkbox mb-5">
                             <input type="checkbox" class="custom-control-input" id="terminos" disabled>
-                            <label class="custom-control-label" for="terminos">Confirme que ha leido y esta de acuerdo con los <a href="#terminos-modal" data-toggle="modal" class="btn btn-link"> <strong>Términos y Condiciones</strong></a></label>
+                            <label class="custom-control-label" for="terminos">Confirme que ha leido y esta de acuerdo
+                                con los <a href="#terminos-modal" data-toggle="modal" class="btn btn-link"> <strong>Términos
+                                        y Condiciones</strong></a></label>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <a href="#" class="btn btn-success btn-block" id="pagar" hidden>
-                        Pagar
+                        Guardar
                     </a>
                 </div>
+
+                <div class="row justify-content-center">
+                    <div class="col-md-8 col-sm-12">
+                    <div class="card card-deck border-radius-10 pd-20 box-shadow bg-light mb-30" id="payment_card" hidden>
+                        <div class="card-body text-center">
+                            <h4 class="card-title weight-500 mb-20">Detalles de su tarjeta</h4>
+                            <h6 class="card-subtitle mb-2 text-muted mb-10">Mientras se realiza la transacción no debe recargar el navegador ni regresar atrás. Por favor espere que termine la operación</h6>
+                            <form class="form-horizontal" id="add-card-form">
+                                <div class="paymentez-form" id="my-card" data-capture-name="true" data-capture-email="true"
+                                     data-capture-cellphone="true" data-icon-colour="#569B29" >
+                                </div>
+                                <button class="btn btn-outline-success weight-500 btn-block"><i class="fa fa-money"></i> Pagar</button>
+                                <div id="messages_paymentez"></div>
+                            </form>
+                        </div>
+                        <div id="loader" hidden>
+                            <i class="fa fa-spinner fa-pulse fa-5x fa-fw text-success"></i>
+                            <span class="sr-only">Cargando...</span></div>
+                    </div>
+                </div>
+                </div>
+
             </section>
 
 
@@ -162,19 +191,21 @@
 
     </div>
 
-    @include('inscripcion.online.modals.add-to-card')
     @include('inscripcion.online.modals.terminos-modal')
 
 @endsection
 
 @push('scripts')
+<script src="https://cdn.paymentez.com/js/ccapi/stg/paymentez.min.js"></script>
 <script src="{{asset('themes/back/src/plugins/jquery-validation/dist/jquery.validate.js')}}"></script>
 <script src="{{asset('themes/back/src/plugins/jquery-validation/dist/localization/messages_es.min.js')}}"></script>
 <script src="{{asset('themes/back/src/plugins/jquery-steps/jquery.steps.min.js')}}"></script>
 <script src="{{ asset('js/toastr_message.js') }}"></script>
+<script src="{{asset('plugins/paymentez/paymentez.js')}}"></script>
 <script>
 
     $(document).ready(function (event) {
+
 
         $("#categoria_id").change(function () {
             let id = this.value;
@@ -288,23 +319,61 @@
 
         });
 
-        $("#mpago").on('change',function () {
-            if ($(this).val()!==''){
-                $("#terminos").prop('disabled',false);
-            }else {
-                $("#terminos").prop('disabled',true);
+        $("#mpago").on('change', function () {
+            if ($(this).val() !== '') {
+                $("#terminos").prop('disabled', false);
+            } else {
+                $("#terminos").prop('disabled', true);
                 $("#pagar").prop('hidden', true);
 
             }
         });
 
         //Habilitar / Desabilitar boton de pago
-        $("#terminos").on('change',function (e) {
+        $("#terminos").on('change', function (e) {
             if ($(this).is(':checked')) {
 //                $("#pagar").prop('disabled', false);
-                $("#pagar").prop('hidden', false);
+//
+//                if ($( "#mpago option:selected" ).text()=='targeta'){
+//                    $("#payment_card").prop('hidden', false);
+//                }else {
+//                    $("#pagar").prop('hidden', false);
+//                }
+                let id =  $("#mpago").val();
+                let token = $("input[name=token]").val();
+                let prom = new Promise((resolve, reject) => {
+                    $.ajax({
+                        url: "{{route('user.checkMPago')}}",
+                        type: "GET",
+                        headers: {'X-CSRF-TOKEN': token},
+                        dataType: 'json',
+                        data: {
+                            mpago_id: id
+                        },
+                        success: (response) => {
+                            resolve(response);
+                        },
+                        error: (error) => {
+                            reject(error);
+                        }
+                    });
+
+                });
+                prom.then((response) => {
+                    stock.html(response.data);
+                }).catch((error) => { //error en respuest ajax
+                    swal(
+                        ':( Lo sentimos ocurrio un error durante su petición',
+                        '' + error.status + ' ' + error.statusText + '',
+                        'error'
+                    );
+//               console.log(error);
+                });
+
+
             }
             else {
+                $("#payment_card").prop('hidden', true);
                 $("#pagar").prop('hidden', true);
             }
         });
@@ -316,11 +385,11 @@
         headerTag: "h5",
         bodyTag: "section",
         transitionEffect: "fade",
-        enableFinishButton: true,
+        enableFinishButton: false,
         titleTemplate: '<span class="step">#index#</span> #title#',
 //        errorClass: "error",
         labels: {
-            finish: "Enviar",
+            finish: "Guardar",
             previous: "Anterior",
             next: "Siguiente",
             loading: "Cargando..."
@@ -363,6 +432,7 @@
 //        Se dispara antes de terminar y se puede usar para evitar la finalización al devolver falso. Muy útil para la validación de formularios.
         onFinishing: function (event, currentIndex) {
             let form = $(this);
+            $('finish').prop('disabled', true);
             //Deshabilitar la validación en los campos que están deshabilitados.
             form.validate().settings.ignore = ":disabled";
             // Comience la validación; Evitar el envío de formularios si es falso
@@ -370,17 +440,17 @@
         },
 //      Se dispara después de la finalización.
         onFinished: function (event, currentIndex) {
-//            let form = $(this);
+            let form = $(this);
             // Enviar entradas del formulario
-//            form.submit();
-            $('#success-modal').modal('show');
+            form.submit();
+//            $('#success-modal').modal('show');
         }
     }).validate({
 
         errorClass: "error",
         //        errorLabelContainer: '.form-text',
-        errorPlacement: function(error, element) {
-            if(element.parent('.form-control').length) {
+        errorPlacement: function (error, element) {
+            if (element.parent('.form-control').length) {
                 error.insertAfter(element.parent());
             } else {
                 error.insertAfter(element);

@@ -89,6 +89,11 @@ Route::middleware(['auth', 'isVerified'])->group(function () {
         //perfiles de las personas que se inscribiran
         Route::resource('personas', 'PersonaController');
 
+
+        //PAYMENTEZ
+        //cancelar reserva
+//        Route::get('inscripcion/pay/get-payment','InscripcionController@getPayment')->name('inscripcion.getPayment');
+
     });
 
     /*

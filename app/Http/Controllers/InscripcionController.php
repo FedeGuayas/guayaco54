@@ -1243,4 +1243,9 @@ class InscripcionController extends Controller
     }
 
 
+    public function getPayment(){
+        return view('inscripcion.online.paymentez');
+    }
+
+
 }
