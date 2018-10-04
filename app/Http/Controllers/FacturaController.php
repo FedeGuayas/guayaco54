@@ -254,7 +254,7 @@ class FacturaController extends Controller
 
 
         $comprobantes = Factura::with('user', 'persona', 'mpago', 'descuento', 'inscripciones')
-            ->where('status', Factura::ACTIVA);
+            ->where('status', Factura::PAGADA);
 
         if (!$start && !$end) { //no se escogio fecha
             //todos los comprobantes
@@ -386,7 +386,7 @@ class FacturaController extends Controller
             ->join('mpagos as p', 'p.id', '=', 'f.mpago_id')
             ->select('f.total', 'i.factura_id', 'i.user_id as uid', 'u.first_name', 'u.last_name', 'i.escenario_id', 'i.created_at', 'i.id', 'i.status', 'p.id as pagoID', 'p.nombre as forma','f.status as fstatus')
             ->where('i.status', Inscripcion::PAGADA)
-            ->where('f.status', Factura::ACTIVA)
+            ->where('f.status', Factura::PAGADA)
             ->groupBy('i.factura_id');//agrupo por facturas de la tabla inscripciones xk hay varias insccripciones con una misma factura
 
         if (!$fecha && !isset($escenario)){

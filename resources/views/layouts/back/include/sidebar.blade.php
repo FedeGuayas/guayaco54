@@ -40,7 +40,7 @@
                     </a>
                     <ul class="submenu">
                         <li><a href="{{route('personas.index')}}">Clientes a Inscribir</a></li>
-                        <li><a href="{{route('admin.inscription.index')}}">Inscripciones</a></li>
+                        <li><a href="{{route('inscriptions.index')}}">Inscripciones</a></li>
                     </ul>
                 </li>
                 <li class="dropdown">
@@ -105,7 +105,7 @@
                         <span class="fa fa-user-o"></span><span class="mtext">Menú Usuario</span>
                     </a>
                     <ul class="submenu">
-                        <li><a href="{{route('user.inscripcion.create')}}">Nueva Inscripción <i
+                        <li><a href="{{route('inscription.create')}}">Nueva Inscripción <i
                                         class="fa fa-pencil-square-o"></i></a>
                         <li><a href="#">Comprobantes <i class="fa fa-sticky-note-o"></i></a>
                     </ul>

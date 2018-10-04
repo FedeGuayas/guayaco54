@@ -80,7 +80,7 @@ class InscripcionController extends Controller
                     </a>
                 @endcan
                 @can(\'edit_inscripciones\')
-                    <a class="dropdown-item" href="{{ route(\'admin.inscription.edit\',[$id]) }}" data-toggle="tooltip" data-placement="top" title="Editar Inscripción">
+                    <a class="dropdown-item" href="{{ route(\'inscriptions.edit\',[$id]) }}" data-toggle="tooltip" data-placement="top" title="Editar Inscripción">
                         <i class="fa fa-pencil text-success"></i> Editar
                     </a>
                 @endcan
@@ -149,11 +149,11 @@ class InscripcionController extends Controller
 
 
     /**
-     * Muestra el formulario para incripcion a un cliente backend
+     * Muestra el formulario para incripcion a un cliente
      *
      * @return \Illuminate\Http\Response
      */
-    public function createBack(Request $request, Persona $persona)
+    public function create(Request $request, Persona $persona)
     {
         $persona_email = $persona->email;
 
@@ -206,50 +206,6 @@ class InscripcionController extends Controller
         return view('inscripcion.interna.create', compact('categorias', 'tallas', 'deportes', 'persona', 'formas_pago', 'descuentos', 'error_email'));
     }
 
-
-    /**ONLINE
-     * Muestra el formulario para inscripcion online
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create(Request $request)
-    {
-        $user = $request->user();
-
-        if (!isset($user->persona)) {//no tiene perfil, debe crearlo antes de inscribirse
-            $notification = [
-                'message_toastr' => 'Debe completar su perfil antes de hacer alguna inscripción',
-                'alert-type' => 'error'];
-            return redirect()->route('getProfile')->with($notification);
-        }
-
-        $edad = $user->persona->getEdad();
-
-        $cat_all = Categoria::where('status', Categoria::ACTIVO)
-            ->where('categoria', 'NOT LIKE', '%deport%')//en online no se tendra en cuenta la categoria Deportistas
-            ->where([
-                ['edad_start', '<=', $edad],
-                ['edad_end', '>=', $edad],
-            ])->get();
-
-        $categorias = $cat_all->pluck('categoria', 'id');
-
-        $tallas_all = Talla::where('status', Talla::ACTIVO)
-            ->where('stock', '>', 0)
-            ->select(DB::raw('concat (talla," - ",color) as talla,id'))
-            ->get();
-        $tallas = $tallas_all->pluck('talla', 'id');
-
-        $deporte_all = Deporte::where('status', Deporte::ACTIVO)->get();
-        $deportes = $deporte_all->pluck('deporte', 'id');
-
-        $mp = Mpago::where('status', Mpago::ACTIVO)->get();
-        $formas_pago = $mp->pluck('nombre', 'id');
-
-        $perfil = $user->persona;
-
-        return view('inscripcion.online.create', compact('categorias', 'tallas', 'deportes', 'perfil', 'formas_pago'));
-    }
 
     /**Guaradar Inscripcion BACKEND
      *
@@ -377,7 +333,7 @@ class InscripcionController extends Controller
                 $factura->identificacion = $num_doc_fact;
                 $factura->mpago()->associate($mpago);
                 $factura->payment_id = NULL;
-                $factura->status = Factura::ACTIVA;  //crear registro (numero de corredor)
+                $factura->status = Factura::PAGADA;  //crear registro (numero de corredor)
                 $factura->save();
             }
 
@@ -625,7 +581,7 @@ class InscripcionController extends Controller
                 $factura->identificacion = $num_doc_fact;
                 $factura->mpago()->associate($mpago);
                 $factura->payment_id = NULL; //solo para pago con tarjeta online
-                $factura->status = Factura::ACTIVA;
+                $factura->status = Factura::PAGADA;
                 $factura->save();
                 //EDITAR INSCRIPCION
                 $inscripcion->producto()->associate($producto);
@@ -812,23 +768,6 @@ class InscripcionController extends Controller
         return response()->json(['data' => $inscripcion], 200);
     }
 
-    /**ONLINE
-     * en este caso no se tienen en cuenta los deportes
-     * Obtener lo circuitos para la categoia seleccionada
-     */
-    public function getCategoriaCircuito(Request $request)
-    {
-        if ($request->ajax()) {
-
-            $circuitos = Producto::with('circuito')
-                ->where('status', Producto::ACTIVO)
-                ->where('categoria_id', $request->input('id'))
-                ->get();
-
-            return response()->json(['data' => $circuitos], 200);
-        }
-    }
-
     /**Para Backend
      *
      * Obtener lo circuitos para la categoia seleccionada
@@ -897,48 +836,6 @@ class InscripcionController extends Controller
         }
     }
 
-
-    /**ONLINE
-     * Obtener el costo de la inscripcion
-     */
-    public function userOnlineCosto(Request $request)
-    {
-
-        if ($request->ajax()) {
-
-            $producto = Producto::where('status', Producto::ACTIVO)
-                ->where('categoria_id', $request->input('categoria_id'))
-                ->where('circuito_id', $request->input('circuito_id'))
-                ->first();
-
-            $costo = 0;
-            if ($producto) {
-                $costo = number_format($producto->price, 2, '.', ' ');
-            }
-
-            return response()->json(['data' => $costo], 200);
-        }
-    }
-
-    /**ONLINE
-     * Mostrar stock de tallas
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function getTallaStock(Request $request)
-    {
-        if ($request->ajax()) {
-
-            $talla = Talla::where('status', Talla::ACTIVO)
-                ->where('id', $request->input('talla_id'))
-                ->first();
-
-            $talla ? $stock = $talla->stock : $stock = 0;
-
-            return response()->json(['data' => $stock], 200);
-        }
-
-    }
 
     /**BACK
      * Imprimir recibo de inscripcion comprobante de pago
@@ -1054,7 +951,7 @@ class InscripcionController extends Controller
                 $inscripcion->update();
 
                 $factura = Factura::where('id', $inscripcion->factura_id)->first();
-                $factura->status = Factura::ACTIVA;
+                $factura->status = Factura::PAGADA;
                 $factura->fecha_edit = Carbon::now();
                 $factura->update();
 

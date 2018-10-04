@@ -28,7 +28,7 @@ $(function() {
      * @param paymentez_client_app_code provided by Paymentez.
      * @param paymentez_client_app_key provided by Paymentez.
      */
-    Paymentez.init('local', 'PAYMENTEZ_CLIENT_APP_CODE', 'PAYMENTEZ_CLIENT_APP_KEY');
+    Paymentez.init('stg', 'PAYMENTEZ_CLIENT_APP_CODE', 'PAYMENTEZ_CLIENT_APP_KEY');
 
     var form              = $("#add-card-form");
     var submitButton            = form.find("button");
@@ -43,7 +43,7 @@ $(function() {
             $('#messages_paymentez').text("Datos de tarjeta inválidos");
         }else{
             $("#loader").attr('hidden', false);
-            submitButton.attr("disabled", "disabled").text("Procesando...");
+            submitButton.attr("disabled", "disabled").text("Procesando su pago...");
 
             /*
              After passing all the validations cardToSave should have the following structure:
@@ -59,8 +59,8 @@ $(function() {
              };
              */
 
-            var uid = "uid1234";
-            var email = "dev@paymentez.com";
+            var uid = "uid1234"; //Id del usuario logueado
+            var email = "dev@paymentez.com"; //Email del usuario
             /* Add Card converts sensitive card data to a single-use token which you can safely pass to your server to charge the user.
              *
              * @param uid User identifier. This is the identifier you use inside your application; you will receive it in notifications.
@@ -74,16 +74,17 @@ $(function() {
 
         e.preventDefault();
     });
+
     var successHandler = function(cardResponse) {
         console.log(cardResponse.card);
         if(cardResponse.card.status === 'valid'){
-            $('#messages_paymentez').html('Card Successfully Added<br>'+
+            $('#messages_paymentez').html('Tarjeta agregada exitosamente<br>'+
                 'status: ' + cardResponse.card.status + '<br>' +
                 "Card Token: " + cardResponse.card.token + "<br>" +
                 "transaction_reference: " + cardResponse.card.transaction_reference
             );
         }else if(cardResponse.card.status === 'review'){
-            $('#messages_paymentez').html('Card Under Review<br>'+
+            $('#messages_paymentez').html('Tarjeta bajo revisión<br>'+
                 'status: ' + cardResponse.card.status + '<br>' +
                 "Card Token: " + cardResponse.card.token + "<br>" +
                 "transaction_reference: " + cardResponse.card.transaction_reference
@@ -100,7 +101,17 @@ $(function() {
     };
     var errorHandler = function(err) {
         console.log(err.error);
-        $('#messages_paymentez').html(err.error.type);
+        let description = err.error.description;
+        let help = err.error.help;
+        let type =err.error.type;
+
+        swal(
+            ':( Lo sentimos ocurrio un error durante el pago',
+            'Tipo: ' + type + '</br>Descripción: ' + description + '</br> Ayuda: '+ help,
+            'error'
+        );
+
+        // $('#messages_paymentez').html(err.error.type);
         $("#loader").attr('hidden', true);
         submitButton.removeAttr("disabled");
         submitButton.text(submitInitialText);

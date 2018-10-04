@@ -13,9 +13,9 @@
 <link href="https://cdn.paymentez.com/js/ccapi/stg/paymentez.min.css" rel="stylesheet" type="text/css"/>
 
 {{--<style>--}}
-    {{--.error {--}}
-        {{--color: #a94442;--}}
-    {{--}--}}
+{{--.error {--}}
+{{--color: #a94442;--}}
+{{--}--}}
 {{--</style>--}}
 @endpush
 
@@ -55,8 +55,6 @@
                             {!! Form::select('circuito_id',[] ,null, ['class'=>'selectpicker show-tick form-control required','data-style'=>'btn-outline-primary','placeholder'=>'Seleccione ...','id'=>'circuito_id','value'=>'{{ old("circuito_id") }}','data-container'=>'.main-container']) !!}
                         </div>
                     </div>
-                </div>
-                <div class="row">
                     <div class="col-md-3 col-sm-12">
                         <div class="form-group">
                             <label for="categoria_id" class="weight-600">Talla camiseta: </label>
@@ -137,55 +135,68 @@
             <h5>Pago y Términos</h5>
             <section>
                 <div class="row">
-                    <div class="col-md-4 col-sm-12">
-                        <div class="form-group">
-                            <label for="categoria_id" class="weight-600">Formas de Pago: *</label>
-                            {!! Form::select('mpago', $formas_pago,null, ['class'=>'selectpicker show-tick form-control required','data-style'=>'btn-outline-primary','id'=>'mpago','value'=>'{{ old("mpago") }}','data-container'=>'.main-container','placeholder'=>'Seleccione ...']) !!}
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-8 col-sm-12">
+                    <div class="col-md-4">
                         <label class="weight-600">Términos y Condiciones</label>
                         <div class="custom-control custom-checkbox mb-5">
-                            <input type="checkbox" class="custom-control-input" id="terminos" disabled>
-                            <label class="custom-control-label" for="terminos">Confirme que ha leido y esta de acuerdo
-                                con los <a href="#terminos-modal" data-toggle="modal" class="btn btn-link"> <strong>Términos
-                                        y Condiciones</strong></a></label>
+                            <input type="checkbox" class="custom-control-input" id="terminos">
+                            <label class="custom-control-label" for="terminos">Acepto los
+                                <a href="#terminos-modal" data-toggle="modal" class="btn btn-link">
+                                    <strong>Términos y Condiciones</strong>
+                                </a>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label for="categoria_id" class="weight-600">Formas de Pago: *</label>
+                            {!! Form::select('mpago', $formas_pago,null, ['class'=>'selectpicker show-tick form-control required','data-style'=>'btn-outline-primary','id'=>'mpago','value'=>'{{ old("mpago") }}','data-container'=>'.main-container','placeholder'=>'Seleccione ...','disabled']) !!}
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <a href="#" class="btn btn-success btn-block" id="pagar" hidden>
-                        Guardar
+                <div class="col-md-6">
+                    <a href="#" class="btn btn-outline-primary btn-block animated bounceIn" id="pagar" hidden>
+                        <i class="fa fa-save"></i> Guardar
                     </a>
                 </div>
-
-                <div class="row justify-content-center">
-                    <div class="col-md-8 col-sm-12">
-                    <div class="card card-deck border-radius-10 pd-20 box-shadow bg-light mb-30" id="payment_card" hidden>
-                        <div class="card-body text-center">
-                            <h4 class="card-title weight-500 mb-20">Detalles de su tarjeta</h4>
-                            <h6 class="card-subtitle mb-2 text-muted mb-10">Mientras se realiza la transacción no debe recargar el navegador ni regresar atrás. Por favor espere que termine la operación</h6>
-                            <form class="form-horizontal" id="add-card-form">
-                                <div class="paymentez-form" id="my-card" data-capture-name="true" data-capture-email="true"
-                                     data-capture-cellphone="true" data-icon-colour="#569B29" >
-                                </div>
-                                <button class="btn btn-outline-success weight-500 btn-block"><i class="fa fa-money"></i> Pagar</button>
-                                <div id="messages_paymentez"></div>
-                            </form>
-                        </div>
-                        <div id="loader" hidden>
-                            <i class="fa fa-spinner fa-pulse fa-5x fa-fw text-success"></i>
-                            <span class="sr-only">Cargando...</span></div>
-                    </div>
-                </div>
-                </div>
-
             </section>
-
-
             {!! Form::close() !!}
+
+
+                        <div class="row justify-content-center">
+                            <div class="col-md-8 col-sm-12">
+                                <div class="card card-deck border-radius-10 box-shadow bg-light animated fadeIn"
+                                     id="payment_card"
+                                     hidden>
+                                    <div class="card-body text-center">
+                                        <h4 class="card-title weight-500 mb-20">Detalles de su tarjeta</h4>
+                                        <h6 class="card-subtitle mb-2 text-muted mb-10">Mientras se realiza la transacción no
+                                            debe recargar el navegador ni regresar atrás. Por favor espere que termine la
+                                            operación</h6>
+                                        {!! Form::open(['class'=>'form-horizontal', 'id'=>'add-card-form']) !!}
+                                        <div class="paymentez-form" id="my-card" data-capture-name="true"
+                                             data-capture-email="true" data-capture-cellphone="true" data-icon-colour="#569B29">
+                                        </div>
+                                        <button class="btn btn-outline-success weight-500 btn-block"><i
+                                                    class="fa fa-money"></i> Proceder al Pago
+                                        </button>
+                                        <div id="messages_paymentez"></div>
+                                        {!! Form::close() !!}
+                                    </div>
+                                    <div id="loader" hidden>
+                                        <i class="fa fa-spinner fa-pulse fa-5x fa-fw text-success"></i>
+                                        <span class="sr-only">Cargando...</span></div>
+                                </div>
+                            </div>
+                        </div>
+
+
+
+
+
+
+
+
+
 
         </div>
 
@@ -319,62 +330,29 @@
 
         });
 
-        $("#mpago").on('change', function () {
-            if ($(this).val() !== '') {
-                $("#terminos").prop('disabled', false);
-            } else {
-                $("#terminos").prop('disabled', true);
-                $("#pagar").prop('hidden', true);
-
-            }
-        });
-
         //Habilitar / Desabilitar boton de pago
         $("#terminos").on('change', function (e) {
             if ($(this).is(':checked')) {
-//                $("#pagar").prop('disabled', false);
-//
-//                if ($( "#mpago option:selected" ).text()=='targeta'){
-//                    $("#payment_card").prop('hidden', false);
-//                }else {
-//                    $("#pagar").prop('hidden', false);
-//                }
-                let id =  $("#mpago").val();
-                let token = $("input[name=token]").val();
-                let prom = new Promise((resolve, reject) => {
-                    $.ajax({
-                        url: "{{route('user.checkMPago')}}",
-                        type: "GET",
-                        headers: {'X-CSRF-TOKEN': token},
-                        dataType: 'json',
-                        data: {
-                            mpago_id: id
-                        },
-                        success: (response) => {
-                            resolve(response);
-                        },
-                        error: (error) => {
-                            reject(error);
-                        }
-                    });
-
-                });
-                prom.then((response) => {
-                    stock.html(response.data);
-                }).catch((error) => { //error en respuest ajax
-                    swal(
-                        ':( Lo sentimos ocurrio un error durante su petición',
-                        '' + error.status + ' ' + error.statusText + '',
-                        'error'
-                    );
-//               console.log(error);
-                });
-
-
+                $("#mpago").prop('disabled', false);
+                $("#mpago option:eq(0)").prop('selected', true);
+                $("#mpago").selectpicker("refresh");
+            } else {
+                $("#mpago").prop('disabled', true);
+                $("#mpago").selectpicker("refresh");
+                $("#payment_card").prop('hidden', true).fadeOut(1000);
+                $("#pagar").prop('hidden', true).fadeOut(1000);
             }
-            else {
-                $("#payment_card").prop('hidden', true);
-                $("#pagar").prop('hidden', true);
+        });
+
+        $("#mpago").on('change', function () {
+            let str = $("#mpago option:selected").text().toLowerCase();
+            if (str.search("tarjeta") !== -1) {
+                $("#payment_card").prop('hidden', false);
+                $("#pagar").prop('hidden', true).fadeOut(1000);
+
+            } else {
+                $("#payment_card").prop('hidden', true).fadeOut(1000);
+                $("#pagar").prop('hidden', false);
             }
         });
 
@@ -472,6 +450,20 @@
     @endif
     {{-- FIN Alertas con Toastr--}}
 
+            {{--Errorres de validacion backend--}}
+            @if ($errors->any())
+    let errors = [];
+    let error = '';
+    @foreach ($errors->all() as $error)
+errors.push("{{$error}}");
+    @endforeach
+    if (errors) {
+        $.each(errors, function (i) {
+            error += errors[i] + '<br>';
+        });
+    }
+    showError(error);
+    @endif
 
 </script>
 @endpush

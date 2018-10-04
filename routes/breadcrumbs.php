@@ -248,7 +248,7 @@ Breadcrumbs::register('descuento-edit', function($breadcrumbs,$descuento)
 Breadcrumbs::register('inscripciones', function($breadcrumbs)
 {
     $breadcrumbs->parent('home');
-    $breadcrumbs->push('Inscripciones', route('admin.inscription.index'));
+    $breadcrumbs->push('Inscripciones', route('inscriptions.index'));
 });
 // Home>Incripciones>[create] BackEnd
 Breadcrumbs::register('inscripcion-create', function($breadcrumbs)
@@ -260,7 +260,7 @@ Breadcrumbs::register('inscripcion-create', function($breadcrumbs)
 Breadcrumbs::register('inscripcion-edit', function($breadcrumbs,$persona)
 {
     $breadcrumbs->parent('inscripciones');
-    $breadcrumbs->push('Editar inscripción '.$persona->getFullName(), route('admin.inscription.index'));
+    $breadcrumbs->push('Editar inscripción '.$persona->getFullName(), route('inscriptions.index'));
 });
 
 

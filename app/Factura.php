@@ -6,8 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Factura extends Model
 {
-    const ACTIVA = '1';
-    const CANCELADA = '0';
+    const PAGADA = '1'; //se pago
+    const PENDIENTE= 'p'; //para pago online, esta pendiente de pago, despues que se pague pasara a ACTIVA (Pagada)
+    const CANCELADA = '0'; //se elimino
 
     protected $fillable = [
         'numero','fecha_edit','descuento','subtotal','total','user_id','persona_id','nombre','email','direccion','telefono','identificacion','mpago_id','payment_id','status'

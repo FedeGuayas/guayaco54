@@ -71,7 +71,7 @@ class PersonaController extends Controller
                 <a class="btn btn-outline-primary dropdown-toggle" href="#" role="button" data-toggle="dropdown"><i class="fa fa-ellipsis-h"></i></a>
                 <div class="dropdown-menu dropdown-menu-left">
                  @can(\'add_inscripciones\')
-                    <a class="dropdown-item" href="{{ route(\'admin.inscripcion.create\',[$id]) }}">
+                    <a class="dropdown-item" href="{{ route(\'inscriptions.create\',[$id]) }}">
                         <i class="fa fa-check-square-o text-primary"></i>Inscribir
                     </a>
                 @endcan

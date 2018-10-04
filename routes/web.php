@@ -76,22 +76,27 @@ Route::middleware(['auth', 'isVerified'])->group(function () {
         Route::post('user/avatar-update', 'UserController@uploadAvatarCrop')->name('user.avatarCrop.upload');
 
         //vista para inscripcion de usuario online
-        Route::get('inscription', 'InscripcionController@create')->name('user.inscripcion.create');
-        //Ajax para inscripciones
-        Route::get('inscription/category/circuit', 'InscripcionController@getCategoriaCircuito')->name('getCategoriaCircuito');
-        //Actualizar costo
-        Route::get('inscription/cost/{data?}', 'InscripcionController@userOnlineCosto')->name('user.getCosto');
-        //Obtener stock de talla
-        Route::get('inscription/talla/stock/{data?}', 'InscripcionController@getTallaStock')->name('user.getTallaStock');
+//        Route::get('inscription', 'InscripcionController@create')->name('user.inscripcion.create');
 
         //Personas/index obtener todas las personas  AJAX
         Route::get('persons/getAll', 'PersonaController@getAllPersonas')->name('getAllPersonas');
+
         //perfiles de las personas que se inscribiran
         Route::resource('personas', 'PersonaController');
 
 
+        // Obtener lo circuitos para la categoria seleccionada. Ajax
+        Route::get('inscription/category/circuit', 'PreInscOnlineController@getCategoriaCircuito')->name('getCategoriaCircuito');
+        //Actualizar costo
+        Route::get('inscription/cost/{data?}', 'PreInscOnlineController@userCosto')->name('user.getCosto');
+        //Obtener stock de tallas
+        Route::get('inscription/tallas/stock/{data?}', 'PreInscOnlineController@getTallaStock')->name('user.getTallaStock');
+
+        Route::resource('inscription', 'PreInscOnlineController', ['except' => ['show', 'destroy']]);
+
+
         //PAYMENTEZ
-        //cancelar reserva
+        //cancelar
 //        Route::get('inscripcion/pay/get-payment','InscripcionController@getPayment')->name('inscripcion.getPayment');
 
     });
@@ -123,7 +128,8 @@ Route::middleware(['auth', 'isVerified'])->group(function () {
         Route::put('cliente/{persona}/update', 'PersonaController@updateBack')->name('admin.cliente.update');
 
         //vista para crear inscripcion de un cliente en backend
-        Route::get('inscription/{persona}', 'InscripcionController@createBack')->name('admin.inscripcion.create');
+        Route::get('inscriptions/{persona}', 'InscripcionController@create')->name('inscriptions.create');
+
         //Ajax para inscripciones obterner los circuitos para la categoria seleccionada
         Route::get('inscription/category/getCircuit', 'InscripcionController@getCatCir')->name('getCatCir');
         //Actualizar costo
@@ -131,14 +137,14 @@ Route::middleware(['auth', 'isVerified'])->group(function () {
         //Guardar Inscripcion de Backend
         Route::post('inscription/store', 'InscripcionController@store')->name('admin.inscription.store');
         //Listar todas las inscripciones
-        Route::get('inscription', 'InscripcionController@index')->name('admin.inscription.index');
+//        Route::get('inscription', 'InscripcionController@index')->name('admin.inscription.index');
         Route::get('inscriptions/getAll', 'InscripcionController@getAll')->name('admin.inscription.getAll');
         //Vista para editar inscripcion
         Route::get('inscription/{inscripcion}/edit', 'InscripcionController@edit')->name('admin.inscription.edit');
         //Actualizar inscripcion
         Route::put('inscription/{inscripcion}', 'InscripcionController@update')->name('admin.inscription.update');
         //Eliminar inscripcion, pone a status c=cancelada
-        Route::delete('inscription/{inscripcion}', 'InscripcionController@destroy')->name('admin.inscription.destroy');
+//        Route::delete('inscription/{inscripcion}', 'InscripcionController@destroy')->name('admin.inscription.destroy');
         //Entregar Kit
         Route::post('inscription/{inscripcion}/setKit', 'InscripcionController@setKit')->name('admin.inscripcion.setKit');
         //Print recibo inscripcion backend
@@ -150,7 +156,7 @@ Route::middleware(['auth', 'isVerified'])->group(function () {
         Route::get('facturas/arqueo', 'FacturaController@getCuadre')->name('admin.facturacion.arqueo');
 
 
-        //RESERVAS
+        //RESERVAS administradas en el BackEnd
 //    Route::group(array('middleware' => 'forceSSL'), function() {
         Route::get('pre-inscripcion/reservas', 'InscripcionController@reservas')->name('admin.inscripcions.reservas');
 //    });
@@ -173,6 +179,7 @@ Route::middleware(['auth', 'isVerified'])->group(function () {
         Route::resource('descuentos', 'DescuentoController', ['except' => ['show']]);
         Route::resource('tallas', 'TallaController', ['except' => ['show']]);
         Route::resource('escenarios', 'EscenarioController', ['except' => ['show', 'destroy']]);
+        Route::resource('inscriptions', 'InscripcionController', ['except' => ['show','create']]);
         Route::resource('deportes', 'DeporteController', ['except' => ['show', 'destroy']]);
         Route::resource('ejercicios', 'EjercicioController', ['except' => ['show', 'destroy']]);
         Route::resource('taxes', 'ImpuestoController', ['except' => ['show', 'destroy']]);

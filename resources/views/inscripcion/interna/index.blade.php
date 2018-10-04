@@ -76,7 +76,7 @@
         </div>
     </div>
 
-    {!! Form::open(['route'=>['admin.inscription.destroy',':ID'],'method'=>'DELETE','id'=>'form-delete']) !!}
+    {!! Form::open(['route'=>['inscriptions.destroy',':ID'],'method'=>'DELETE','id'=>'form-delete']) !!}
     {!! Form::close() !!}
 
     {!! Form::open(['route'=>['admin.inscripcion.setKit',':ID'],'method'=>'post','id'=>'form-statusKit']) !!}

@@ -29,7 +29,7 @@ class CreateFacturasTable extends Migration
             $table->string('identificacion')->nullable();//SI personalisa datos facturacion
             $table->unsignedTinyInteger('mpago_id');//forma de pago
             $table->string('payment_id')->unique()->nullable();//id de la compra proporcionado por payment si es online sino es null
-            $table->string('status')->default(\App\Factura::ACTIVA);
+            $table->string('status')->default(\App\Factura::PAGADA);
 
             $table->timestamps();
         });
