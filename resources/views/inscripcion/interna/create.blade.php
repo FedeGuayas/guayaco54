@@ -23,7 +23,7 @@
             </div>
         @endif
 
-        {!! Form::open(['route'=>['admin.inscription.store'],'method' => 'post', 'autocomplete'=> 'off', 'class'=>'form_noEnter']) !!}
+        {!! Form::open(['route'=>['inscriptions.store'],'method' => 'post', 'autocomplete'=> 'off', 'class'=>'form_noEnter']) !!}
         {!! Form::hidden('persona_id',$persona->id,['id'=>'persona_id']) !!}
         {!! Form::hidden('persona_edad',$persona->getEdad(),['id'=>'persona_edad']) !!}
         <div class="row clearfix justify-content-center">

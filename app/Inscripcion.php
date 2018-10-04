@@ -9,7 +9,6 @@ class Inscripcion extends Model
 
     const RESERVADA = 'r';
     const PAGADA = 'p';
-    const CANCELADA = 'c';
 
     const INSCRIPCION_ONLINE='1';
     const INSCRIPCION_PRESENCIAL='0';
@@ -18,7 +17,7 @@ class Inscripcion extends Model
     const KIT_POR_ENTREGAR =null;
 
     protected $fillable = [
-        'escenario_id', 'producto_id', 'persona_id', 'user_id', 'user_edit', 'deporte_id', 'factura_id', 'fecha', 'num_corredor', 'kit', 'talla_id', 'costo', 'ejercicio_id', 'status'
+        'escenario_id', 'producto_id', 'persona_id', 'user_id', 'user_edit', 'deporte_id', 'factura_id', 'fecha', 'num_corredor', 'kit', 'talla_id', 'costo', 'ejercicio_id','inscripcion_type' ,'status'
     ];
 
     /**

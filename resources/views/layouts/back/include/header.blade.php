@@ -36,21 +36,20 @@
             </div>
         </div>
 
-        {{--<div class="user-info-dropdown">--}}
-            {{--<div class="dropdown">--}}
-                {{--<a class="dropdown-toggle" href="#" role="button" data-toggle="dropdown">--}}
-                    {{--<i class="fa fa-shopping-cart"></i>--}}
-                    {{--<span class="badge badge-danger">{{Session::has('cart') ? Session::get('cart')->totalQty : '1' }}</span>--}}
-
-                {{--</a>--}}
-                {{--<div class="dropdown-menu dropdown-menu-right ">--}}
-                    {{--<a class="dropdown-item" href="#"><i class="fa fa-shopping-bag" aria-hidden="true"></i> Mis compras--}}
-                        {{--<span class="badge badge-danger">3</span></a>--}}
-                    {{--<a class="dropdown-item" href="#"><i class="fa fa-credit-card" aria-hidden="true"></i> Proceder al--}}
-                        {{--Pago</a>--}}
-                {{--</div>--}}
-            {{--</div>--}}
-        {{--</div>--}}
+        <div class="user-info-dropdown">
+            <div class="dropdown">
+                <a class="dropdown-toggle" href="#" role="button" data-toggle="dropdown">
+                    <i class="fa fa-shopping-cart"></i>
+                    <span class="badge badge-danger">{{Session::has('cart') ? Session::get('cart')->totalQty : '1' }}</span>
+                </a>
+                <div class="dropdown-menu dropdown-menu-right ">
+                    <a class="dropdown-item" href="#"><i class="fa fa-shopping-bag" aria-hidden="true"></i> Mis compras
+                        <span class="badge badge-danger">3</span></a>
+                    <a class="dropdown-item" href="#"><i class="fa fa-credit-card" aria-hidden="true"></i> Proceder al
+                        Pago</a>
+                </div>
+            </div>
+        </div>
 
         <div class="user-notification">
             <a class="nav-item" href="{{route('terms')}}">Términos</a>

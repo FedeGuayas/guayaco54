@@ -40,6 +40,7 @@ class InscripcionController extends Controller
      */
     public function index()
     {
+
         return view('inscripcion.interna.index');
     }
 
@@ -60,7 +61,8 @@ class InscripcionController extends Controller
                 with('user', 'producto', 'producto.categoria', 'producto.circuito', 'persona', 'talla', 'factura')
                     ->join('personas', 'personas.id', '=', 'inscripcions.persona_id')
                     ->leftJoin('registros', 'registros.inscripcion_id', '=', 'inscripcions.id')
-                    ->where('inscripcions.status', '!=', Inscripcion::CANCELADA)//no mostrar las canceladas
+                    ->where('inscripcions.status', '=', Inscripcion::PAGADA)//solo mostrar las pagadas
+                    ->where('inscripcions.inscripcion_type', '=', Inscripcion::INSCRIPCION_PRESENCIAL)//mostrar las que hicieron los trabajadores
 //                ->whereHas('roles', function($q){ //con rol=employee
 //                    $q->where('name', '=', 'employee');
 //                })
@@ -153,8 +155,9 @@ class InscripcionController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create(Request $request, Persona $persona)
+    public function create(Request $request,  $persona)
     {
+        dd($persona);
         $persona_email = $persona->email;
 
         $persona_email == '' || is_null($persona_email) ? $error_email = true : $error_email = false;
@@ -165,7 +168,6 @@ class InscripcionController extends Controller
         $inscription_true = Inscripcion::with('producto')
             ->where('persona_id', $persona->id)
             ->where('ejercicio_id', $ejercicio)
-            ->where('status', '!=', Inscripcion::CANCELADA)//por si se inscribio antes y se borro la inscripcion
             ->first();
 
         if (count($inscription_true) > 0) {
@@ -366,6 +368,7 @@ class InscripcionController extends Controller
             $inscripcion->costo = $costo;
             $inscripcion->ejercicio_id = $ejercicio->ejercicio_id;
             $inscripcion->status = Inscripcion::PAGADA;
+            $inscripcion->inscripcion_type=Inscripcion::INSCRIPCION_PRESENCIAL;
             $inscripcion->save();
 
             //CREAR EL REGISTRO DEL CORREDOR
@@ -388,7 +391,7 @@ class InscripcionController extends Controller
             $notification = [
                 'message_toastr' => 'Inscripción creada correctamente. Debe imprimir el comprobante de pago con el cuál se podrá retirar el Kit.',
                 'alert-type' => 'success'];
-            return redirect()->route('admin.inscription.index')->with($notification);
+            return redirect()->route('inscriptions.index')->with($notification);
 
         } catch (\Exception $e) {
             DB::rollBack();
@@ -419,9 +422,9 @@ class InscripcionController extends Controller
      * @param  \App\Inscripcion $inscripcion
      * @return \Illuminate\Http\Response
      */
-    public function edit(Inscripcion $inscripcion)
+    public function edit(Inscripcion $inscription)
     {
-        $edad = $inscripcion->persona->getEdad();
+        $edad = $inscription->persona->getEdad();
 
         $cat_all = Categoria::where('status', Categoria::ACTIVO)
             ->where([
@@ -431,7 +434,7 @@ class InscripcionController extends Controller
 
         $categorias = $cat_all->pluck('categoria', 'id');
 
-        $circuito = Circuito::where('id', $inscripcion->producto->circuito_id)->get();
+        $circuito = Circuito::where('id', $inscription->producto->circuito_id)->get();
         $circuito_set = $circuito->pluck('circuito', 'id');
 
         $tallas_all = Talla::where('stock', '>=', 0)
@@ -440,8 +443,8 @@ class InscripcionController extends Controller
         $tallas = $tallas_all->pluck('talla', 'id');
 
         $talla_agotada = false;
-        if ($inscripcion->talla) {
-            $talla_de_inscripcion = Talla::where('id', $inscripcion->talla_id)->select('stock')->first();
+        if ($inscription->talla) {
+            $talla_de_inscripcion = Talla::where('id', $inscription->talla_id)->select('stock')->first();
             $talla_de_inscripcion->stock > 0 ? $talla_agotada = false : $talla_agotada = true;
         }
 
@@ -456,7 +459,7 @@ class InscripcionController extends Controller
         $mp = Mpago::where('status', Mpago::ACTIVO)->get();
         $formas_pago = $mp->pluck('nombre', 'id');
 
-        return view('inscripcion.interna.edit', compact('categorias', 'tallas', 'deportes', 'inscripcion', 'formas_pago', 'descuentos', 'circuito_set', 'talla_agotada'));
+        return view('inscripcion.interna.edit', compact('categorias', 'tallas', 'deportes', 'inscription', 'formas_pago', 'descuentos', 'circuito_set', 'talla_agotada'));
     }
 
     /**
@@ -694,7 +697,7 @@ class InscripcionController extends Controller
             $notification = [
                 'message_toastr' => 'Inscripción actualizada correctamente.',
                 'alert-type' => 'success'];
-            return redirect()->route('admin.inscription.index')->with($notification);
+            return redirect()->route('inscriptions.index')->with($notification);
 
         } catch (\Exception $e) {
             DB::rollBack();
@@ -796,7 +799,7 @@ class InscripcionController extends Controller
      */
     public function getCosto(Request $request)
     {
-
+//        return response()->json(['data' => 'nnnn'], 403);
         if ($request->ajax()) {
 
             $producto = Producto::where('status', Producto::ACTIVO)

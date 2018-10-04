@@ -66,7 +66,6 @@
                         <th></th>
                         <th></th>
                         <th class="tfoot_search"></th>
-
                     </tr>
                     </tfoot>
                     <tbody>
@@ -118,11 +117,11 @@
             processing: true,
             select: true,
             serverSide: true,
-            order: [[1, 'desc']],
+//            order: [[1, 'desc']],
             "language": {
                 "url": '/plugins/DataTables/i18n/Spanish_original.lang'
             },
-            ajax: '{{route('admin.inscription.getAll')}}',
+            ajax: '{{route('admin.getAllInscripcions')}}',
             columns: [
                 {data: 'actions', name: 'opciones', orderable: false, searchable: false},
                 {data: 'id', name: 'id'},

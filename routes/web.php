@@ -135,14 +135,13 @@ Route::middleware(['auth', 'isVerified'])->group(function () {
         //Actualizar costo
         Route::get('inscriptions/cost/{data?}', 'InscripcionController@getCosto')->name('admin.getCosto');
         //Guardar Inscripcion de Backend
-        Route::post('inscription/store', 'InscripcionController@store')->name('admin.inscription.store');
-        //Listar todas las inscripciones
-//        Route::get('inscription', 'InscripcionController@index')->name('admin.inscription.index');
-        Route::get('inscriptions/getAll', 'InscripcionController@getAll')->name('admin.inscription.getAll');
+//        Route::post('inscription/store', 'InscripcionController@store')->name('admin.inscription.store');
+        //Listar todas las inscripciones AJAX
+        Route::get('inscriptions/get/inscripciones', 'InscripcionController@getAll')->name('admin.getAllInscripcions');
         //Vista para editar inscripcion
-        Route::get('inscription/{inscripcion}/edit', 'InscripcionController@edit')->name('admin.inscription.edit');
+//        Route::get('inscriptions/{inscripcion}/edit', 'InscripcionController@edit')->name('admin.inscription.edit');
         //Actualizar inscripcion
-        Route::put('inscription/{inscripcion}', 'InscripcionController@update')->name('admin.inscription.update');
+//        Route::put('inscription/{inscripcion}', 'InscripcionController@update')->name('admin.inscription.update');
         //Eliminar inscripcion, pone a status c=cancelada
 //        Route::delete('inscription/{inscripcion}', 'InscripcionController@destroy')->name('admin.inscription.destroy');
         //Entregar Kit
