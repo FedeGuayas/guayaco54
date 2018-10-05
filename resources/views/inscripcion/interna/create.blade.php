@@ -397,17 +397,14 @@ $("#categoria_id").change(function () {
                     headers: {'X-CSRF-TOKEN': token},
                     dataType: 'json',
                     data: {
-                        persona_edad: persona_edad,
                         descuento_id: descuento_id,
                         circuito_id: circuito_id,
                         categoria_id: categoria_id
                     },
                     success: (response) => {
-                        console.log(response)
                         resolve(response);
                     },
                     error: (error) => {
-                        console.log(error)
                         reject(error);
                     }
                 });
@@ -421,7 +418,6 @@ $("#categoria_id").change(function () {
                     '' + error.status + ' ' + error.statusText + '',
                     'error'
                 );
-//               console.log(error);
             });
         };
 

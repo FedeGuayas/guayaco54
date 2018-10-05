@@ -63,6 +63,7 @@ class InscripcionController extends Controller
                     ->leftJoin('registros', 'registros.inscripcion_id', '=', 'inscripcions.id')
                     ->where('inscripcions.status', '=', Inscripcion::PAGADA)//solo mostrar las pagadas
                     ->where('inscripcions.inscripcion_type', '=', Inscripcion::INSCRIPCION_PRESENCIAL)//mostrar las que hicieron los trabajadores
+                    ->orderBy('inscripcions.id', 'desc')
 //                ->whereHas('roles', function($q){ //con rol=employee
 //                    $q->where('name', '=', 'employee');
 //                })
@@ -155,9 +156,8 @@ class InscripcionController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create(Request $request,  $persona)
+    public function create(Request $request, Persona $persona)
     {
-        dd($persona);
         $persona_email = $persona->email;
 
         $persona_email == '' || is_null($persona_email) ? $error_email = true : $error_email = false;
@@ -368,7 +368,7 @@ class InscripcionController extends Controller
             $inscripcion->costo = $costo;
             $inscripcion->ejercicio_id = $ejercicio->ejercicio_id;
             $inscripcion->status = Inscripcion::PAGADA;
-            $inscripcion->inscripcion_type=Inscripcion::INSCRIPCION_PRESENCIAL;
+            $inscripcion->inscripcion_type = Inscripcion::INSCRIPCION_PRESENCIAL;
             $inscripcion->save();
 
             //CREAR EL REGISTRO DEL CORREDOR
@@ -469,9 +469,8 @@ class InscripcionController extends Controller
      * @param  \App\Inscripcion $inscripcion
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Inscripcion $inscripcion)
+    public function update(Request $request, Inscripcion $inscription)
     {
-
         $user = $request->user(); //usuario logueado que edita
 
         $ahora = Carbon::now();
@@ -533,7 +532,7 @@ class InscripcionController extends Controller
             $mpago_id = $request->input('mpago');
             $mpago = Mpago::where('status', Mpago::ACTIVO)->where('id', $mpago_id)->first();
 
-            $persona_id = $inscripcion->persona_id;
+            $persona_id = $inscription->persona_id;
             $persona = Persona::where('id', $persona_id)->first();
 
             //con descuento aplicado si lo hay
@@ -556,7 +555,7 @@ class InscripcionController extends Controller
             $num_doc_fact = $request->input('num_doc_fact');
 
             //Ahora no se ecogio deporte pero anteriormente (era deportista y no tenia factura)
-            if (!isset($deporte) && ($inscripcion->deporte_id && !$inscripcion->factura_id)) { //CAMBIO DE INSCRIPCION DE DEPORTISTA A CORREDOR NORMAL
+            if (!isset($deporte) && ($inscription->deporte_id && !$inscription->factura_id)) { //CAMBIO DE INSCRIPCION DE DEPORTISTA A CORREDOR NORMAL
                 //CREAR NUMERO DE FACTURA
                 $maxnumFact = DB::table('facturas')->max('numero'); //maximo valor en la columna numero
                 if (is_numeric($maxnumFact)) {
@@ -587,15 +586,15 @@ class InscripcionController extends Controller
                 $factura->status = Factura::PAGADA;
                 $factura->save();
                 //EDITAR INSCRIPCION
-                $inscripcion->producto()->associate($producto);
-                $inscripcion->user_edit = $user->id;
-                $inscripcion->deporte_id = NULL; //no se escogio deporte
-                $inscripcion->factura()->associate($factura); //se genero factura nueva
+                $inscription->producto()->associate($producto);
+                $inscription->user_edit = $user->id;
+                $inscription->deporte_id = NULL; //no se escogio deporte
+                $inscription->factura()->associate($factura); //se genero factura nueva
                 if (!isset($deporte) && isset($talla)) { //no es deportista y se escogio la talla
-                    $inscripcion->talla()->associate($talla);
+                    $inscription->talla()->associate($talla);
                 }
-                $inscripcion->costo = $costo;
-                $inscripcion->update();
+                $inscription->costo = $costo;
+                $inscription->update();
                 //ACTUALIZAR STOCK DE TALLAS
                 $talla->decrement('stock');
                 $talla->stock > 0 ? $talla->status = Talla::ACTIVO : $talla->status = Talla::INACTIVO;
@@ -605,14 +604,14 @@ class InscripcionController extends Controller
             } else { //CAMBIO EN INSCRIPCION DE CORREDOR NORMAL o Actualizacion de deportistas
 
                 //Validar que existe la factura, porque los deportistas no tienen factura en tonces daria error  $inscripcion->factura_id
-                if ($inscripcion->factura) {
-                    $factura = Factura::where('id', $inscripcion->factura_id)->first();
+                if ($inscription->factura) {
+                    $factura = Factura::where('id', $inscription->factura_id)->first();
                     $old_costo = $factura->total;
                 }
 
 
                 //No se escogio deporte y tenia factura
-                if (!isset($deporte) && $inscripcion->factura_id) {//Cambio de Corredor normal a normal
+                if (!isset($deporte) && $inscription->factura_id) {//Cambio de Corredor normal a normal
 
                     //la factura se actualizara solo sino es DEPORTISTA
                     $factura->fecha_edit = $ahora; //fecha en que se edita
@@ -632,9 +631,9 @@ class InscripcionController extends Controller
                     LogActivity::addToLog('Factura editada por trabajador (Valores de Factura)', $user, $old_costo, $factura->costo);
                     //ACTUALIZAR STOCK DE TALLAS
                     //se cambio de talla
-                    if (isset($talla) && ($talla->id != $inscripcion->talla_id)) {
+                    if (isset($talla) && ($talla->id != $inscription->talla_id)) {
                         //incrementar la talla anterior
-                        $talla_anterior = Talla::where('id', $inscripcion->talla_id)->first();
+                        $talla_anterior = Talla::where('id', $inscription->talla_id)->first();
                         $talla_anterior->increment('stock');
                         $talla_anterior->stock > 0 ? $talla_anterior->status = Talla::ACTIVO : $talla_anterior->status = Talla::INACTIVO;
                         $talla_anterior->update();
@@ -645,18 +644,18 @@ class InscripcionController extends Controller
                     }
 
                     //EDITAR INSCRIPCION
-                    $inscripcion->producto()->associate($producto);
-                    $inscripcion->user_edit = $user->id; //usuario que edita
-                    $inscripcion->deporte_id = NULL;
+                    $inscription->producto()->associate($producto);
+                    $inscription->user_edit = $user->id; //usuario que edita
+                    $inscription->deporte_id = NULL;
                     //si se cambia de talla
-                    if (isset($talla) && ($talla->id != $inscripcion->talla_id)) {
-                        $inscripcion->talla()->associate($talla);
+                    if (isset($talla) && ($talla->id != $inscription->talla_id)) {
+                        $inscription->talla()->associate($talla);
                     }
-                    $inscripcion->costo = $costo;
-                    $inscripcion->update();
+                    $inscription->costo = $costo;
+                    $inscription->update();
 
                     //se cambio de corredor normal a deportista
-                } elseif (isset($deporte) && $inscripcion->factura_id) { //Se escogio deporte y anteriormente tenia factura
+                } elseif (isset($deporte) && $inscription->factura_id) { //Se escogio deporte y anteriormente tenia factura
                     //se cancela la factura,
                     $factura->status = Factura::CANCELADA;
                     $factura->update();
@@ -665,29 +664,29 @@ class InscripcionController extends Controller
                     //se cambio de talla, se deselecciono la anterior al cambiarse a deportista
                     if (!isset($talla)) {
                         //incrementar la talla anterior
-                        $talla_anterior = Talla::where('id', $inscripcion->talla_id)->first();
+                        $talla_anterior = Talla::where('id', $inscription->talla_id)->first();
                         $talla_anterior->increment('stock');
                         $talla_anterior->stock > 0 ? $talla_anterior->status = Talla::ACTIVO : $talla_anterior->status = Talla::INACTIVO;
                         $talla_anterior->update();
                     }
                     //EDITAR INSCRIPCION
-                    $inscripcion->producto()->associate($producto);
-                    $inscripcion->user_edit = $user->id; //usuario que edita
-                    $inscripcion->deporte_id = $deporte->id;
-                    $inscripcion->factura_id = NULL; //se anula la factura
+                    $inscription->producto()->associate($producto);
+                    $inscription->user_edit = $user->id; //usuario que edita
+                    $inscription->deporte_id = $deporte->id;
+                    $inscription->factura_id = NULL; //se anula la factura
                     //deportista, no hay talla
-                    $inscripcion->talla_id = NULL;
-                    $inscripcion->costo = $costo;
-                    $inscripcion->update();
+                    $inscription->talla_id = NULL;
+                    $inscription->costo = $costo;
+                    $inscription->update();
 
                     //Era deportistas y sigue siendolo
-                } elseif (isset($deporte) && !$inscripcion->factura_id) { //Se escogio deporte y anterirormente no tenia factura
+                } elseif (isset($deporte) && !$inscription->factura_id) { //Se escogio deporte y anterirormente no tenia factura
 
                     //EDITAR INSCRIPCION
-                    $inscripcion->producto()->associate($producto);
-                    $inscripcion->user_edit = $user->id; //usuario que edita
-                    $inscripcion->deporte_id = $deporte->id;
-                    $inscripcion->update();
+                    $inscription->producto()->associate($producto);
+                    $inscription->user_edit = $user->id; //usuario que edita
+                    $inscription->deporte_id = $deporte->id;
+                    $inscription->update();
                     LogActivity::addToLog('Actualizacion de inscripcion, deportista', $user);
                 }
             }
@@ -712,12 +711,12 @@ class InscripcionController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Eliminar inscripcion, La factura se cancela
      *
      * @param  \App\Inscripcion $inscripcion
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Request $request, Inscripcion $inscripcion)
+    public function destroy(Request $request, Inscripcion $inscription)
     {
         if ($request->user()->can('delete_inscripciones') && $request->ajax()) {
 
@@ -725,37 +724,37 @@ class InscripcionController extends Controller
 
                 DB::beginTransaction();
 
-                if (isset($inscripcion->talla)) {
+                if (isset($inscription->talla)) {
 
-                    $talla = $inscripcion->talla;
+                    $talla = $inscription->talla;
                     $talla->increment('stock');
                     $talla->stock > 0 ? $talla->status = Talla::ACTIVO : $talla->status = Talla::INACTIVO;
                     $talla->update();
                 }
 
-                $registro = Registro::where('inscripcion_id', $inscripcion->id)->first();
+                $registro = Registro::where('inscripcion_id', $inscription->id)->first();
                 $registro ? $registro->delete() : $registro = false;
-                LogActivity::addToLog('Registro eliminado (No. inscripcion, No. corredor) ', $request->user(), $inscripcion->id, $inscripcion->num_corredor);
+                LogActivity::addToLog('Registro eliminado (No. inscripcion, No. corredor) ', $request->user(), $inscription->id, $inscription->num_corredor);
 
-                $factura = $inscripcion->factura;
+                $factura = $inscription->factura;
                 if ($factura) {
                     $factura->status = Factura::CANCELADA;
                     $factura->update();
-                    LogActivity::addToLog('Inscripcion eliminada, Factura cancelada (Inscripcion->id, Factura->id) ', $request->user(), $inscripcion->id, $factura->id);
+                    LogActivity::addToLog('Inscripcion eliminada, Factura cancelada (Inscripcion->id, Factura->id) ', $request->user(), $inscription->id, $factura->id);
                 }
 
-                $inscripcion->delete();
+                $inscription->delete();
 
                 DB::Commit();
 
-                return response()->json(['data' => $inscripcion], 200);
+                return response()->json(['data' => $inscription], 200);
 
             } catch (\Exception $e) {
                 DB:: rollBack();
-                return response()->json(['data' => $inscripcion]);
+                return response()->json(['data' => $inscription, 404]);
 
             }
-        } else  return response()->json(['data' => $inscripcion], 403);
+        } else  return response()->json(['data' => $inscription], 403);
     }
 
     /**
@@ -765,7 +764,6 @@ class InscripcionController extends Controller
      */
     public function setKit(Inscripcion $inscripcion)
     {
-//        $categoria=Inscripcion::findOrFail($id);
         $inscripcion->kit == Inscripcion::KIT_POR_ENTREGAR ? $inscripcion->kit = Inscripcion::KIT_ENTREGADO : $inscripcion->kit = Inscripcion::KIT_POR_ENTREGAR;
         $inscripcion->update();
         return response()->json(['data' => $inscripcion], 200);
@@ -799,7 +797,7 @@ class InscripcionController extends Controller
      */
     public function getCosto(Request $request)
     {
-//        return response()->json(['data' => 'nnnn'], 403);
+
         if ($request->ajax()) {
 
             $producto = Producto::where('status', Producto::ACTIVO)
@@ -848,7 +846,6 @@ class InscripcionController extends Controller
     public function reciboInscripcion(Inscripcion $inscripcion)
     {
         setlocale(LC_ALL, 'es');
-//dd($inscripcion);
         $pdf = PDF::loadView('inscripcion.interna.recibo', compact('inscripcion'));
         return $pdf->stream('Recibo de Inscripcion No-' . $inscripcion->id . '.pdf');
 
@@ -1143,7 +1140,8 @@ class InscripcionController extends Controller
     }
 
 
-    public function getPayment(){
+    public function getPayment()
+    {
         return view('inscripcion.online.paymentez');
     }
 

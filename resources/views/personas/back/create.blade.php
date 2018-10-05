@@ -126,6 +126,8 @@
             language: 'es',
             dateFormat: 'yyyy-mm-dd',
             position: 'right bottom',
+            clearButton:true,
+            todayButton:new Date(),
             maxDate: new Date()
         });
 

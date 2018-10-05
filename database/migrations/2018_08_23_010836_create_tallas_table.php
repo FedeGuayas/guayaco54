@@ -17,7 +17,7 @@ class CreateTallasTable extends Migration
             $table->increments('id');
             $table->integer('talla');
             $table->integer('stock')->unsigned()->default(0);
-            $table->char('color')->default(\App\Talla::NEGRA);
+            $table->char('color');
             $table->string('status')->default(\App\Talla::INACTIVO);
 
             $table->unique(['talla', 'color']);

@@ -92,8 +92,8 @@
         $("#print_cuadre").on('click',function (e) {
             e.preventDefault();
             let escenario=$("#escenario option:selected").text();
-            let pto_cobro=''
-            if ($("#escenario").val()){
+            let pto_cobro='';
+            if ($("#escenario").val()!==''){
                 pto_cobro=escenario;
             }
             let fecha=$("#fecha").val();
@@ -102,7 +102,7 @@
                 importStyle: true,
                 removeInline: false,
 //                removeInlineSelector: "*",
-                header: '<h3>Cuadre de Caja.</h3><br>',
+                header: '<h3>Federación Deportiva del Guayas.</h3><br> <h4>Cuadre de Caja.</b>',
                 footer: 'Guayaco Runner 2018. <br>  '+pto_cobro+' <br> '+fecha+'',
                 formValues: true
             });

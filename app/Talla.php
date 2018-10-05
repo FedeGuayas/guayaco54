@@ -9,9 +9,6 @@ class Talla extends Model
     const ACTIVO ='1'; //Disponible
     const INACTIVO ='0';
 
-    const BLANCA ='b';
-    const NEGRA ='n';
-
     public $timestamps=false;
 
     protected $fillable = [
@@ -23,33 +20,33 @@ class Talla extends Model
     ];
 
 
-//    public function getColorAttribute($value)
-//    {
-//        return mb_strtoupper($value);
-//    }
-//    public function setColorAttribute($value)
-//    {
-//        $this->attributes['color'] =mb_strtolower($value);
-//    }
-
     public function getColorAttribute($value)
     {
-        if ($value==Talla::NEGRA){
-            return  'NEGRA';
-        }elseif ($this->attributes['color']==Talla::BLANCA){
-            return  'BLANCA';
-        }
+        return mb_strtoupper($value);
     }
     public function setColorAttribute($value)
     {
-        $color=strtolower($value);
-        if ($color=='negra' || $color=='n' ){
-            $this->attributes['color']=Talla::NEGRA;
-        }
-        if ($color=='blanca' || $color=='b'){
-            $this->attributes['color']=Talla::BLANCA;
-        }
+        $this->attributes['color'] =mb_strtolower($value);
     }
+
+//    public function getColorAttribute($value)
+//    {
+//        if ($value==Talla::NEGRA){
+//            return  'NEGRA';
+//        }elseif ($this->attributes['color']==Talla::BLANCA){
+//            return  'BLANCA';
+//        }
+//    }
+//    public function setColorAttribute($value)
+//    {
+//        $color=strtolower($value);
+//        if ($color=='negra' || $color=='n' ){
+//            $this->attributes['color']=Talla::NEGRA;
+//        }
+//        if ($color=='blanca' || $color=='b'){
+//            $this->attributes['color']=Talla::BLANCA;
+//        }
+//    }
 
 
     //una tallapuede estar en muchas inscripciones

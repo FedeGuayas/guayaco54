@@ -46,8 +46,9 @@ class FacturaController extends Controller
 
                 $comprobantes = Factura::
                 with('user', 'persona', 'mpago', 'descuento')
-                    ->where('facturas.status', '!=', Factura::CANCELADA)//no mostrar las canceladas
-                    ->select('facturas.*');
+                    ->where('facturas.status', Factura::PAGADA)//no mostrar las canceladas
+                    ->select('facturas.*')
+                ->orderBy('facturas.id', 'desc');
 
                 $action_buttons = '
             <div class="dropdown">

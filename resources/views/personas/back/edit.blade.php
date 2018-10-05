@@ -46,7 +46,7 @@
             </div>
             <div class="form-group col-md-4 col-sm-12">
                 {!! Form::label('gen','Género *',['class'=>'weight-600']) !!}
-                {!! Form::select('gen', ['Masculino' => 'Masculino', 'Femenino' => 'Femenino'],null, ['class'=>'selectpicker show-tick form-control','data-style'=>'btn-outline-primary','required']) !!}
+                {!! Form::select('gen', ['MASCULINO' => 'Masculino', 'FEMENINO' => 'Femenino'],$persona->gen, ['class'=>'selectpicker show-tick form-control','data-style'=>'btn-outline-primary','required']) !!}
             </div>
         </div>
         <div class="row">
@@ -60,14 +60,14 @@
                     <div class="custom-control custom-radio mb-5 mr-20">
                         <input type="radio" id="discapacidad-si" name="discapacitado"
                                class="custom-control-input" value="si"
-                               @if(old('discapacitado')==="si") checked @endif>
+                               @if($persona->discapacitado==\App\Persona::DISCAPACITADO) checked @endif>
                         <label class="custom-control-label weight-400"
                                for="discapacidad-si">Si</label>
                     </div>
                     <div class="custom-control custom-radio mb-5">
                         <input type="radio" id="discapacidad-no" name="discapacitado"
                                class="custom-control-input" value="no"
-                               @if(old('discapacitado')==="no") checked @endif checked>
+                               @if($persona->discapacitado==\App\Persona::NO_DISCAPACITADO) checked @endif>
                         <label class="custom-control-label weight-400"
                                for="discapacidad-no">No</label>
                     </div>
@@ -79,14 +79,14 @@
                     <div class="custom-control custom-radio mb-5 mr-20">
                         <input type="radio" id="privacidad-si" name="privado"
                                class="custom-control-input" value="si"
-                               @if(old('privado')==="si") checked @endif>
+                               @if( $persona->privado===\App\Persona::PERFIL_PRIVADO) checked @endif>
                         <label class="custom-control-label weight-400"
                                for="privacidad-si">Si</label>
                     </div>
                     <div class="custom-control custom-radio mb-5">
                         <input type="radio" id="privacidad-no" name="privado"
                                class="custom-control-input" value="no"
-                               @if(old('privado')==="no") checked @endif checked>
+                               @if($persona->privado===\App\Persona::PERFIL_PUBLICO) checked @endif>
                         <label class="custom-control-label weight-400"
                                for="privacidad-no">No</label>
                     </div>

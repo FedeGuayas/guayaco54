@@ -304,7 +304,7 @@ class PersonaController extends Controller
 
 
     /**
-     * Guardar a la persona
+     * Metodo para guardar a la persona forn y back
      * @param $request
      * @return Persona
      */
@@ -353,7 +353,7 @@ class PersonaController extends Controller
     }
 
     /**
-     * Metodo para editar las personas en el backend por parte de los trabjadores
+     * Metodo para editar las personas en el backend por parte de los trabajadores
      *
      * @param  \App\Persona $persona
      * @return \Illuminate\Http\Response
@@ -768,7 +768,6 @@ class PersonaController extends Controller
 
     }
 
-
     /**
      * No, eliminar, Cambiar estado, accedido solo por trabajadores
      *
@@ -777,7 +776,6 @@ class PersonaController extends Controller
      */
     public function destroy(Request $request,Persona $persona)
     {
-
         if ($request->user()->can('delete_personas')) {
 
             $persona->estado == Persona::PERFIL_INACTIVO ? $persona->estado = Persona::PERFIL_ACTIVO : $persona->estado = Persona::PERFIL_INACTIVO;

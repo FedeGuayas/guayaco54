@@ -66,7 +66,7 @@
                                                           id="stock-talla" data-toggle="tooltip" data-placement="top"
                                                           title="Stock">0</span>
                                                     {!! Form::select('talla', $tallas, $inscription->talla ? $inscription->talla->id : '', ['class'=>'selectpicker show-tick form-control','data-style'=>'btn-outline-primary','id'=>'talla','placeholder'=>'Seleccione ...', 'data-live-search'=>'true','data-container'=>'.main-container']) !!}
-                                                    @if ($talla_agotada) <small class="form-text text-danger">La talla ({{$inscription->talla->talla.'/'.$inscripcion->talla->color}}) de esta inscripción esta agotada. Si no desea cambiar de talla no es necesario que escoja ninguna</small>
+                                                    @if ($talla_agotada) <small class="form-text text-danger">La talla ({{$inscription->talla->talla.'/'.$inscription->talla->color}}) de esta inscripción esta agotada. Si no desea cambiar de talla no es necesario que escoja ninguna</small>
                                                     @endif
                                                 </div>
                                             </div>
@@ -459,12 +459,13 @@ $("#categoria_id").change(function () {
                 direccion_fact.val('N/A').prop('readonly', true);
             }
             else {
-                nombres_fact.val('').prop('readonly', false);
-                apellidos_fact.val('').prop('readonly', false);
-                num_doc_fact.val('').prop('readonly', false);
-                email_fact.val('').prop('readonly', false);
-                telefono_fact.val('').prop('readonly', false);
-                direccion_fact.val('').prop('readonly', false);
+                $('.form_noEnter').trigger("reset");
+                nombres_fact.prop('readonly', false);
+                apellidos_fact.prop('readonly', false);
+                num_doc_fact.prop('readonly', false);
+                email_fact.prop('readonly', false);
+                telefono_fact.prop('readonly', false);
+                direccion_fact.prop('readonly', false);
             }
         });
 

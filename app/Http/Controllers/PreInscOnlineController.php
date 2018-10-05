@@ -42,7 +42,7 @@ class PreInscOnlineController extends Controller
 
         if (!isset($user->persona)) {//no tiene perfil, debe crearlo antes de inscribirse
             $notification = [
-                'message_toastr' => 'Debe completar su perfil antes de hacer alguna inscripción',
+                'message_toastr' => 'Debe completar su perfil para poder hacer alguna inscripción',
                 'alert-type' => 'error'];
             return redirect()->route('getProfile')->with($notification);
         }
@@ -60,19 +60,17 @@ class PreInscOnlineController extends Controller
 
         $tallas_all = Talla::where('status', Talla::ACTIVO)
             ->where('stock', '>', 0)
-            ->select(DB::raw('concat (talla," - ",color) as talla,id'))
+            ->select(DB::raw('concat (talla," - ",upper(color)) as talla,id'))
             ->get();
         $tallas = $tallas_all->pluck('talla', 'id');
 
-        $deporte_all = Deporte::where('status', Deporte::ACTIVO)->get();
-        $deportes = $deporte_all->pluck('deporte', 'id');
 
         $mp = Mpago::where('status', Mpago::ACTIVO)->get();
         $formas_pago = $mp->pluck('nombre', 'id');
 
         $perfil = $user->persona;
 
-        return view('inscripcion.online.create', compact('categorias', 'tallas', 'deportes', 'perfil', 'formas_pago'));
+        return view('inscripcion.online.create', compact('categorias', 'tallas', 'perfil', 'formas_pago'));
     }
 
     /**

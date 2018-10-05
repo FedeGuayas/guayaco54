@@ -130,20 +130,13 @@ Route::middleware(['auth', 'isVerified'])->group(function () {
         //vista para crear inscripcion de un cliente en backend
         Route::get('inscriptions/{persona}', 'InscripcionController@create')->name('inscriptions.create');
 
+
         //Ajax para inscripciones obterner los circuitos para la categoria seleccionada
         Route::get('inscription/category/getCircuit', 'InscripcionController@getCatCir')->name('getCatCir');
         //Actualizar costo
-        Route::get('inscriptions/cost/{data?}', 'InscripcionController@getCosto')->name('admin.getCosto');
-        //Guardar Inscripcion de Backend
-//        Route::post('inscription/store', 'InscripcionController@store')->name('admin.inscription.store');
+        Route::get('inscription/getCost/{data?}', 'InscripcionController@getCosto')->name('admin.getCosto');
         //Listar todas las inscripciones AJAX
         Route::get('inscriptions/get/inscripciones', 'InscripcionController@getAll')->name('admin.getAllInscripcions');
-        //Vista para editar inscripcion
-//        Route::get('inscriptions/{inscripcion}/edit', 'InscripcionController@edit')->name('admin.inscription.edit');
-        //Actualizar inscripcion
-//        Route::put('inscription/{inscripcion}', 'InscripcionController@update')->name('admin.inscription.update');
-        //Eliminar inscripcion, pone a status c=cancelada
-//        Route::delete('inscription/{inscripcion}', 'InscripcionController@destroy')->name('admin.inscription.destroy');
         //Entregar Kit
         Route::post('inscription/{inscripcion}/setKit', 'InscripcionController@setKit')->name('admin.inscripcion.setKit');
         //Print recibo inscripcion backend

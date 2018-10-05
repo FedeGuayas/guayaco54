@@ -12,11 +12,11 @@
 <link rel="stylesheet" type="text/css" href="{{asset('css/my_paymentez.css')}}">
 <link href="https://cdn.paymentez.com/js/ccapi/stg/paymentez.min.css" rel="stylesheet" type="text/css"/>
 
-{{--<style>--}}
-{{--.error {--}}
-{{--color: #a94442;--}}
-{{--}--}}
-{{--</style>--}}
+<style>
+.error {
+color: #a94442;
+}
+</style>
 @endpush
 
 @section('content')

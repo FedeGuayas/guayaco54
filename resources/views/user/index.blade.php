@@ -88,7 +88,7 @@
             $(this).html('<input type="text" class="input-sm" placeholder="Buscar ' + title + '" />');
         });
         let table = $(".data-table").DataTable({
-            lengthMenu: [[3, 5, 10], [3, 5, 10]],
+            lengthMenu: [[5, 10, -1], [5, 10, 'Todos']],
             scrollCollapse: true,
             autoWidth: false,
             responsive: true,
