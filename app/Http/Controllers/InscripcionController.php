@@ -800,9 +800,14 @@ class InscripcionController extends Controller
 
         if ($request->ajax()) {
 
+            $ejercicio = Configuracion::where('status', Configuracion::ATIVO)
+                ->select('ejercicio_id')
+                ->first();
+
             $producto = Producto::where('status', Producto::ACTIVO)
                 ->where('categoria_id', $request->input('categoria_id'))
                 ->where('circuito_id', $request->input('circuito_id'))
+                ->where('ejercicio_id', $ejercicio->ejercicio_id)
                 ->first();
 
             $costo = 0;
@@ -944,7 +949,6 @@ class InscripcionController extends Controller
 
                 $inscripcion = Inscripcion::where('id', $id)->with('factura', 'user')->first();
                 $inscripcion->status = Inscripcion::PAGADA;
-                $inscripcion->inscripcion_type = Inscripcion::INSCRIPCION_PRESENCIAL; //aunque se haya hecho online se pago en fedeguayas
                 $inscripcion->user_edit = $user->id; //usuario que confirmo la reserva
                 $inscripcion->fecha = Carbon::now(); //fecha de aprobada
                 $inscripcion->escenario_id = $user->escenario_id; //escenario donde se confirmo la reserva

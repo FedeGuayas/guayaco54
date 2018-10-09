@@ -9,8 +9,8 @@
 
 @push('styles')
 <link rel="stylesheet" type="text/css" href="{{asset('themes/back/src/plugins/jquery-steps/jquery.steps.css')}}">
-<link rel="stylesheet" type="text/css" href="{{asset('css/my_paymentez.css')}}">
-<link href="https://cdn.paymentez.com/js/ccapi/stg/paymentez.min.css" rel="stylesheet" type="text/css"/>
+{{--<link rel="stylesheet" type="text/css" href="{{asset('css/my_paymentez.css')}}">--}}
+{{--<link href="https://cdn.paymentez.com/js/ccapi/stg/paymentez.min.css" rel="stylesheet" type="text/css"/>--}}
 
 <style>
 .error {
@@ -26,21 +26,22 @@ color: #a94442;
             <h4 class="text-info">Siga los pasos</h4>
             <p class="mb-30 font-14">Para inscribirse en la carrera</p>
         </div>
-
         <div class="form-text text-info small">Si desea inscribir a un amigo
-            <a href="{{route('getProfile')}}#asociados.tab('show')" class="weight-600"><i class="ion-man"></i>, click
-                aqui
-            </a> para cargar al Asociado
+            <a href="{{route('getProfile')}}#asociados.tab('show')" class="weight-600">, click aqui
+             para cargar al Asociado</a>
         </div>
 
         <div class="wizard-content">
 
-            {!! Form::open(['method' => 'post', 'autocomplete'=> 'off', 'class'=>'tab-wizard wizard-circle wizard','id'=>'form-wizard' ]) !!}
-            {!! Form::hidden('asociado_id',null,['id'=>'asociado_id']) !!}
+            {!! Form::open(['route'=>'inscription.store','method' => 'post', 'autocomplete'=> 'off', 'class'=>'tab-wizard wizard-circle wizard','id'=>'form-wizard' ]) !!}
 
             {{--Paso 1--}}
             <h5>Carrera</h5>
             <section>
+                @if ($asociado)
+                    {!! Form::hidden('asociado_id',$asociado->persona->id,['id'=>'asociado_id']) !!}
+                    <h6 class="weight-500 mb-20">{{$asociado->persona->getFullName()}}, <strong class="font-14 text-info">Edad : {{$asociado->persona->getEdad()}} años. </strong></h6>
+                @endif
 
                 <div class="row">
                     <div class="col-md-3 col-sm-12">
@@ -87,14 +88,14 @@ color: #a94442;
                     <div class="col-md-6">
                         <div class="form-group">
                             <label>Nombres :</label>
-                            {!! Form::text('nombres',$perfil->nombres,['class'=>'form-control required','style'=>'text-transform: uppercase', 'value'=>'{{ old("nombres") }}','required','id'=>'nombres']) !!}
+                            {!! Form::text('nombres_fact',$perfil->nombres,['class'=>'form-control required','style'=>'text-transform: uppercase', 'value'=>'{{ old("nombres_fact") }}','required','id'=>'nombres_fact']) !!}
 
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
                             <label>Apellidos :</label>
-                            {!! Form::text('apellidos',$perfil->apellidos,['class'=>'form-control required','style'=>'text-transform: uppercase','value'=>'{{ old("apellidos") }}','required','id'=>'apellidos']) !!}
+                            {!! Form::text('apellidos_fact',$perfil->apellidos,['class'=>'form-control required','style'=>'text-transform: uppercase','value'=>'{{ old("apellidos_fact") }}','required','id'=>'apellidos_fact']) !!}
                         </div>
                     </div>
                 </div>
@@ -102,13 +103,13 @@ color: #a94442;
                     <div class="col-md-6">
                         <div class="form-group">
                             <label>Identificación: </label>
-                            {!! Form::text('num_doc',$perfil->num_doc,['class'=>'form-control required','style'=>'text-transform: uppercase','value'=>'{{ old("num_doc") }}','required']) !!}
+                            {!! Form::text('num_doc_fact',$perfil->num_doc,['class'=>'form-control required','style'=>'text-transform: uppercase','value'=>'{{ old("num_doc_fact") }}','required']) !!}
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
                             <label>Email :</label>
-                            {!! Form::email('email',$perfil->email ? $perfil->email : Auth::user()->email,['class'=>'form-control required','placeholder'=>'Email','style'=>'text-transform: lowercase','value'=>'{{ old("email") }}','required']) !!}
+                            {!! Form::email('email_fact',$perfil->email ? $perfil->email : Auth::user()->email,['class'=>'form-control required','placeholder'=>'Email','style'=>'text-transform: lowercase','value'=>'{{ old("email_fact") }}','required']) !!}
                         </div>
                     </div>
                 </div>
@@ -117,13 +118,13 @@ color: #a94442;
                     <div class="col-md-6">
                         <div class="form-group">
                             <label>Teléfono :</label>
-                            {!! Form::text('telefono',$perfil->telefono ? $perfil->telefono : '',['class'=>'form-control','value'=>'{{ old("telefono") }}']) !!}
+                            {!! Form::text('telefono_fact',$perfil->telefono ? $perfil->telefono : '',['class'=>'form-control required','value'=>'{{ old("telefono_fact") }}']) !!}
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
                             <label>Dirección: </label>
-                            {!! Form::text('direccion',$perfil->direccion ? $perfil->direccion : '',['class'=>'form-control','value'=>'{{ old("direccion") }}']) !!}
+                            {!! Form::text('direccion_fact',$perfil->direccion ? $perfil->direccion : '',['class'=>'form-control required','value'=>'{{ old("direccion_fact") }}']) !!}
                         </div>
                     </div>
                 </div>
@@ -138,7 +139,7 @@ color: #a94442;
                     <div class="col-md-4">
                         <label class="weight-600">Términos y Condiciones</label>
                         <div class="custom-control custom-checkbox mb-5">
-                            <input type="checkbox" class="custom-control-input" id="terminos">
+                            <input type="checkbox" name="terminos" class="custom-control-input required" id="terminos" required>
                             <label class="custom-control-label" for="terminos">Acepto los
                                 <a href="#terminos-modal" data-toggle="modal" class="btn btn-link">
                                     <strong>Términos y Condiciones</strong>
@@ -149,53 +150,12 @@ color: #a94442;
                     <div class="col-sm-4">
                         <div class="form-group">
                             <label for="categoria_id" class="weight-600">Formas de Pago: *</label>
-                            {!! Form::select('mpago', $formas_pago,null, ['class'=>'selectpicker show-tick form-control required','data-style'=>'btn-outline-primary','id'=>'mpago','value'=>'{{ old("mpago") }}','data-container'=>'.main-container','placeholder'=>'Seleccione ...','disabled']) !!}
+                            {!! Form::select('mpago', $formas_pago,null, ['class'=>'selectpicker show-tick form-control required','data-style'=>'btn-outline-primary','id'=>'mpago','value'=>'{{ old("mpago") }}','data-container'=>'.main-container','placeholder'=>'Seleccione ...','required']) !!}
                         </div>
                     </div>
                 </div>
-                <div class="col-md-6">
-                    <a href="#" class="btn btn-outline-primary btn-block animated bounceIn" id="pagar" hidden>
-                        <i class="fa fa-save"></i> Guardar
-                    </a>
-                </div>
             </section>
             {!! Form::close() !!}
-
-
-                        <div class="row justify-content-center">
-                            <div class="col-md-8 col-sm-12">
-                                <div class="card card-deck border-radius-10 box-shadow bg-light animated fadeIn"
-                                     id="payment_card"
-                                     hidden>
-                                    <div class="card-body text-center">
-                                        <h4 class="card-title weight-500 mb-20">Detalles de su tarjeta</h4>
-                                        <h6 class="card-subtitle mb-2 text-muted mb-10">Mientras se realiza la transacción no
-                                            debe recargar el navegador ni regresar atrás. Por favor espere que termine la
-                                            operación</h6>
-                                        {!! Form::open(['class'=>'form-horizontal', 'id'=>'add-card-form']) !!}
-                                        <div class="paymentez-form" id="my-card" data-capture-name="true"
-                                             data-capture-email="true" data-capture-cellphone="true" data-icon-colour="#569B29">
-                                        </div>
-                                        <button class="btn btn-outline-success weight-500 btn-block"><i
-                                                    class="fa fa-money"></i> Proceder al Pago
-                                        </button>
-                                        <div id="messages_paymentez"></div>
-                                        {!! Form::close() !!}
-                                    </div>
-                                    <div id="loader" hidden>
-                                        <i class="fa fa-spinner fa-pulse fa-5x fa-fw text-success"></i>
-                                        <span class="sr-only">Cargando...</span></div>
-                                </div>
-                            </div>
-                        </div>
-
-
-
-
-
-
-
-
 
 
         </div>
@@ -207,12 +167,12 @@ color: #a94442;
 @endsection
 
 @push('scripts')
-<script src="https://cdn.paymentez.com/js/ccapi/stg/paymentez.min.js"></script>
+{{--<script src="https://cdn.paymentez.com/js/ccapi/stg/paymentez.min.js"></script>--}}
 <script src="{{asset('themes/back/src/plugins/jquery-validation/dist/jquery.validate.js')}}"></script>
 <script src="{{asset('themes/back/src/plugins/jquery-validation/dist/localization/messages_es.min.js')}}"></script>
 <script src="{{asset('themes/back/src/plugins/jquery-steps/jquery.steps.min.js')}}"></script>
 <script src="{{ asset('js/toastr_message.js') }}"></script>
-<script src="{{asset('plugins/paymentez/paymentez.js')}}"></script>
+{{--<script src="{{asset('plugins/paymentez/paymentez.js')}}"></script>--}}
 <script>
 
     $(document).ready(function (event) {
@@ -333,28 +293,29 @@ color: #a94442;
         //Habilitar / Desabilitar boton de pago
         $("#terminos").on('change', function (e) {
             if ($(this).is(':checked')) {
-                $("#mpago").prop('disabled', false);
                 $("#mpago option:eq(0)").prop('selected', true);
                 $("#mpago").selectpicker("refresh");
             } else {
-                $("#mpago").prop('disabled', true);
+                $("#mpago option:eq(0)").prop('selected', true);
                 $("#mpago").selectpicker("refresh");
-                $("#payment_card").prop('hidden', true).fadeOut(1000);
-                $("#pagar").prop('hidden', true).fadeOut(1000);
+//                $("#payment_card").prop('hidden', true).fadeOut(1000);
+//                $("#guardar").prop('hidden', true).fadeOut(1000);
             }
         });
 
-        $("#mpago").on('change', function () {
-            let str = $("#mpago option:selected").text().toLowerCase();
-            if (str.search("tarjeta") !== -1) {
-                $("#payment_card").prop('hidden', false);
-                $("#pagar").prop('hidden', true).fadeOut(1000);
-
-            } else {
-                $("#payment_card").prop('hidden', true).fadeOut(1000);
-                $("#pagar").prop('hidden', false);
-            }
-        });
+//        $("#mpago").on('change', function () {
+////            let str = $("#mpago option:selected").text().toLowerCase();
+//            console.log($(this).val());
+////            if (str.search("tarjeta") !== -1) {
+//            if ($(this).val() == '') {
+////                $("#payment_card").prop('hidden', false);
+//                $("#guardar").prop('hidden', true).fadeOut(1000);
+//
+//            } else {
+////                $("#payment_card").prop('hidden', true).fadeOut(1000);
+//                $("#guardar").prop('hidden', false);
+//            }
+//        });
 
 
     });
@@ -363,7 +324,7 @@ color: #a94442;
         headerTag: "h5",
         bodyTag: "section",
         transitionEffect: "fade",
-        enableFinishButton: false,
+        enableFinishButton: true,
         titleTemplate: '<span class="step">#index#</span> #title#',
 //        errorClass: "error",
         labels: {
@@ -406,11 +367,11 @@ color: #a94442;
 //            if (currentIndex === 2 && priorIndex === 3) {
 //                $(this).steps("previous");
 //            }
+            $('#finish').prop('disabled', true);
         },
 //        Se dispara antes de terminar y se puede usar para evitar la finalización al devolver falso. Muy útil para la validación de formularios.
         onFinishing: function (event, currentIndex) {
             let form = $(this);
-            $('finish').prop('disabled', true);
             //Deshabilitar la validación en los campos que están deshabilitados.
             form.validate().settings.ignore = ":disabled";
             // Comience la validación; Evitar el envío de formularios si es falso

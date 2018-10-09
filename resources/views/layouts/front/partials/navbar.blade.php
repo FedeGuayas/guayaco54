@@ -43,12 +43,16 @@
             </li>
             @if (Route::has('login'))
                 @if (Auth::check())
+
                     <li class="nav-item">
                         <a class="nav-link link text-white display-4" href="#">
-                            <span class="mbrib-shopping-cart mbr-iconfont mbr-iconfont-btn text-secondary"></span>Mi Carrito
-                            <span class="badge badge-danger">{{Session::has('cart') ? Session::get('cart')->totalQty : '1' }}</span>
+                            <span class="mbrib-shopping-cart mbr-iconfont mbr-iconfont-btn text-secondary"></span>
+                            <span class="badge badge-danger">
+                                    {{ Session::has('insc_pagar') ? Session::get('insc_pagar') : '0'  }}
+                                </span>
                         </a>
                     </li>
+
                     <li class="nav-item dropdown">
                         <a class="nav-link link text-white dropdown-toggle display-4" href="#"
                            data-toggle="dropdown-submenu" aria-expanded="false">

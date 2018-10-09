@@ -107,7 +107,8 @@
                     <ul class="submenu">
                         <li><a href="{{route('inscription.create')}}">Nueva Inscripción <i
                                         class="fa fa-pencil-square-o"></i></a>
-                        <li><a href="#">Comprobantes <i class="fa fa-sticky-note-o"></i></a>
+                        <li><a href="{{route('user.getComprobantes')}}">Comprobantes <span class="badge-pill badge-danger ">
+                                    {{ Session::has('insc_pagar') ?  Session::get('insc_pagar') : '0'}}</span>
                     </ul>
                 </li>
                 @endhasallroles

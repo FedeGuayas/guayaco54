@@ -80,7 +80,7 @@
                                         </div>
                                     </div>
                                     <div class="view-contact">
-                                        <a href="#">Incribir</a>
+                                        <a href="{{route('inscription.create',$asociado->id)}}">Incribir</a>
                                     </div>
                                 </div>
                             </li>
