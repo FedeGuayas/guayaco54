@@ -109,6 +109,8 @@
                                         class="fa fa-pencil-square-o"></i></a>
                         <li><a href="{{route('user.getComprobantes')}}">Comprobantes <span class="badge-pill badge-danger ">
                                     {{ Session::has('insc_pagar') ?  Session::get('insc_pagar') : '0'}}</span>
+                            </a>
+                        </li>
                     </ul>
                 </li>
                 @endhasallroles

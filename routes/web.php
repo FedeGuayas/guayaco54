@@ -92,7 +92,7 @@ Route::middleware(['auth', 'isVerified'])->group(function () {
         //Obtener stock de tallas
         Route::get('inscription/tallas/stock/{data?}', 'PreInscOnlineController@getTallaStock')->name('user.getTallaStock');
         //Obtener comprobantes del usuario
-        Route::get('inscription/get/comprobantes', 'PreInscOnlineController@getCOmprobantes')->name('user.getComprobantes');
+        Route::get('inscription/get/comprobantes', 'PreInscOnlineController@getComprobantes')->name('user.getComprobantes');
 
 
 

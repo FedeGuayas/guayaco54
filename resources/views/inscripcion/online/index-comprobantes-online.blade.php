@@ -3,8 +3,8 @@
 @section('page_title','Comprobantes')
 
 @section('breadcrumbs')
-    {!! Breadcrumbs::render('home') !!}
-@stop
+    {!! Breadcrumbs::render('comprobante-online') !!}
+@endsection
 
 @push('styles')
 <link rel="stylesheet" type="text/css"
@@ -23,6 +23,10 @@
             <div class="pull-left">
                 <h5 class="text-blue">Todos sus comprobantes</h5>
             </div>
+        </div>
+        <div class="form-text small mb-30">En Acción podrá imprimir su comprobante de inscripción, que le permitirá realizar el pago o el registro de la inscripción una vez haya realizado el pago. Con este último podrá retirar el kit para participar en la carrera.
+            <br>
+            <strong>Pasas 48 horas de realizada la inscripción sino realiza el pago de la misma esta será eliminada del sistema. </strong>
         </div>
         <div class="row">
             <table class="data-table stripe hover nowrap compact">
@@ -45,9 +49,15 @@
                             <div class="dropdown">
                                 <a class="btn btn-outline-primary dropdown-toggle" href="#" role="button" data-toggle="dropdown"><i class="fa fa-ellipsis-h"></i></a>
                                 <div class="dropdown-menu dropdown-menu-left">
-                                        <a class="dropdown-item" href="#" data-toggle="tooltip" data-placement="top" title="Imprimir Recibo" target="_blank">
+                                    @if ($c->factura->status===\App\Factura::PENDIENTE && $c->status===\App\Inscripcion::RESERVADA)
+                                        <a class="dropdown-item" href="#" data-toggle="tooltip" data-placement="top" title="Imprimir Comprobante" target="_blank">
                                             <i class="fa fa-file-pdf-o text-primary"></i> Imprimir
                                         </a>
+                                    @elseif(($c->factura->status===\App\Factura::PAGADA && $c->status===\App\Inscripcion::PAGADA))
+                                    <a class="dropdown-item" href="#" data-toggle="tooltip" data-placement="top" title="Imprimir Registro" target="_blank">
+                                        <i class="fa fa-file-pdf-o text-primary"></i> Imprimir
+                                    </a>
+                                    @endif
                                         <a class="dropdown-item delete" href="#" data-id="#" data-toggle="tooltip" data-placement="top" title="Eliminar">
                                             <i class="fa fa-trash-o text-danger"></i>  Cancelar
                                         </a>
@@ -58,7 +68,7 @@
                         <td>{{$c->producto->circuito->circuito}}</td>
                         <td>{{$c->producto->categoria->categoria}}</td>
                         <td>{{$c->created_at}}</td>
-                        <td>{{ number_format($c->factura->mpago->valor,2,'.', ' ') }}</td>
+                        <td>$ {{ number_format($c->factura->total,2,'.', ' ') }}</td>
                         <td>{{$c->factura->mpago->nombre}}</td>
                         <td>
                             @if (\Carbon\Carbon::now()->diffInHours($c->created_at)>48)

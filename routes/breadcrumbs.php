@@ -294,4 +294,14 @@ Breadcrumbs::register('reserva-edit', function($breadcrumbs,$inscripcion)
 });
 
 
+//// Menu Ususario>Comprobantes
+Breadcrumbs::register('comprobante-online', function($breadcrumbs)
+{
+    $breadcrumbs->parent('home');
+    $breadcrumbs->push('Inscripciones', route('user.getComprobantes'));
+});
+
+
+
+
 
