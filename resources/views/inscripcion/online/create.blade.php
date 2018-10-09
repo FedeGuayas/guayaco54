@@ -9,9 +9,6 @@
 
 @push('styles')
 <link rel="stylesheet" type="text/css" href="{{asset('themes/back/src/plugins/jquery-steps/jquery.steps.css')}}">
-{{--<link rel="stylesheet" type="text/css" href="{{asset('css/my_paymentez.css')}}">--}}
-{{--<link href="https://cdn.paymentez.com/js/ccapi/stg/paymentez.min.css" rel="stylesheet" type="text/css"/>--}}
-
 <style>
 .error {
 color: #a94442;
@@ -167,12 +164,12 @@ color: #a94442;
 @endsection
 
 @push('scripts')
-{{--<script src="https://cdn.paymentez.com/js/ccapi/stg/paymentez.min.js"></script>--}}
+
 <script src="{{asset('themes/back/src/plugins/jquery-validation/dist/jquery.validate.js')}}"></script>
 <script src="{{asset('themes/back/src/plugins/jquery-validation/dist/localization/messages_es.min.js')}}"></script>
 <script src="{{asset('themes/back/src/plugins/jquery-steps/jquery.steps.min.js')}}"></script>
 <script src="{{ asset('js/toastr_message.js') }}"></script>
-{{--<script src="{{asset('plugins/paymentez/paymentez.js')}}"></script>--}}
+
 <script>
 
     $(document).ready(function (event) {

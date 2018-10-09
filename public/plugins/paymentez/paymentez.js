@@ -28,7 +28,7 @@ $(function() {
      * @param paymentez_client_app_code provided by Paymentez.
      * @param paymentez_client_app_key provided by Paymentez.
      */
-    Paymentez.init('stg', 'PAYMENTEZ_CLIENT_APP_CODE', 'PAYMENTEZ_CLIENT_APP_KEY');
+    Paymentez.init('stg', 'FEDE-EC-CLIENT', 'a8N2cTAlauosoRDxM2mPYbdnW9ALmP');
 
     var form              = $("#add-card-form");
     var submitButton            = form.find("button");

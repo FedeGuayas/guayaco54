@@ -24,9 +24,12 @@
                 <h5 class="text-blue">Todos sus comprobantes</h5>
             </div>
         </div>
-        <div class="form-text small mb-30">En Acción podrá imprimir su comprobante de inscripción, que le permitirá realizar el pago o el registro de la inscripción una vez haya realizado el pago. Con este último podrá retirar el kit para participar en la carrera.
+        <div class="form-text small mb-30">En Acción podrá imprimir su comprobante de inscripción, que le permitirá
+            realizar el pago o el registro de la inscripción una vez haya realizado el pago. Con este último podrá
+            retirar el kit para participar en la carrera.
             <br>
-            <strong>Pasas 48 horas de realizada la inscripción sino realiza el pago de la misma esta será eliminada del sistema. </strong>
+            <strong>Pasas 48 horas de realizada la inscripción sino realiza el pago de la misma esta será eliminada del
+                sistema. </strong>
         </div>
         <div class="row">
             <table class="data-table stripe hover nowrap compact">
@@ -34,8 +37,8 @@
                 <tr>
                     <th class="datatable-nosort">Acción</th>
                     <th class="datatable-nosort">Insc.</th>
-                    <th >Circuito</th>
-                    <th >Categoría</th>
+                    <th>Circuito</th>
+                    <th>Categoría</th>
                     <th>Fecha</th>
                     <th>Valor</th>
                     <th>Forma Pago</th>
@@ -47,24 +50,28 @@
                     <tr>
                         <td class="dt-nosort">
                             <div class="dropdown">
-                                <a class="btn btn-outline-primary dropdown-toggle" href="#" role="button" data-toggle="dropdown"><i class="fa fa-ellipsis-h"></i></a>
+                                <a class="btn btn-outline-primary dropdown-toggle" href="#" role="button"
+                                   data-toggle="dropdown"><i class="fa fa-ellipsis-h"></i></a>
                                 <div class="dropdown-menu dropdown-menu-left">
-                                    @if ($c->factura->status===\App\Factura::PENDIENTE && $c->status===\App\Inscripcion::RESERVADA)
-                                        <a class="dropdown-item" href="#" data-toggle="tooltip" data-placement="top" title="Imprimir Comprobante" target="_blank">
+                                    @if ( ($c->factura->status===\App\Factura::PENDIENTE && $c->status===\App\Inscripcion::RESERVADA) && strtolower($c->factura->mpago->nombre)!= 'tarjeta')
+                                        <a class="dropdown-item" href="#" data-toggle="tooltip" data-placement="top"
+                                           title="Imprimir Comprobante" target="_blank">
                                             <i class="fa fa-file-pdf-o text-primary"></i> Imprimir
                                         </a>
                                     @elseif(($c->factura->status===\App\Factura::PAGADA && $c->status===\App\Inscripcion::PAGADA))
-                                    <a class="dropdown-item" href="#" data-toggle="tooltip" data-placement="top" title="Imprimir Registro" target="_blank">
-                                        <i class="fa fa-file-pdf-o text-primary"></i> Imprimir
-                                    </a>
-                                    @endif
-                                        <a class="dropdown-item delete" href="#" data-id="#" data-toggle="tooltip" data-placement="top" title="Eliminar">
-                                            <i class="fa fa-trash-o text-danger"></i>  Cancelar
+                                        <a class="dropdown-item" href="#" data-toggle="tooltip" data-placement="top"
+                                           title="Imprimir Registro" target="_blank">
+                                            <i class="fa fa-file-pdf-o text-primary"></i> Imprimir
                                         </a>
+                                    @endif
+                                    <a class="dropdown-item delete" href="#" data-id="#" data-toggle="tooltip"
+                                       data-placement="top" title="Eliminar">
+                                        <i class="fa fa-trash-o text-danger"></i> Cancelar
+                                    </a>
                                 </div>
                             </div>
                         </td>
-                        <td >{{$c->id}}</td>
+                        <td>{{$c->id}}</td>
                         <td>{{$c->producto->circuito->circuito}}</td>
                         <td>{{$c->producto->categoria->categoria}}</td>
                         <td>{{$c->created_at}}</td>
@@ -75,9 +82,14 @@
                                 <span class="text-danger" data-toggle="tooltip" data-placement="left"
                                       title="Vencida (+48H)"> <i class="fa fa-trash-o fa-2x"></i></span>
                             @else
+                                @if ( ($c->factura->status===\App\Factura::PENDIENTE && $c->status===\App\Inscripcion::RESERVADA) && strtolower($c->factura->mpago->nombre)== 'tarjeta')
+                                    <button class="btn btn-outline-success btn-sm js-paymentez-checkout" data-toggle="tooltip" data-placement="top" title="Proceder al pago">Pagar</button>
+                                @else
                                 <span class="text-success" data-toggle="tooltip" data-placement="left"
                                       title="En tiempo"><i class="fa fa-check-square-o fa-2x"></i></span>
+                                @endif
                             @endif
+
                         </td>
                     </tr>
                 @endforeach
@@ -96,6 +108,8 @@
 <script src="{{asset('themes/back/src/plugins/datatables/media/js/dataTables.responsive.js')}}"></script>
 <script src="{{asset('themes/back/src/plugins/datatables/media/js/responsive.bootstrap4.js')}}"></script>
 <script src="{{ asset('js/toastr_message.js') }}"></script>
+<script src="https://cdn.paymentez.com/checkout/1.0.1/paymentez-checkout.min.js"></script>
+<script src="{{asset('plugins/paymentez/paymentez-check-out.js')}}"></script>
 <script>
 
     $('document').ready(function () {
@@ -153,7 +167,7 @@
                 })
             },
         }).then((result) => { //respuesta ajax
-            //confirmo la acción
+//confirmo la acción
             if (result.value) {
                 swal({
                     title: ':)',
@@ -168,7 +182,7 @@
                         }, 1);
                     }
                 })
-                //cancelo la eliminacion
+//cancelo la eliminacion
             } else if (result.dismiss === swal.DismissReason.cancel) {// 'cancel', 'overlay', 'close', and 'timer'
                 swal(
                     'Acción cancelada',

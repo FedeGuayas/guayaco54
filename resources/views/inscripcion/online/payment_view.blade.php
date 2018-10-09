@@ -1,14 +1,12 @@
 <div class="row justify-content-center">
-    <div class="col-md-8 col-sm-12">
-        <div class="card card-deck border-radius-10 box-shadow bg-light animated fadeIn"
-             id="payment_card"
-             hidden>
+    <div class="col-sm-12">
+        <div class="card card-deck border-radius-10 box-shadow bg-light animated fadeIn" id="payment_card">
             <div class="card-body text-center">
                 <h4 class="card-title weight-500 mb-20">Detalles de su tarjeta</h4>
                 <h6 class="card-subtitle mb-2 text-muted mb-10">Mientras se realiza la transacción no
                     debe recargar el navegador ni regresar atrás. Por favor espere que termine la
                     operación</h6>
-                {!! Form::open(['class'=>'form-horizontal', 'id'=>'add-card-form']) !!}
+                {!! Form::open(['class'=>'form-horizontal', 'id'=>'add-card-form', 'method'=>'post']) !!}
                 <div class="paymentez-form" id="my-card" data-capture-name="true"
                      data-capture-email="true" data-capture-cellphone="true" data-icon-colour="#569B29">
                 </div>

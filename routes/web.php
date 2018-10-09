@@ -101,7 +101,7 @@ Route::middleware(['auth', 'isVerified'])->group(function () {
 
         //PAYMENTEZ
         //cancelar
-//        Route::get('inscripcion/pay/get-payment','InscripcionController@getPayment')->name('inscripcion.getPayment');
+//        Route::get('payment/check-out','PaymentController@getCheckOut')->name('payment.getCheckOut');
 
     });
 

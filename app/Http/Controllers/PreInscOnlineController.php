@@ -294,7 +294,7 @@ class PreInscOnlineController extends Controller
             $notification = [
                 'message_toastr' => 'Ud se ha inscrito correctamente. Compruebe sus comprobantes en su menú de usuario.',
                 'alert-type' => 'success'];
-            return redirect()->route('inscription.index')->with($notification);
+            return redirect()->route('user.getComprobantes')->with($notification);
 
         } catch (\Exception $e) {
             DB::rollBack();
