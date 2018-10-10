@@ -17,6 +17,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Facades\App\Classes\LogActivity;
 use Illuminate\Support\Facades\Validator;
+use Barryvdh\DomPDF\Facade as PDF;
 
 class PreInscOnlineController extends Controller
 {
@@ -58,12 +59,12 @@ class PreInscOnlineController extends Controller
         $data = $request->all();
         $asociado_id = key($data);
 
-        $asociado=Asociado::with('persona')->where('id',$asociado_id)->first();
+        $asociado = Asociado::with('persona')->where('id', $asociado_id)->first();
 
         //incripcion de asociado
-        if (isset($asociado)){
+        if (isset($asociado)) {
 
-            $edad=$asociado->persona->getEdad();
+            $edad = $asociado->persona->getEdad();
 
             $cat_all = Categoria::where('status', Categoria::ACTIVO)
                 ->where('categoria', 'NOT LIKE', '%deport%')//en online no se tendra en cuenta la categoria Deportistas
@@ -76,7 +77,7 @@ class PreInscOnlineController extends Controller
 
             $perfil = $asociado->persona;
 
-        }else{
+        } else {
             //inscripcion del usuario logueado
             $edad = $user->persona->getEdad();
 
@@ -103,14 +104,13 @@ class PreInscOnlineController extends Controller
         $formas_pago = $mp->pluck('nombre', 'id');
 
 
-
-        return view('inscripcion.online.create', compact('categorias', 'tallas', 'perfil', 'formas_pago','asociado'));
+        return view('inscripcion.online.create', compact('categorias', 'tallas', 'perfil', 'formas_pago', 'asociado'));
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
 
@@ -163,16 +163,16 @@ class PreInscOnlineController extends Controller
             DB::beginTransaction();
 
             $persona_id = $user->persona->id; //persona a inscribir es el perfil del usuario logeado
-            $asociado_id=$request->input('asociado_id'); //estoy cargando el persona_id
-            if (isset($asociado_id)){
-                $asociado=Asociado::where('user_id',$user->id)->where('persona_id',$asociado_id)->first();
-                if (!isset($asociado)){
+            $asociado_id = $request->input('asociado_id'); //estoy cargando el persona_id
+            if (isset($asociado_id)) {
+                $asociado = Asociado::where('user_id', $user->id)->where('persona_id', $asociado_id)->first();
+                if (!isset($asociado)) {
                     $notification = [
                         'message_toastr' => "No se encontró el asociado a su cuenta.",
                         'alert-type' => 'error'];
                     return back()->with($notification);
-                }else {
-                    $persona_id=$asociado_id; //la persona a inscribir seria el perfil del asociado
+                } else {
+                    $persona_id = $asociado_id; //la persona a inscribir seria el perfil del asociado
                 }
 
             }
@@ -262,11 +262,11 @@ class PreInscOnlineController extends Controller
             $inscripcion->escenario_id = NULL; //la inscripcion es online
             $inscripcion->producto()->associate($producto);
             $inscripcion->persona()->associate($persona); //perfil del inscrito
-            $inscripcion->user_id=NULL; //id del empleado, la inscripcion no la hizo un empleado
+            $inscripcion->user_id = NULL; //id del empleado, la inscripcion no la hizo un empleado
             $inscripcion->user_edit = NULL;
             $inscripcion->deporte_id = NULL;
             $inscripcion->factura()->associate($factura);
-            $inscripcion->fecha =$ahora; //fecha de aprobacion, no se ha aprobado , inicialmente la fecha de inscripcion.
+            $inscripcion->fecha = $ahora; //fecha de aprobacion, no se ha aprobado , inicialmente la fecha de inscripcion.
             $inscripcion->num_corredor = NULL; //poner el numero al pagar
             $inscripcion->kit = NULL; //1 cuando sea entregado
             $inscripcion->talla()->associate($talla);
@@ -300,7 +300,7 @@ class PreInscOnlineController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
 //            $message = $e->getMessage();
-           $message = 'Lo sentimos! Ocurrio un error y no se pudo crear la inscripción.';
+            $message = 'Lo sentimos! Ocurrio un error y no se pudo crear la inscripción.';
             $notification = [
                 'message_toastr' => $message,
                 'alert-type' => 'error'];
@@ -312,7 +312,7 @@ class PreInscOnlineController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param  int $id
      * @return \Illuminate\Http\Response
      */
     public function show($id)
@@ -323,7 +323,7 @@ class PreInscOnlineController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
+     * @param  int $id
      * @return \Illuminate\Http\Response
      */
     public function edit($id)
@@ -334,8 +334,8 @@ class PreInscOnlineController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param  \Illuminate\Http\Request $request
+     * @param  int $id
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
@@ -346,13 +346,12 @@ class PreInscOnlineController extends Controller
     /**
      * El usuario podra eliminar sus inscripciones pendientes
      *
-     * @param  int  $id
+     * @param  int $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Request $request,Inscripcion $inscription)
+    public function destroy(Request $request, Inscripcion $inscription)
     {
-        if ($request->user()->id===$inscription->user_online && $request->ajax()) {
-
+        if ($request->user()->id === $inscription->user_online && $request->ajax()) {
             try {
 
                 DB::beginTransaction();
@@ -413,7 +412,6 @@ class PreInscOnlineController extends Controller
     }
 
 
-
     /**
      * Obtener el costo de la inscripcion
      */
@@ -468,18 +466,46 @@ class PreInscOnlineController extends Controller
      */
     public function getComprobantes(Request $request)
     {
-        $user=$request->user();
+        $user = $request->user();
 
         $ejercicio = Configuracion::where('status', Configuracion::ATIVO)
             ->select('ejercicio_id')
             ->first();
 
-        $comprobantes = Inscripcion::with('producto','factura')
+        $comprobantes = Inscripcion::with('producto', 'factura')
             ->where('user_online', $user->id)
             ->where('ejercicio_id', $ejercicio->ejercicio_id)
             ->get();
 
-        return view('inscripcion.online.index-comprobantes-online',compact('comprobantes'));
+        return view('inscripcion.online.index-comprobantes-online', compact('comprobantes'));
+    }
+
+    /**
+     * Imprimir comprobante de inscripcion para poder realizar pago en WU o fedeguayas
+     * @param Inscripcion $inscription
+     * @return mixed
+     */
+    public function comprobantePDF(Inscripcion $inscription)
+    {
+        Carbon::setLocale(config('app.locale'));
+
+        $pdf = PDF::loadView('inscripcion.online.comprobantes.pre-comprobante', compact('inscription'));
+
+        return $pdf->stream('Comprobante pre-inscripcion.pdf');
+
+    }
+
+    /**
+     * Imprimir Registro de Inscripción (Inscripcion ya pagada y aprobada del usuario Online)
+     * @param Factura $factura
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function registroInscripcion(Inscripcion $inscription)
+    {
+        setlocale(LC_ALL, 'es');
+        $pdf = PDF::loadView('inscripcion.online.comprobantes.registro', compact('inscription'));
+        return $pdf->stream('Recibo de Inscripcion No-' . $inscription->id . '.pdf');
+
     }
 
 

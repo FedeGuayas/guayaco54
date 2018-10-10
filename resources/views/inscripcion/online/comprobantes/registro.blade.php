@@ -13,7 +13,7 @@
 <div class="header">
 
 
-    <div class="descripcion"><h4>Registro # {{sprintf("%'.04d",$inscripcion->id)}}</h4></div>
+    <div class="descripcion"><h4>Registro # {{sprintf("%'.04d",$inscription->id)}}</h4></div>
 
 
 </div>
@@ -28,35 +28,35 @@
             <tbody>
             <tr>
                 <th>Nombres y Apellidos</th>
-                <td>{{$inscripcion->persona->getFullName()}}</td>
+                <td>{{$inscription->persona->getFullName()}}</td>
             </tr>
             <tr>
                 <th>Identificación</th>
-                <td>{{$inscripcion->persona->num_doc}}</td>
+                <td>{{$inscription->persona->num_doc}}</td>
             </tr>
             <tr>
                 <th>Fecha Nac.</th>
-                <td>{{$inscripcion->persona->fecha_nac}}</td>
+                <td>{{$inscription->persona->fecha_nac}}</td>
             </tr>
             <tr>
                 <th>Edad</th>
-                <td>{{$inscripcion->persona->getEdad()}}</td>
+                <td>{{$inscription->persona->getEdad()}}</td>
             </tr>
             <tr>
                 <th>Sexo</th>
-                <td>{{$inscripcion->persona->gen}}</td>
+                <td>{{$inscription->persona->gen}}</td>
             </tr>
             <tr>
                 <th>Teléfono</th>
-                <td>{{$inscripcion->persona->telefono}}</td>
+                <td>{{$inscription->persona->telefono}}</td>
             </tr>
             <tr>
                 <th>Email</th>
-                <td>{{$inscripcion->persona->email}}</td>
+                <td>{{$inscription->persona->email}}</td>
             </tr>
             <tr>
                 <th>Fecha Inscripción</th>
-                <td>{{$inscripcion->created_at}}</td>
+                <td>{{$inscription->created_at}}</td>
             </tr>
             </tbody>
         </table>
@@ -68,27 +68,27 @@
             <tbody>
             <tr>
                 <th>Categoría</th>
-                <td>{{$inscripcion->producto->categoria->categoria}}</td>
+                <td>{{$inscription->producto->categoria->categoria}}</td>
             </tr>
             <tr>
                 <th>Circuito</th>
-                <td>{{$inscripcion->producto->circuito->circuito}}</td>
+                <td>{{$inscription->producto->circuito->circuito}}</td>
             </tr>
             <tr>
                 <th>Número</th>
-                <td>{{$inscripcion->num_corredor}}</td>
+                <td>{{$inscription->num_corredor}}</td>
             </tr>
-            @if ($inscripcion->talla)
+            @if ($inscription->talla)
                 <tr>
                     <th>Talla Camiseta</th>
                     <td>
-                        {{$inscripcion->talla->talla}}
+                        {{$inscription->talla->talla}}
                     </td>
                 </tr>
                 <tr>
                     <th>Color Camiseta</th>
                     <td>
-                        {{$inscripcion->talla->color}}
+                        {{$inscription->talla->color}}
                     </td>
                 </tr>
             @endif
@@ -114,16 +114,16 @@
 
             </thead>
             <tbody>
-            @if ($inscripcion->factura)
+            @if ($inscription->factura)
             <tr>
-                <td>{{$inscripcion->factura->nombre}}</td>
-                <td>{{$inscripcion->factura->identificacion}}</td>
-                <td>{{$inscripcion->factura->telefono}}</td>
-{{--                <td>{{$inscripcion->factura->direccion}}</td>--}}
-                <td>{{$inscripcion->factura->email}}</td>
-                <td>$ {{number_format($inscripcion->factura->subtotal,'2','.',' ')}}</td>
-                <td>$ {{number_format($inscripcion->factura->descuento,'2','.',' ')}}</td>
-                <td class="precio_total">$ {{number_format($inscripcion->factura->total,'2','.',' ')}}</td>
+                <td>{{$inscription->factura->nombre}}</td>
+                <td>{{$inscription->factura->identificacion}}</td>
+                <td>{{$inscription->factura->telefono}}</td>
+{{--                <td>{{$inscription->factura->direccion}}</td>--}}
+                <td>{{$inscription->factura->email}}</td>
+                <td>$ {{number_format($inscription->factura->subtotal,'2','.',' ')}}</td>
+                <td>$ {{number_format($inscription->factura->descuento,'2','.',' ')}}</td>
+                <td class="precio_total">$ {{number_format($inscription->factura->total,'2','.',' ')}}</td>
             </tr>
                 @else
                 <tr class="text-center">
@@ -142,19 +142,15 @@
 
     <div class="cancelado">
         <table class="table">
-            <caption>CANCELADO POR:</caption>
+            <caption>CANCELADO:</caption>
             <thead>
             <tr>
-                <th>Usuario:</th>
-                <th>Pto Cobro:</th>
                 <th>Fecha</th>
             </tr>
             </thead>
             <tbody>
             <tr>
-                <td>{{$inscripcion->user->getFullName()}}</td>
-                <td>{{$inscripcion->escenario ? $inscripcion->escenario->escenario : '-'}}</td>
-                <td>{{$inscripcion->created_at->formatLocalized('%d %B %Y')}}</td>
+                <td>{{$inscription->factura->updated_at->formatLocalized('%d %B %Y')}}</td>
             </tr>
             </tbody>
         </table>

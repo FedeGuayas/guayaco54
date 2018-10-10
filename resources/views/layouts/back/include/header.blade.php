@@ -36,7 +36,7 @@
             </div>
         </div>
 
-        @if ( $insc_pagar > 0) )
+        @if ( $insc_pagar > 0)
         <div class="user-info-dropdown">
             <div class="dropdown">
                 <a class="dropdown-toggle" href="#" role="button" data-toggle="dropdown">

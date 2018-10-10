@@ -843,7 +843,7 @@ class InscripcionController extends Controller
 
 
     /**BACK
-     * Imprimir recibo de inscripcion comprobante de pago
+     * Imprimir Registro de Inscripción (Inscripcion ya pagada y aprobada)
      * @param Factura $factura
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
@@ -942,8 +942,18 @@ class InscripcionController extends Controller
                 DB::beginTransaction();
                 $user = $request->user();
 
+                //CREAR NUMERO DE CORREDOR
+                $maxNumCorr = DB::table('registros')->max('numero'); //maximo valor en la columna numero
+                if (is_numeric($maxNumCorr)) {
+                    $nexNumCorredor = $maxNumCorr + 1;
+                } else {
+                    $maxNumCorr = 0;
+                    $nexNumCorredor = 1;
+                }
+
                 $inscripcion = Inscripcion::where('id', $id)->with('factura', 'user')->first();
                 $inscripcion->status = Inscripcion::PAGADA;
+                $inscripcion->num_corredor = $nexNumCorredor;
                 $inscripcion->user_edit = $user->id; //usuario que confirmo la reserva
                 $inscripcion->fecha = Carbon::now(); //fecha de aprobada
                 $inscripcion->escenario_id = $user->escenario_id; //escenario donde se confirmo la reserva
@@ -953,6 +963,15 @@ class InscripcionController extends Controller
                 $factura->status = Factura::PAGADA;
                 $factura->fecha_edit = Carbon::now();
                 $factura->update();
+
+                $persona=$inscripcion->persona;
+
+                //CREAR EL REGISTRO DEL CORREDOR
+                $registro = new Registro();
+                $registro->numero = $nexNumCorredor;
+                $registro->inscripcion()->associate($inscripcion);
+                $registro->persona()->associate($persona);
+                $registro->save();
 
                 LogActivity::addToLog('Reserva confirmada,(inscripcion->id) ', $request->user(), $inscripcion->id);
 

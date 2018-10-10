@@ -93,7 +93,10 @@ Route::middleware(['auth', 'isVerified'])->group(function () {
         Route::get('inscription/tallas/stock/{data?}', 'PreInscOnlineController@getTallaStock')->name('user.getTallaStock');
         //Obtener comprobantes del usuario
         Route::get('payment/check-out', 'PreInscOnlineController@getComprobantes')->name('user.getComprobantes');
-
+        //Comprobante de inscripcion, para realizar pago en WU o Contado en Fedeguayas
+        Route::get('inscription/comprobante/{inscription}', 'PreInscOnlineController@comprobantePDF')->name('user.comprobantePDF');
+        //Registro de inscripcion aprobado y pagado de usuario online
+        Route::get('inscription/registro/{inscription}/', 'PreInscOnlineController@registroInscripcion')->name('user.registroInscripcion');
 
 
         Route::resource('inscription', 'PreInscOnlineController', ['except' => ['show']]);

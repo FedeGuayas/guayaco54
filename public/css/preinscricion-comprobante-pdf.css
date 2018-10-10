@@ -1,0 +1,39 @@
+/*body {
+    width: 1cm;
+}
+*/
+
+body{
+
+    font-family: sans-serif;
+}
+
+td {
+    border:hidden;
+}
+
+
+@page {
+    margin: 5px 5px;
+}
+
+
+.logo{
+    background: url(../images/fdg-logo.png)  fixed center;
+    width: 100%;
+    height: 120px;
+    position: absolute;
+    -webkit-print-color-adjust: exact;
+    margin-top: 100px;
+    color: #d2f2f5;
+    border-radius: 50px;
+    opacity: 0.2;
+    top: 60px;
+    transform: rotate(-20deg);
+    -webkit-transform: rotate(-20deg);
+    -moz-transform: rotate(-20deg);
+
+}
+
+
+

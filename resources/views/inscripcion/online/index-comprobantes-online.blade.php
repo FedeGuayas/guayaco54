@@ -54,21 +54,35 @@
                                 <a class="btn btn-outline-primary dropdown-toggle" href="#" role="button"
                                    data-toggle="dropdown"><i class="fa fa-ellipsis-h"></i></a>
                                 <div class="dropdown-menu dropdown-menu-left">
-                                    @if ( ($c->factura->status===\App\Factura::PENDIENTE && $c->status===\App\Inscripcion::RESERVADA) && strtolower($c->factura->mpago->nombre)!= 'tarjeta')
-                                        <a class="dropdown-item" href="#" data-toggle="tooltip" data-placement="top"
-                                           title="Imprimir Comprobante" target="_blank">
-                                            <i class="fa fa-file-pdf-o text-primary"></i> Imprimir
+                                    @if ( (\Carbon\Carbon::now()->diffInHours($c->created_at)>48) && $c->factura->status===\App\Factura::PENDIENTE && $c->status===\App\Inscripcion::RESERVADA )
+                                        <a class="dropdown-item delete" href="#" data-id="{{$c->id}}"
+                                           data-toggle="tooltip"
+                                           data-placement="top" title="Eliminar">
+                                            <i class="fa fa-trash-o text-danger"></i> Cancelar
                                         </a>
-                                    @elseif(($c->factura->status===\App\Factura::PAGADA && $c->status===\App\Inscripcion::PAGADA))
-                                        <a class="dropdown-item" href="#" data-toggle="tooltip" data-placement="top"
-                                           title="Imprimir Registro" target="_blank">
-                                            <i class="fa fa-file-pdf-o text-primary"></i> Imprimir
+                                    @elseif  ((\Carbon\Carbon::now()->diffInHours($c->created_at)< 48) && ($c->factura->status===\App\Factura::PENDIENTE && $c->status===\App\Inscripcion::RESERVADA) && strtolower($c->factura->mpago->nombre)!= 'tarjeta')
+                                        <a class="dropdown-item" href="{{route('user.comprobantePDF',$c->id)}}" data-toggle="tooltip" data-placement="top"
+                                           title="Comprobante" target="_blank">
+                                            <i class="fa fa-file-pdf-o text-primary"></i> Imprimir Comprobante
+                                        </a>
+                                        <a class="dropdown-item delete" href="#" data-id="{{$c->id}}"
+                                           data-toggle="tooltip"
+                                           data-placement="top" title="Eliminar">
+                                            <i class="fa fa-trash-o text-danger"></i> Cancelar
+                                        </a>
+                                    @elseif ( (\Carbon\Carbon::now()->diffInHours($c->created_at)< 48) && ($c->factura->status===\App\Factura::PENDIENTE && $c->status===\App\Inscripcion::RESERVADA) && strtolower($c->factura->mpago->nombre)== 'tarjeta')
+                                        <a class="dropdown-item delete" href="#" data-id="{{$c->id}}"
+                                           data-toggle="tooltip"
+                                           data-placement="top" title="Eliminar">
+                                            <i class="fa fa-trash-o text-danger"></i> Cancelar
+                                        </a>
+                                    @elseif (($c->factura->status===\App\Factura::PAGADA && $c->status===\App\Inscripcion::PAGADA))
+                                        <a class="dropdown-item" href="{{route('user.registroInscripcion',$c->id)}}" data-toggle="tooltip" data-placement="top"
+                                           title="Confirmación" target="_blank">
+                                            <i class="fa fa-file-pdf-o text-primary"></i> Imprimir Registro
                                         </a>
                                     @endif
-                                    <a class="dropdown-item delete" href="#" data-id="{{$c->id}}" data-toggle="tooltip"
-                                       data-placement="top" title="Eliminar">
-                                        <i class="fa fa-trash-o text-danger"></i> Cancelar
-                                    </a>
+
                                 </div>
                             </div>
                         </td>
@@ -80,18 +94,20 @@
                         <td>$ {{ number_format($c->factura->total,2,'.', ' ') }}</td>
                         <td>{{$c->factura->mpago->nombre}}</td>
                         <td>
-                            @if (\Carbon\Carbon::now()->diffInHours($c->created_at)>48)
+                            @if (\Carbon\Carbon::now()->diffInHours($c->created_at)>48 && ($c->factura->status===\App\Factura::PENDIENTE && $c->status===\App\Inscripcion::RESERVADA))
                                 <span class="text-danger" data-toggle="tooltip" data-placement="left"
                                       title="Vencida (+48H)"> <i class="fa fa-trash-o fa-2x"></i></span>
-                            @else
-                                @if ( ($c->factura->status===\App\Factura::PENDIENTE && $c->status===\App\Inscripcion::RESERVADA) && strtolower($c->factura->mpago->nombre)== 'tarjeta')
-                                    <button class="btn btn-outline-success btn-sm js-paymentez-checkout"
-                                            data-toggle="tooltip" data-placement="top" title="Proceder al pago">Pagar
-                                    </button>
-                                @else
-                                    <span class="text-success" data-toggle="tooltip" data-placement="left"
-                                          title="En tiempo"><i class="fa fa-check-square-o fa-2x"></i></span>
-                                @endif
+                            @elseif ((\Carbon\Carbon::now()->diffInHours($c->created_at)< 48) && ($c->factura->status===\App\Factura::PENDIENTE && $c->status===\App\Inscripcion::RESERVADA) && strtolower($c->factura->mpago->nombre)!= 'tarjeta')
+                                <span class="text-warning" data-toggle="tooltip" data-placement="left"
+                                      title="En tiempo"><i class="fa fa-hourglass fa-2x"></i></span>
+                            @elseif ( (\Carbon\Carbon::now()->diffInHours($c->created_at)< 48) && ($c->factura->status===\App\Factura::PENDIENTE && $c->status===\App\Inscripcion::RESERVADA) && strtolower($c->factura->mpago->nombre)== 'tarjeta')
+                                <button class="btn btn-outline-primary btn-sm js-paymentez-checkout"
+                                        data-toggle="tooltip" data-placement="top" title="Proceder al pago"><i
+                                            class="fa fa-money"></i> Pagar
+                                </button>
+                            @elseif (($c->factura->status===\App\Factura::PAGADA && $c->status===\App\Inscripcion::PAGADA))
+                                <span class="text-success" data-toggle="tooltip" data-placement="left"
+                                      title="Confirmada"><i class="fa fa-check-square-o fa-2x"></i></span>
                             @endif
 
                         </td>
@@ -127,7 +143,7 @@
     });
 
 
-let  table;
+    let table;
     function cargarDatatables() {
 
 
@@ -150,11 +166,11 @@ let  table;
     }
 
 
-
     //Eliminar inscripcion
     $(document).on('click', '.delete', function (e) {
         e.preventDefault();
         let id = $(this).attr('data-id');
+        let row = $(this).parents('tr');
         let token = $("input[name=_token]").val();
         let form = $("#form-delete");
         let url = form.attr('action').replace(':ID', id);
@@ -201,8 +217,7 @@ let  table;
                     allowEscapeKey: false
                 }).then((resp) => {
                     if (resp.value) { //recargar al dar en ok
-
-                        table.draw();
+                        row.fadeOut();
 //                        table.ajax.reload();
                     }
                 })
@@ -215,6 +230,7 @@ let  table;
                 )
             }
         }).catch((error) => { //error en la respuesta ajax
+            row.show();
             swal(
                 ':( Lo sentimos ocurrio un error durante su petición',
                 '' + error.status + ' ' + error.statusText + '',
