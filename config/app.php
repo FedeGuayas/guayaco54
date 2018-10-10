@@ -196,6 +196,8 @@ return [
         Barryvdh\DomPDF\ServiceProvider::class,
         //Mi service provider para el  helper validar ruc
         App\Providers\ValidaRUCServiceProvider::class,
+        //ServiceProvider que cree para los compowser que desee implementar
+        App\Providers\ComposerServiceProvider::class,
 
     ],
 

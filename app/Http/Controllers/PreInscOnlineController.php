@@ -15,6 +15,7 @@ use App\Talla;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Facades\App\Classes\LogActivity;
 use Illuminate\Support\Facades\Validator;
 
 class PreInscOnlineController extends Controller
@@ -343,14 +344,51 @@ class PreInscOnlineController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * El usuario podra eliminar sus inscripciones pendientes
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request,Inscripcion $inscription)
     {
-        //
+        if ($request->user()->id===$inscription->user_online && $request->ajax()) {
+
+            try {
+
+                DB::beginTransaction();
+
+                if (isset($inscription->talla)) {
+
+                    $talla = $inscription->talla;
+                    $talla->increment('stock');
+                    $talla->stock > 0 ? $talla->status = Talla::ACTIVO : $talla->status = Talla::INACTIVO;
+                    $talla->update();
+                }
+
+                //No eliminar registro xk una vez paga no se puede eliminar
+//                $registro = Registro::where('inscripcion_id', $inscription->id)->first();
+//                $registro ? $registro->delete() : $registro = false;
+//                LogActivity::addToLog('Registro eliminado (No. inscripcion, No. corredor) ', $request->user(), $inscription->id, $inscription->num_corredor);
+
+                $factura = $inscription->factura;
+                if ($factura) {
+                    $factura->status = Factura::CANCELADA;
+                    $factura->update();
+                    LogActivity::addToLog('Inscripcion online eliminada, Factura cancelada (Inscripcion->id, Factura->id) ', $request->user(), $inscription->id, $factura->id);
+                }
+
+                $inscription->delete();
+
+                DB::Commit();
+
+                return response()->json(['data' => $inscription], 200);
+
+            } catch (\Exception $e) {
+                DB:: rollBack();
+                return response()->json(['data' => $inscription, 404]);
+
+            }
+        } else  return response()->json(['data' => $inscription], 403);
     }
 
 

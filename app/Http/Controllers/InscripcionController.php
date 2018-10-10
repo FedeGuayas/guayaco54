@@ -17,7 +17,6 @@ use App\Talla;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Facades\Excel;
 use Yajra\Datatables\Datatables;
@@ -871,10 +870,6 @@ class InscripcionController extends Controller
             ->where('inscripcions.status', '=', Inscripcion::RESERVADA)
             ->get();
 
-        $cantidad_reservas = $inscripciones->count();
-
-        Session::put('reservas', $cantidad_reservas);
-//        dd(Session::get('$cantidad_reservas'));
         return view('inscripcion.reservas.reservas', ['inscripciones' => $inscripciones]);
     }
 

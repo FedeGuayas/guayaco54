@@ -36,7 +36,8 @@
                 <thead>
                 <tr>
                     <th class="datatable-nosort">Acción</th>
-                    <th class="datatable-nosort">Insc.</th>
+                    <th class="datatable-nosort">Reg.</th>
+                    <th>Inscrito</th>
                     <th>Circuito</th>
                     <th>Categoría</th>
                     <th>Fecha</th>
@@ -64,7 +65,7 @@
                                             <i class="fa fa-file-pdf-o text-primary"></i> Imprimir
                                         </a>
                                     @endif
-                                    <a class="dropdown-item delete" href="#" data-id="#" data-toggle="tooltip"
+                                    <a class="dropdown-item delete" href="#" data-id="{{$c->id}}" data-toggle="tooltip"
                                        data-placement="top" title="Eliminar">
                                         <i class="fa fa-trash-o text-danger"></i> Cancelar
                                     </a>
@@ -72,6 +73,7 @@
                             </div>
                         </td>
                         <td>{{$c->id}}</td>
+                        <td>{{$c->persona->getFullName()}}</td>
                         <td>{{$c->producto->circuito->circuito}}</td>
                         <td>{{$c->producto->categoria->categoria}}</td>
                         <td>{{$c->created_at}}</td>
@@ -83,10 +85,12 @@
                                       title="Vencida (+48H)"> <i class="fa fa-trash-o fa-2x"></i></span>
                             @else
                                 @if ( ($c->factura->status===\App\Factura::PENDIENTE && $c->status===\App\Inscripcion::RESERVADA) && strtolower($c->factura->mpago->nombre)== 'tarjeta')
-                                    <button class="btn btn-outline-success btn-sm js-paymentez-checkout" data-toggle="tooltip" data-placement="top" title="Proceder al pago">Pagar</button>
+                                    <button class="btn btn-outline-success btn-sm js-paymentez-checkout"
+                                            data-toggle="tooltip" data-placement="top" title="Proceder al pago">Pagar
+                                    </button>
                                 @else
-                                <span class="text-success" data-toggle="tooltip" data-placement="left"
-                                      title="En tiempo"><i class="fa fa-check-square-o fa-2x"></i></span>
+                                    <span class="text-success" data-toggle="tooltip" data-placement="left"
+                                          title="En tiempo"><i class="fa fa-check-square-o fa-2x"></i></span>
                                 @endif
                             @endif
 
@@ -98,6 +102,9 @@
         </div>
     </div>
     {!! Form::open(['route'=>['circuitos.set.status',':ID'],'method'=>'post','id'=>'form-status']) !!}
+    {!! Form::close() !!}
+
+    {!! Form::open(['route'=>['inscription.destroy',':ID'],'method'=>'DELETE','id'=>'form-delete']) !!}
     {!! Form::close() !!}
 
 @endsection
@@ -113,7 +120,18 @@
 <script>
 
     $('document').ready(function () {
-        $('.data-table').DataTable({
+
+        cargarDatatables();
+
+
+    });
+
+
+let  table;
+    function cargarDatatables() {
+
+
+        table = $('.data-table').DataTable({
             scrollCollapse: true,
             autoWidth: false,
             responsive: true,
@@ -124,11 +142,89 @@
             "lengthMenu": [[5, 10, -1], [5, 10, "Todos"]],
             "language": {
                 "url": '/plugins/DataTables/i18n/Spanish_original.lang'
+            },
+            initComplete: function (settings, json) {
+                $('.data-table').fadeIn();
             }
+        });
+    }
+
+
+
+    //Eliminar inscripcion
+    $(document).on('click', '.delete', function (e) {
+        e.preventDefault();
+        let id = $(this).attr('data-id');
+        let token = $("input[name=_token]").val();
+        let form = $("#form-delete");
+        let url = form.attr('action').replace(':ID', id);
+        let data = form.serialize();
+        swal({
+            title: 'Confirme la acción',
+            text: "Se eliminará la inscripción, esta acción no se podrá deshacer!",
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Si, proceder! <i class="fa fa-trash-o"></i>',
+            cancelButtonText: 'No, cancelar! <i class="fa fa-ban"></i>',
+            showCloseButton: true,
+            confirmButtonClass: 'btn btn-outline-danger m5',
+            cancelButtonClass: 'btn btn-outline-secondary m-5',
+            buttonsStyling: false,
+            showLoaderOnConfirm: true,
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            preConfirm: function () {
+                return new Promise((resolve, reject) => {
+                    $.ajax({
+                        url: url,
+                        data: data,
+                        headers: {'X-CSRF-TOKEN': token},
+                        type: "post",
+                        success: function (response) {
+                            resolve(response);
+                        },
+                        error: function (error) {
+                            reject(error)
+                        }
+                    });
+                })
+            },
+        }).then((response) => { //respuesta ajax
+            //confirmo la acción
+            if (response.value) {
+//                    console.log(response)
+                swal({
+                    title: ':)',
+                    text: 'Inscripción eliminada',
+                    type: 'success',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false
+                }).then((resp) => {
+                    if (resp.value) { //recargar al dar en ok
+
+                        table.draw();
+//                        table.ajax.reload();
+                    }
+                })
+                //cancelo la eliminacion
+            } else if (response.dismiss === swal.DismissReason.cancel) {// 'cancel', 'overlay', 'close', and 'timer'
+                swal(
+                    'Acción cancelada',
+                    'Ud canceló la acción, no se realizaron cambios :)',
+                    'error'
+                )
+            }
+        }).catch((error) => { //error en la respuesta ajax
+            swal(
+                ':( Lo sentimos ocurrio un error durante su petición',
+                '' + error.status + ' ' + error.statusText + '',
+                'error'
+            )
         });
     });
 
-    //habilitar /deshabilitar circuito
+
+    //VERIFICAR
     $(document).on('click', '.status_circuito', function (e) {
         e.preventDefault();
         let id = $(this).attr('data-id');

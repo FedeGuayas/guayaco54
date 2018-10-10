@@ -55,7 +55,7 @@
                 <li>
                     <a href="{{route('admin.inscripcions.reservas')}}" class="dropdown-toggle no-arrow">
                         <span class="fa fa-pencil-square"></span><span class="mtext">Insc. Pendientes <span
-                                    class="badge-pill badge-danger ">{{ Session::has('reservas') ?  Session::get('reservas') : ''}}</span>
+                                    class="badge-pill badge-danger ">{{$cantidad_reservas}}</span>
                         </span>
                     </a>
                 </li>
@@ -108,7 +108,7 @@
                         <li><a href="{{route('inscription.create')}}">Nueva Inscripción <i
                                         class="fa fa-pencil-square-o"></i></a>
                         <li><a href="{{route('user.getComprobantes')}}">Comprobantes <span class="badge-pill badge-danger ">
-                                    {{ Session::has('insc_pagar') ?  Session::get('insc_pagar') : '0'}}</span>
+                                    {{ $insc_pagar}}</span>
                             </a>
                         </li>
                     </ul>

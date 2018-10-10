@@ -36,13 +36,13 @@
             </div>
         </div>
 
-        @if ( Session::has('insc_pagar') )
+        @if ( $insc_pagar > 0) )
         <div class="user-info-dropdown">
             <div class="dropdown">
                 <a class="dropdown-toggle" href="#" role="button" data-toggle="dropdown">
                     <i class="fa fa-shopping-cart"></i>
                     <span class="badge badge-danger">
-                        {{ Session::get('insc_pagar')  }}
+                        {{ $insc_pagar }}
                     </span>
                 </a>
                 <div class="dropdown-menu dropdown-menu-right ">

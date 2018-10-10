@@ -48,7 +48,7 @@
                         <a class="nav-link link text-white display-4" href="#">
                             <span class="mbrib-shopping-cart mbr-iconfont mbr-iconfont-btn text-secondary"></span>
                             <span class="badge badge-danger">
-                                    {{ Session::has('insc_pagar') ? Session::get('insc_pagar') : '0'  }}
+                                    {{ $insc_pagar }}
                                 </span>
                         </a>
                     </li>

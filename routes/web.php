@@ -96,7 +96,7 @@ Route::middleware(['auth', 'isVerified'])->group(function () {
 
 
 
-        Route::resource('inscription', 'PreInscOnlineController', ['except' => ['show', 'destroy']]);
+        Route::resource('inscription', 'PreInscOnlineController', ['except' => ['show']]);
 
 
         //PAYMENTEZ
