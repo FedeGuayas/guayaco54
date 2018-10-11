@@ -14,6 +14,8 @@
 <link rel="stylesheet" type="text/css"
       href="{{asset('themes/back/src/plugins/datatables/media/css/responsive.dataTables.css')}}">
 <link rel="stylesheet " type="text/css" href="{{asset('css/my_datatable.css')}}">
+<script src="https://cdn.paymentez.com/checkout/1.0.1/paymentez-checkout.min.js"></script>
+
 @endpush
 
 @section('content')
@@ -117,8 +119,6 @@
             </table>
         </div>
     </div>
-    {!! Form::open(['route'=>['circuitos.set.status',':ID'],'method'=>'post','id'=>'form-status']) !!}
-    {!! Form::close() !!}
 
     {!! Form::open(['route'=>['inscription.destroy',':ID'],'method'=>'DELETE','id'=>'form-delete']) !!}
     {!! Form::close() !!}
@@ -131,23 +131,13 @@
 <script src="{{asset('themes/back/src/plugins/datatables/media/js/dataTables.responsive.js')}}"></script>
 <script src="{{asset('themes/back/src/plugins/datatables/media/js/responsive.bootstrap4.js')}}"></script>
 <script src="{{ asset('js/toastr_message.js') }}"></script>
-<script src="https://cdn.paymentez.com/checkout/1.0.1/paymentez-checkout.min.js"></script>
+<script src="https://cdn.paymentez.com/js/ccapi/stg/paymentez.min.js"></script>
 <script src="{{asset('plugins/paymentez/paymentez-check-out.js')}}"></script>
 <script>
 
     $('document').ready(function () {
 
-        cargarDatatables();
-
-
-    });
-
-
-    let table;
-    function cargarDatatables() {
-
-
-        table = $('.data-table').DataTable({
+        let table = $('.data-table').DataTable({
             scrollCollapse: true,
             autoWidth: false,
             responsive: true,
@@ -163,7 +153,9 @@
                 $('.data-table').fadeIn();
             }
         });
-    }
+
+
+    });
 
 
     //Eliminar inscripcion
@@ -238,79 +230,6 @@
             )
         });
     });
-
-
-    //VERIFICAR
-    $(document).on('click', '.status_circuito', function (e) {
-        e.preventDefault();
-        let id = $(this).attr('data-id');
-        let token = $("input[name=_token]").val();
-        let form = $("#form-status");
-        let url = form.attr('action').replace(':ID', id);
-        let data = form.serialize();
-        swal({
-            title: 'Confirme la acción',
-            text: "Se Habilitará/Dashabilitará el circuito según corresponda!",
-            type: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Si, proceder! <i class="fa fa-thumbs-up"></i>',
-            cancelButtonText: 'No, cancelar! <i class="fa fa-thumbs-o-down"></i>',
-            showCloseButton: true,
-            confirmButtonClass: 'btn btn-outline-primary m5',
-            cancelButtonClass: 'btn btn-outline-secondary m-5',
-            buttonsStyling: false,
-            showLoaderOnConfirm: true,
-            allowOutsideClick: false,
-            allowEscapeKey: false,
-            preConfirm: function () {
-                return new Promise((resolve, reject) => {
-                    $.ajax({
-                        url: url,
-                        data: data,
-                        headers: {'X-CSRF-TOKEN': token},
-                        type: "post",
-                        success: function (response) {
-                            resolve(response);
-                        },
-                        error: function (error) {
-                            reject(error)
-                        }
-                    });
-                })
-            },
-        }).then((result) => { //respuesta ajax
-//confirmo la acción
-            if (result.value) {
-                swal({
-                    title: ':)',
-                    text: 'Estado actualizado correctamente',
-                    type: 'success',
-                    allowOutsideClick: false,
-                    allowEscapeKey: false
-                }).then((resp) => {
-                    if (resp.value) { //recargar al dar en ok
-                        window.setTimeout(function () {
-                            location.reload()
-                        }, 1);
-                    }
-                })
-//cancelo la eliminacion
-            } else if (result.dismiss === swal.DismissReason.cancel) {// 'cancel', 'overlay', 'close', and 'timer'
-                swal(
-                    'Acción cancelada',
-                    'Ud canceló la acción, no se realizaron cambios :)',
-                    'error'
-                )
-            }
-        }).catch((error) => { //error en la respuesta ajax
-            swal(
-                ':( Lo sentimos ocurrio un error durante su petición',
-                '' + error.status + ' ' + error.statusText + '',
-                'error'
-            )
-        });
-    });
-
 
             {{--Alertas con Toastr--}}
             @if(Session::has('message_toastr'))
