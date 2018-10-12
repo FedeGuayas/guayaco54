@@ -18,7 +18,8 @@
             </div>
             <div id="loader" hidden>
                 <i class="fa fa-spinner fa-pulse fa-5x fa-fw text-success"></i>
-                <span class="sr-only">Cargando...</span></div>
+                <span class="sr-only">Cargando...</span>
+            </div>
         </div>
     </div>
 </div>
