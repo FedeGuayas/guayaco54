@@ -146,6 +146,7 @@
 
     let table;
 
+
     $('document').ready(function () {
 
         table = $('.data-table').DataTable({
@@ -168,13 +169,14 @@
 
     });
 
+    let token = $("input[name=_token]").val();
 
     //Eliminar inscripcion
     $(document).on('click', '.delete', function (e) {
         e.preventDefault();
         let id = $(this).attr('data-id');
         let row = $(this).parents('tr');
-        let token = $("input[name=_token]").val();
+        token = $("input[name=_token]").val();
         let form = $("#form-delete");
         let url = form.attr('action').replace(':ID', id);
         let data = form.serialize();
@@ -242,7 +244,8 @@
         });
     });
 
-    //    Paymentez
+    // ************   Paymentez ********//
+
     let paymentezCheckout = new PaymentezCheckout.modal({
         client_app_code: 'FEDE-EC-CLIENT', // Client Credentials Provied by Paymentez
         client_app_key: 'a8N2cTAlauosoRDxM2mPYbdnW9ALmP', // Client Credentials Provied by Paymentez
@@ -252,7 +255,7 @@
             // console.log('modal open');
         },
         onClose: function () { //The callback to invoke when Checkout is closed
-             console.log('modal closed');
+//             console.log('modal closed');
         },
         onResponse: function (response) { // The callback to invoke when the Checkout process is completed
             /*
@@ -275,8 +278,10 @@
              }
              */
             // console.log('modal response');
+//             console.log(response);
 
             if (response.transaction.status === 'success' && response.transaction.status_detail === 3) {
+                let payID=response.transaction.id;
                 swal({
                     title: ':) Transacción satisfactoria',
                     text: ' Se realizó el pago correctamente',
@@ -284,12 +289,51 @@
                     allowOutsideClick: false,
                     allowEscapeKey: false
                 }).then((resp) => {
+
                     if (resp.value) { //recargar al dar en ok
-//                        row.fadeOut();
+
                         console.log('enviar correo');
-                        window.setTimeout(function () {
-                            location.reload()
-                        }, 1);
+                        let id = id_insc;
+                        token = $("input[name=_token]").val();
+                        let url = "{{route('user.sendInscripcionPayOut')}}";
+                        let data = {
+                            insc_id: id,
+                            payID : payID
+                        };
+
+                        let promise = new Promise((resolve, reject) => {
+                            $.ajax({
+                                url: url,
+                                data: data,
+                                headers: {'X-CSRF-TOKEN': token},
+                                type: "post",
+                                success: function (response) {
+                                console.log(response);
+                                    resolve(response);
+                                },
+                                error: function (error) {
+                                    console.log(response);
+                                    reject(error)
+                                }
+                            });
+                        });
+                        promise.then((response) => {
+                            swal(
+                                ':)  Se actualizó la inscripción',
+                                'se le ha enviado un correo de confirmación a la dirección de facturación',
+                                'succes'
+                            )
+//                            window.setTimeout(function () {
+//                                location.reload()
+//                            }, 5000);
+//
+                        }).catch((error) => { //error en la respuesta ajax
+                            swal(
+                                ':( Lo sentimos ocurrio un error',
+                                ''+ error.status + ' ' + error.statusText + '',
+                                'error'
+                            )
+                        });
 
                     }
                 })
@@ -325,14 +369,14 @@
     });
 
     let btnOpenCheckout = $(".js-paymentez-checkout");
-
+    let id_insc;
     if (btnOpenCheckout !== null) {
         $(document).on('click', '.js-paymentez-checkout', function () {
-            let id = $(this).data("id");
+            id_insc= $(this).data("id");
             let token = $("input[name=_token]").val();
             let url = "{{route('user.getInscripcionPay')}}";
             let data = {
-                insc_id: id
+                insc_id: id_insc
             };
             let promise = new Promise((resolve, reject) => {
                 $.ajax({
@@ -371,7 +415,6 @@
                     'error'
                 )
             });
-
 
         });
 
