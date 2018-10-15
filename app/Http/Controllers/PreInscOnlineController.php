@@ -508,5 +508,45 @@ class PreInscOnlineController extends Controller
 
     }
 
+    /**
+     * Obtener los pagos online aprobados para realizar reembolsos y cancelaciones
+     * @param Request $request
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function getRefund(Request $request)
+    {
+        $user = $request->user();
+
+        $ejercicio = Configuracion::where('status', Configuracion::ATIVO)
+            ->select('ejercicio_id')
+            ->first();
+
+        $comprobantes = Inscripcion::with('producto', 'factura')
+            ->where('user_online', $user->id)
+            ->where('ejercicio_id', $ejercicio->ejercicio_id)
+            ->whereHas('factura', function ($query) {
+                $query->whereNotNull('payment_id');
+            })
+            ->get();
+
+
+
+        return view('inscripcion.online.index-refund', compact('comprobantes'));
+    }
+
+    //generar el token paymentez
+    public  function paymentezGenerateToken()
+    {
+        $paymentez_server_application_code = 'FEDE-EC-CLIENT';
+        $paymentez_server_app_key = 'a8N2cTAlauosoRDxM2mPYbdnW9ALmP';
+        $unix_timestamp = Carbon::now()->timestamp;
+        $uniq_token_string = $paymentez_server_application_code.''. $unix_timestamp;
+        $uniq_token_hash = hash_hmac('sha256', $uniq_token_string,$paymentez_server_app_key);
+
+        $auth_token = base64_encode($uniq_token_hash);
+
+        return $auth_token;
+    }
+
 
 }

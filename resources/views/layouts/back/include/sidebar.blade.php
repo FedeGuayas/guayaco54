@@ -111,6 +111,10 @@
                                     {{ $insc_pagar}}</span>
                             </a>
                         </li>
+                        <li><a href="{{route('user.getRefund')}}">Rembolsos <span class="badge-pill badge-danger ">
+                                    <i class="fa fa-refresh"></i></span>
+                            </a>
+                        </li>
                     </ul>
                 </li>
                 @endhasallroles

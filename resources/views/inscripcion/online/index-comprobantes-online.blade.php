@@ -26,10 +26,7 @@
                 <h5 class="text-blue">Todos sus comprobantes</h5>
             </div>
         </div>
-        <div class="form-text small mb-30">En Acción podrá imprimir su comprobante de inscripción, que le permitirá
-            realizar el pago o el registro de la inscripción una vez haya realizado el pago. Con este último podrá
-            retirar el kit para participar en la carrera.
-            <br>
+        <div class="form-text small mb-30">
             <strong>Pasas 48 horas de realizada la inscripción sino realiza el pago de la misma esta será eliminada del
                 sistema. </strong>
         </div>

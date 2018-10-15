@@ -302,6 +302,14 @@ Breadcrumbs::register('comprobante-online', function($breadcrumbs)
 });
 
 
+//// Menu Ususario>Reembolsos
+Breadcrumbs::register('refund', function($breadcrumbs)
+{
+    $breadcrumbs->parent('comprobante-online');
+    $breadcrumbs->push('Reembolsos', route('user.getRefund'));
+});
+
+
 
 
 

@@ -125,4 +125,29 @@ class PaymentController extends Controller
         }
     }
 
+
+    /**
+     *  Realizar reembolso
+     * @param Request $request
+     * @return bool|\Illuminate\Http\JsonResponse
+     */
+    public function setRefund(Request $request)
+    {
+        if ($request->ajax()) {
+
+            $inscripcion = Inscripcion::with('factura', 'producto')
+                ->where('id', $request->input('insc_id'))
+                ->where('user_online', $request->user()->id)
+                ->first();
+
+            if ($inscripcion) {
+                return response()->json(['data' => $inscripcion], 200);
+            } else {
+                return response()->json(['data' => 'No se encontró la inscripción'], 404);
+            }
+
+        }
+        return false;
+    }
+
 }
