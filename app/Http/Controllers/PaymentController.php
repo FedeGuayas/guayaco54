@@ -111,19 +111,15 @@ class PaymentController extends Controller
 
                 DB::commit();
 
-                $notification = [
-                    'message_toastr' => 'Reserva de Inscripción confirmada correctamente.',
-                    'alert-type' => 'success'];
-                return response()->json(['data' => $notification], 400);
+                $message = 'Se actualizó el estado del pago';
+                return response()->json(['data' => $message], 200);
 
-            } catch (\Exception $e) { //en caso de error viro al estado anterior
+            } catch (\Exception $e) {
                 DB::rollback();
 //              $message=$e->getMessage();
-                $message = 'Ocurrio un error y no se pudo aprobar la reserva';
-                $notification = [
-                    'message_toastr' => $message,
-                    'alert-type' => 'error'];
-                return redirect()->route('admin.inscripcions.reservas')->with($notification);
+                $message = 'Ocurrio un error y no se pudo actualizar la inscripción';
+                return response()->json(['data' => $message], 400);
+
             }
 
         }

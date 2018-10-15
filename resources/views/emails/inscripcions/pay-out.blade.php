@@ -1,5 +1,5 @@
 @component('mail::message')
-# Introduction
+# Confirmación de pago
 
 Gracias por realizar el pago de su inscripción en la carrera Guayaco Runner
 

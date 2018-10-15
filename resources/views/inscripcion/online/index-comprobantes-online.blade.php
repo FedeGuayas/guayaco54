@@ -258,30 +258,9 @@
 //             console.log('modal closed');
         },
         onResponse: function (response) { // The callback to invoke when the Checkout process is completed
-            /*
-             In Case of an error, this will be the response.
-             response = {
-             "error": {
-             "type": "Server Error",
-             "help": "Try Again Later",
-             "description": "Sorry, there was a problem loading Checkout."
-             }
-             }
-
-             When the User completes all the Flow in the Checkout, this will be the response.
-             response = {
-             "transaction":{
-             "status":"success", // success or failure
-             "id":"CB-81011", // transaction_id
-             "status_detail":3 // for the status detail please refer to: https://paymentez.github.io/api-doc/#status-details
-             }
-             }
-             */
-            // console.log('modal response');
-//             console.log(response);
 
             if (response.transaction.status === 'success' && response.transaction.status_detail === 3) {
-                let payID=response.transaction.id;
+                let payID = response.transaction.id;
                 swal({
                     title: ':) Transacción satisfactoria',
                     text: ' Se realizó el pago correctamente',
@@ -289,18 +268,15 @@
                     allowOutsideClick: false,
                     allowEscapeKey: false
                 }).then((resp) => {
-
-                    if (resp.value) { //recargar al dar en ok
-
-                        console.log('enviar correo');
+//                        console.log('enviar correo');
+                    if (resp.value) { //Enviar correo de confirmacion y actualizacion de estado
                         let id = id_insc;
                         token = $("input[name=_token]").val();
                         let url = "{{route('user.sendInscripcionPayOut')}}";
                         let data = {
                             insc_id: id,
-                            payID : payID
+                            payID: payID
                         };
-
                         let promise = new Promise((resolve, reject) => {
                             $.ajax({
                                 url: url,
@@ -308,29 +284,36 @@
                                 headers: {'X-CSRF-TOKEN': token},
                                 type: "post",
                                 success: function (response) {
-                                console.log(response);
                                     resolve(response);
                                 },
                                 error: function (error) {
-                                    console.log(response);
                                     reject(error)
                                 }
                             });
                         });
                         promise.then((response) => {
-                            swal(
-                                ':)  Se actualizó la inscripción',
-                                'se le ha enviado un correo de confirmación a la dirección de facturación',
-                                'succes'
-                            )
-//                            window.setTimeout(function () {
-//                                location.reload()
-//                            }, 5000);
-//
+                            swal({
+                                title: ':)  Se actualizó la inscripción',
+                                text: '' + response.data + '',
+                                type: 'success',
+                                allowOutsideClick: false,
+                                allowEscapeKey: false
+                            }).then((resp) => {
+                                window.setTimeout(function () {
+                                    location.reload()
+                                }, 1);
+                            })
                         }).catch((error) => { //error en la respuesta ajax
+//                            console.log(error);
+                            let message;
+                            if (error.responseJSON.data !== null) {
+                                message = error.responseJSON.data;
+                            } else {
+                                message = ':( Lo sentimos ocurrio un error';
+                            }
                             swal(
-                                ':( Lo sentimos ocurrio un error',
-                                ''+ error.status + ' ' + error.statusText + '',
+                                '' + message + '',
+                                '' + error.status + ' ' + error.statusText + '',
                                 'error'
                             )
                         });
@@ -364,7 +347,6 @@
                 )
             }
 
-            // document.getElementById('response').innerHTML = JSON.stringify(response);
         }
     });
 
@@ -372,7 +354,7 @@
     let id_insc;
     if (btnOpenCheckout !== null) {
         $(document).on('click', '.js-paymentez-checkout', function () {
-            id_insc= $(this).data("id");
+            id_insc = $(this).data("id");
             let token = $("input[name=_token]").val();
             let url = "{{route('user.getInscripcionPay')}}";
             let data = {
@@ -407,11 +389,10 @@
                     //order_tax_percentage: 10 // optional: Only available for Datafast (Equador). The tax percentage to be applied to this order.
                 });
 
-            }).catch((error) => { //error en la respuesta ajax
-                console.log(error)
+            }).catch((error) => {
                 swal(
                     ':( Lo sentimos ocurrio un error durante su petición',
-                    ''+ error.status + ' ' + error.statusText + '',
+                    '' + error.status + ' ' + error.statusText + '',
                     'error'
                 )
             });

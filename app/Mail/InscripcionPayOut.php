@@ -12,7 +12,7 @@ class InscripcionPayOut extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $inscription;
+    public $inscripcion;
 
     /**
      * Create a new message instance.
@@ -21,7 +21,7 @@ class InscripcionPayOut extends Mailable
      */
     public function __construct(Inscripcion $inscription)
     {
-        $this->inscription=$inscription;
+        $this->inscripcion=$inscription;
     }
 
     /**
