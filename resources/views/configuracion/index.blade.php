@@ -51,8 +51,18 @@
                 </a>
             </div>
         </div>
-
-
+        <div class="form-group row">
+            <label for="client_app_code" class="col-sm-12 col-md-2 col-form-label weight-600">App Code</label>
+            <div class="col-sm-12 col-md-6">
+                {!! Form::text('client_app_code',isset($config->client_app_code) ? $config->client_app_code : null,['class'=>'form-control','placeholder'=>'app code paymentez']) !!}
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="client_app_key" class="col-sm-12 col-md-2 col-form-label weight-600">App Key</label>
+            <div class="col-sm-12 col-md-6">
+                {!! Form::text('client_app_key',isset($config->client_app_key) ? $config->client_app_key : null,['class'=>'form-control','placeholder'=>'app key paymentez']) !!}
+            </div>
+        </div>
         <div class="form-group row">
             <label class="col-sm-12 col-md-2 col-form-label weight-600">Empresa *</label>
             <div class="col-sm-12 col-md-6">

@@ -108,6 +108,8 @@ class ConfiguracionController extends Controller
             $configuracion->email = $request->input('email');
             $configuracion->direccion = $request->input('direccion');
             $configuracion->nombre_contacto = $request->input('nombre_contacto');
+            $configuracion->client_app_code=trim($request->input('client_app_code'));
+            $configuracion->client_app_key=trim($request->input('client_app_key'));
             $configuracion->save();
 
             DB::Commit();
@@ -188,6 +190,8 @@ class ConfiguracionController extends Controller
             $configuracion->email = $request->input('email');
             $configuracion->direccion = $request->input('direccion');
             $configuracion->nombre_contacto = $request->input('nombre_contacto');
+            $configuracion->client_app_code=trim($request->input('client_app_code'));
+            $configuracion->client_app_key=trim($request->input('client_app_key'));
             $configuracion->update();
 
             DB::Commit();

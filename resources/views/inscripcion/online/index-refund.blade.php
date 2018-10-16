@@ -14,7 +14,6 @@
 <link rel="stylesheet" type="text/css"
       href="{{asset('themes/back/src/plugins/datatables/media/css/responsive.dataTables.css')}}">
 <link rel="stylesheet " type="text/css" href="{{asset('css/my_datatable.css')}}">
-
 @endpush
 
 @section('content')
@@ -52,7 +51,7 @@
                                 <a class="btn btn-outline-primary dropdown-toggle" href="#" role="button"
                                    data-toggle="dropdown"><i class="fa fa-ellipsis-h"></i></a>
                                 <div class="dropdown-menu dropdown-menu-left">
-                                    <a class="dropdown-item refund" href="#" data-id="{{$c->id}}"
+                                    <a class="dropdown-item refund" href="#" data-id="{{$c->factura->payment_id}}"
                                            data-toggle="tooltip"
                                            data-placement="top" title="Reembolsar y cancelar Inscripción">
                                             <i class="fa fa-recycle text-danger"></i> Reembolsar
@@ -92,7 +91,6 @@
 <script src="{{asset('themes/back/src/plugins/datatables/media/js/dataTables.bootstrap4.js')}}"></script>
 <script src="{{asset('themes/back/src/plugins/datatables/media/js/dataTables.responsive.js')}}"></script>
 <script src="{{asset('themes/back/src/plugins/datatables/media/js/responsive.bootstrap4.js')}}"></script>
-<script src="https://cdn.paymentez.com/js/ccapi/stg/paymentez.min.js"></script>
 <script src="{{ asset('js/toastr_message.js') }}"></script>
 <script>
 
@@ -122,15 +120,42 @@
     });
 
     let token = $("input[name=_token]").val();
+//
+
+    function genToken(){
+        let data;
+        let url="{{route('payment.getToken')}}";
+        $.ajax({
+            url: url,
+            data: '',
+            async: false,
+            headers: {'X-CSRF-TOKEN': token},
+            type: "post",
+            success: function (response) {
+                data=response;
+            },
+            error: function (error) {
+               console.log(error);
+            }
+        });
+        return data;
+    }
 
     //Realizar reembolso
     $(document).on('click', '.refund', function (e) {
         e.preventDefault();
+        {{--let client_app_code= "{{ $configuracion->client_app_code }}";--}}
+        {{--let client_app_key= "{{ $configuracion->client_app_key }}";--}}
+        {{--let unix_timestamp= $.now().toString();--}}
+        {{--let uniq_token_string = client_app_key + unix_timestamp;--}}
+
+        let auth_token=genToken();
+
+
         let id = $(this).attr('data-id');
+        console.log(auth_token)
         let row = $(this).parents('tr');
-        token = $("input[name=_token]").val();
         let form = $("#form-refund");
-//        let url = form.attr('action').replace(':ID', id);
         let url = 'https://ccapi-stg.paymentez.com/v2/transaction/refund/';
         let data = {
             "transaction": {
@@ -156,11 +181,10 @@
                     $.ajax({
                         url: url,
                         data: data,
-                        headers: {'X-CSRF-TOKEN': token},
-                        type: "get",
-//                        contentType: 'application/json',
-//                        dataType:'json',
-//                        AuthToken:token,
+                        headers: {'Auth-Token': auth_token},
+                        type: "post",
+                        contentType: 'application/json',
+                        dataType:'json',
                         success: function (response) {
                             resolve(response);
                         },

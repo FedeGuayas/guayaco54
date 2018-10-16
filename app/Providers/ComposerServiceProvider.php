@@ -18,6 +18,7 @@ class ComposerServiceProvider extends ServiceProvider
         //['welcome','layouts.back.master'] son las vistas o plantillas que utilizaran la clase
         View::composer(['welcome','layouts.back.master'], 'App\Http\ViewComposers\UserPendienteComposer');
         View::composer(['*'], 'App\Http\ViewComposers\ReservasPendientesComposer');
+        View::composer(['inscripcion.online.index-comprobantes-online','inscripcion.online.index-refund'], 'App\Http\ViewComposers\ConfiguracionComposer');
     }
 
     /**

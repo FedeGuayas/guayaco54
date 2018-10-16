@@ -535,15 +535,16 @@ class PreInscOnlineController extends Controller
     }
 
     //generar el token paymentez
-    public  function paymentezGenerateToken()
+    public function paymentezGenerateToken()
     {
-        $paymentez_server_application_code = 'FEDE-EC-CLIENT';
-        $paymentez_server_app_key = 'a8N2cTAlauosoRDxM2mPYbdnW9ALmP';
-        $unix_timestamp = Carbon::now()->timestamp;
-        $uniq_token_string = $paymentez_server_application_code.''. $unix_timestamp;
-        $uniq_token_hash = hash_hmac('sha256', $uniq_token_string,$paymentez_server_app_key);
+        $paymentez_server_application_code = 'FEDE-EC-SERVER';
+        $paymentez_server_app_key = 'rQph9IKZPta4KhiOXXwCfvWco9Vml6'; //server
+        $unix_timestamp =(string)Carbon::now()->timestamp;
 
-        $auth_token = base64_encode($uniq_token_hash);
+        $uniq_token_string = $paymentez_server_app_key.''. $unix_timestamp;
+        $uniq_token_hash = hash('sha256', $uniq_token_string,false);
+        $string=$paymentez_server_application_code.';'.$unix_timestamp.';'.$uniq_token_hash;
+        $auth_token = base64_encode($string);
 
         return $auth_token;
     }

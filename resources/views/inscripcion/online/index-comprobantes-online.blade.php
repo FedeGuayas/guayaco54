@@ -243,9 +243,10 @@
 
     // ************   Paymentez ********//
 
+
     let paymentezCheckout = new PaymentezCheckout.modal({
-        client_app_code: 'FEDE-EC-CLIENT', // Client Credentials Provied by Paymentez
-        client_app_key: 'a8N2cTAlauosoRDxM2mPYbdnW9ALmP', // Client Credentials Provied by Paymentez
+        client_app_code:"{{ $configuracion->client_app_code }}", // Client Credentials Provied by Paymentez
+        client_app_key: "{{ $configuracion->client_app_key }}", // Client Credentials Provied by Paymentez
         locale: 'es', // User's preferred language (es, en, pt). English will be used by default.
         env_mode: 'stg', // `prod`, `stg`, `dev`, `local` to change environment. Default is `stg`
         onOpen: function () {  //The callback to invoke when Checkout is opened
@@ -290,7 +291,7 @@
                         });
                         promise.then((response) => {
                             swal({
-                                title: ':)  Se actualizó la inscripción',
+                                title: ':) Se actualizó la inscripción',
                                 text: '' + response.data + '',
                                 type: 'success',
                                 allowOutsideClick: false,

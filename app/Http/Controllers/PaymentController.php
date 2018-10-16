@@ -56,20 +56,24 @@ class PaymentController extends Controller
     {
         if ($request->ajax()) {
 
+            $transaction_id = $request->input('payID');
+            $insc_id=$request->input('insc_id');
+
+            $inscripcion = Inscripcion::with('factura', 'user','producto','persona')->where('id', $insc_id)->first();
+            $factura = $inscripcion->factura;
+
+            if (!$inscripcion || !$factura) {
+                $notification = 'Se realizo su pago pero ocurrio un error al actualizar el estado de la inscripción, por favor pongase en contacto con nosotros proporcionando este ID de transacción ID: ' . $transaction_id . '';
+                return response()->json(['data' => $notification], 400);
+            }
+
+            $factura->payment_id=$transaction_id;
+            $factura->status = Factura::PAGADA;
+            $factura->update();
+
             try {
 
                 DB::beginTransaction();
-
-                $transaction_id = $request->input('payID');
-                $insc_id=$request->input('insc_id');
-
-                $inscripcion = Inscripcion::with('factura', 'user','producto','persona')->where('id', $insc_id)->first();
-                $factura = $inscripcion->factura;
-
-                if (!$inscripcion || !$factura) {
-                    $notification = 'Se realizo su pago pero ocurrio un error al actualizar el estado de la inscripción, por favor pongase en contacto con nosotros proporcionando este ID de transacción ID: ' . $transaction_id . '';
-                    return response()->json(['data' => $notification], 400);
-                }
 
                 //CREAR NUMERO DE CORREDOR
                 $maxNumCorr = DB::table('registros')->max('numero'); //maximo valor en la columna numero
@@ -84,10 +88,6 @@ class PaymentController extends Controller
                 $inscripcion->num_corredor = $nexNumCorredor;
                 $inscripcion->inscripcion_type = Inscripcion::INSCRIPCION_ONLINE;
                 $inscripcion->update();
-
-                $factura->status = Factura::PAGADA;
-                $factura->payment_id=$transaction_id;
-                $factura->update();
 
                 $persona = $inscripcion->persona;
 
@@ -124,6 +124,7 @@ class PaymentController extends Controller
 
         }
     }
+
 
 
     /**
