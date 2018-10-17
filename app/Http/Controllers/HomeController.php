@@ -27,12 +27,18 @@ class HomeController extends Controller
     {
         $user = $request->user();
 
-        $perfil = false;
-        if (isset($user->persona) || $user->hasRole('employee')) {//no tiene perfil, debe crearlo antes de inscribirse , al empleado no pedir crearlo
-            $perfil = true;
-        }
+//        $perfil = false;
+//        if (isset($user->persona) || $user->hasRole('employee')) {//no tiene perfil, debe crearlo antes de inscribirse , al empleado no pedir crearlo
+//            $perfil = true;
+//        }
 
-        return view('home', compact('perfil'));
+        if ($user->hasRole('employee')) {
+            return redirect()->route('personas.index');
+        } else
+            return redirect()->route('getProfile');
+
+//            return view('home', compact('perfil'));
+
     }
 
     /**
@@ -48,6 +54,11 @@ class HomeController extends Controller
     public function getTerms()
     {
         return view('inscripcion.online.terminos');
+    }
+
+    public function getReglamento()
+    {
+        return view('inscripcion.online.reglamento');
     }
 
 

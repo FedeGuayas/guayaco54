@@ -28,18 +28,16 @@
 
     <p class=MsoNormal style='text-align:justify;text-justify:inter-ideograph;
 text-autospace:none'><span lang=ES style='font-size:11.0pt'>La competencia
-atlética se llevará a cabo el domingo 28 de octubre del 2018.              </span></p>
+atlética se llevará a cabo el domingo 18 de noviembre del 2018.              </span></p>
 
     <p class=MsoNormal style='text-align:justify;text-justify:inter-ideograph;
 text-autospace:none'><span lang=ES style='font-size:11.0pt'>&nbsp;</span></p>
 
     <p class=MsoNormal style='text-align:justify;text-justify:inter-ideograph;
-text-autospace:none'><span lang=ES style='font-size:11.0pt'>Salida:                  Pista
-Atlética del Estadio Modelo “Alberto Spencer”</span></p>
+text-autospace:none'><span lang=ES style='font-size:11.0pt'>Salida: Explanada del Estadio Modelo “Alberto Spencer”</span></p>
 
     <p class=MsoNormal style='text-align:justify;text-justify:inter-ideograph;
-text-autospace:none'><span lang=ES style='font-size:11.0pt'>Llegada:              Pista
-Atlética del Estadio Modelo “Alberto Spencer”</span></p>
+text-autospace:none'><span lang=ES style='font-size:11.0pt'>Llegada: Explanada del Estadio Modelo “Alberto Spencer”</span></p>
 
     <p class=MsoNormal style='text-align:justify;text-justify:inter-ideograph;
 text-autospace:none'><span lang=ES style='font-size:11.0pt'>&nbsp;</span></p>
@@ -75,7 +73,7 @@ text-indent:-18.0pt;text-autospace:none'><span lang=ES style='font-size:11.0pt;
 font-family:Symbol'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 </span></span><span lang=ES style='font-size:11.0pt'>El deportista deberá
 retirar el chip y todo el equipamiento en el Coliseo de Voleibol ubicado en el Estadio
-Modelo el día sábado 27 de octubre de 09H00 a 16H00 deslindando de cualquier
+Modelo el día sábado 17 de noviembre de 09H00 a 16H00 deslindando de cualquier
 responsabilidad al comité organizador en caso de no hacerlo, en esa fecha y
 lugar. Este sería el único día en el que se entregue el kit de competencia.</span></p>
 
@@ -354,7 +352,7 @@ inter-ideograph;text-indent:-18.0pt;text-autospace:none'><span lang=ES
                     style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 </span></span><span lang=ES style='font-size:11.0pt'>La entrega de los premios
 se realizará de acuerdo al reglamento entregado a cada uno de los participantes,
-el día lunes 29 de octubre en la bodega de FDG ubicado atras del Estadio Modelo
+el día lunes 19 de noviembre en la bodega de FDG ubicado atras del Estadio Modelo
 .</span></p>
 
     <p class=MsoListParagraphCxSpLast style='text-align:justify;text-justify:inter-ideograph;

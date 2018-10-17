@@ -57,5 +57,10 @@
             <a class="nav-item" href="{{route('terms')}}">Términos</a>
         </div>
 
+        <div class="user-notification">
+            <a class="nav-item" href="{{route('getReglamento')}}">Reglamento</a>
+        </div>
+
+
     </div>
 </div>

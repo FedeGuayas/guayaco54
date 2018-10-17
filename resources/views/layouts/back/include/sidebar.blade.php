@@ -12,7 +12,7 @@
                         <span class="fa fa-home"></span><span class="mtext">Inicio</span>
                     </a>
                     <ul class="submenu">
-                        <li><a href="{{route('home')}}">Reglamento</a></li>
+                        <li><a href="{{route('getProfile')}}">Perfil</a></li>
                     </ul>
                 </li>
 

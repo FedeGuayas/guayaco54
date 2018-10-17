@@ -41,6 +41,9 @@ Route::middleware(['auth', 'isVerified'])->group(function () {
 
         //Ver terminos
         Route::get('/terms', 'HomeController@getTerms')->name('terms');
+        //Ver Reglamento
+        Route::get('/reglamento', 'HomeController@getReglamento')->name('getReglamento');
+
     });
 
     /*

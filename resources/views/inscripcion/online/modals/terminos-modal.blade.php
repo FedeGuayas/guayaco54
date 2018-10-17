@@ -25,7 +25,7 @@
                         El kit incluye: camiseta, bolso y medalla de participación.
                     </li>
                     <li>
-                        Los kits sólo pueden ser retirados el día sábado 27 de octubre a partir de las 09h00 am hasta
+                        Los kits sólo pueden ser retirados el día sábado 17 de noviembre a partir de las 09h00 am hasta
                         15h00 en el Coliseo de Vóley en la Explanada del Estadio Modelo (Av. De las Américas y Av.
                         Kennedy) presentando la Cédula de identidad y el ticket de inscripción.
                     </li>
@@ -34,7 +34,7 @@
                     </li>
                     <li>
                         Todo ticket que no se encuentre en estado PAGADO no tendrá derecho a reclamación del kit, el
-                        usuario puede cancelar en efectivo su inscripción hasta el 27 de octubre del 2018.
+                        usuario puede cancelar en efectivo su inscripción hasta el 17 de noviembre del 2018.
                     </li>
                     <li>
                         Los participantes están sujetos al Reglamento de la carrera publicado en la Página web
@@ -56,8 +56,7 @@
                 <dl>
                     <li>
                         El sistema acepta como medios de pago tarjetas de crédito: Diners Club, Discover, Visa,
-                        Mastercard,
-                        American Express, Maestro y Electrón de débito y crédito como MasterCard, Visa, Electrón.
+                        Mastercard, Maestro y Electrón de débito y crédito como MasterCard, Visa, Electrón.
                     </li>
                     <li>
                         El uso, condiciones de pago y otras condiciones aplicables a las tarjetas de crédito, son de
