@@ -31,10 +31,12 @@
                     </p>
                 @endcan
             </div>
-            <div class="form-group pull-right">
-                <a href="{{ route('facturas.index') }}" class="btn btn-outline-danger"><i class="fa fa-money"></i>
-                    Comprobantes</a>
-            </div>
+            @can('add_comprobantes')
+                <div class="form-group pull-right">
+                    <a href="{{ route('facturas.index') }}" class="btn btn-outline-danger"><i class="fa fa-money"></i>
+                        Comprobantes</a>
+                </div>
+            @endcan
         </div>
 
         <div class="row">
@@ -48,7 +50,7 @@
                         <th>Num. Identidad</th>
                         <th>Categoría</th>
                         <th>Circuito</th>
-                        <th  width="5">Corredor   No.</th>
+                        <th width="5">Corredor No.</th>
                         <th>Kit</th>
                         <th>Talla</th>
                         <th>Email</th>
@@ -102,7 +104,7 @@
 
     });
 
-    let  table;
+    let table;
     function cargarDatatables() {
 
         $('.tfoot_search').each(function () {
@@ -131,17 +133,17 @@
                 {data: 'producto.circuito.circuito', name: 'producto.circuito.circuito'},
                 {data: 'numero', name: 'numero'},
                 {data: 'kit', name: 'kit'},
-                {data: 'tallas', name: 'tallas', orderable:false, searchable: false},
-                {data: 'persona.email', name: 'persona.email', orderable:false}
+                {data: 'tallas', name: 'tallas', orderable: false, searchable: false},
+                {data: 'persona.email', name: 'persona.email', orderable: false}
             ],
             columnDefs: [
                 {
                     targets: 7,
                     render: function (data, type, row, meta) {
-                        if (row.deporte_id==''){
-                            if (type === 'display' && data=='1') {
+                        if (row.deporte_id == '') {
+                            if (type === 'display' && data == '1') {
                                 data = '<i class="fa fa-thumbs-o-up fa-2x text-primary" data-toggle="tooltip" data-placement="top" title="Entregado"></i>';
-                            }else {
+                            } else {
                                 data = '<i class="fa fa-thumbs-o-down fa-2x text-danger" data-toggle="tooltip" data-placement="top" title="Por Entregar"></i>';
                             }
                         }
@@ -357,8 +359,7 @@
     });
 
 
-
-    {{--Alertas con Toastr--}}
+            {{--Alertas con Toastr--}}
             @if(Session::has('message_toastr'))
     let type = "{{ Session::get('alert-type') }}";
     let text_toastr = "{{ Session::get('message_toastr') }}";

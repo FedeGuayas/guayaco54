@@ -32,22 +32,27 @@
             <div class="table-responsive">
                 <div class="dataTables_wrapper container-fluid dt-bootstrap4">
                     <div class="dt-buttons btn-group pull-right">
-                        {!! Form::open() !!}
-                        <div class="form-group row">
-                            <div class="col">
-                                <input type="text" class="form-control date-picker" name="desde" id="desde" readonly/>
-                                <small class="form-text text-muted">Desde</small>
+                        @can('add_comprobantes')
+                            {!! Form::open() !!}
+                            <div class="form-group row">
+                                <div class="col">
+                                    <input type="text" class="form-control date-picker" name="desde" id="desde"
+                                           readonly/>
+                                    <small class="form-text text-muted">Desde</small>
+                                </div>
+                                <div class="col">
+                                    <input type="text" class="form-control date-picker" name="hasta" id="hasta"
+                                           readonly/>
+                                    <small class="form-text text-muted">Hasta</small>
+                                </div>
+                                <div class="col">
+                                    <a href="#facturacionMasiva" data-toggle="modal" data-backdrop="static"
+                                       data-keyboard="false" class="btn btn-outline-primary"
+                                       id="facturacion_masiva"><i class="fa fa-file-excel-o"></i> Facturación Masiva</a>
+                                </div>
                             </div>
-                            <div class="col">
-                                <input type="text" class="form-control date-picker" name="hasta" id="hasta" readonly/>
-                                <small class="form-text text-muted">Hasta</small>
-                            </div>
-                            <div class="col">
-                                <a href="#facturacionMasiva" data-toggle="modal" data-backdrop="static" data-keyboard="false" class="btn btn-outline-primary"
-                                   id="facturacion_masiva"><i class="fa fa-file-excel-o"></i> Facturación Masiva</a>
-                            </div>
-                        </div>
-                        {!! Form::close() !!}
+                            {!! Form::close() !!}
+                        @endcan
                     </div>
                 </div>
 
@@ -255,8 +260,6 @@
     }
 
 
-
-
     //enviar info al modal antes de cargarlo
     $('#facturacionMasiva').on('show.bs.modal', function (event) {
         let modal = $(this);
@@ -271,7 +274,6 @@
         let form = $("#facturacion-form");
         form.submit();
     });
-
 
 
     //eliminar usuario

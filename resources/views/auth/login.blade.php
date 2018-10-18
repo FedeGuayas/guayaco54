@@ -23,7 +23,7 @@
                 <div class="col-md-12 offset-lg-3">
 
                     <div class="card text-white mt-3">
-                        <div class="display-2 ">Inicio de Sessión</div>
+                        <div class="display-2 ">Inicio de Sesión</div>
 
                         <div class="card-body">
 

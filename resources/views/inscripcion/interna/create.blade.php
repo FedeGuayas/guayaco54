@@ -25,6 +25,7 @@
 
         {!! Form::open(['route'=>['inscriptions.store'],'method' => 'post', 'autocomplete'=> 'off', 'class'=>'form_noEnter']) !!}
         {!! Form::hidden('persona_edad',$persona->getEdad(),['id'=>'persona_edad']) !!}
+        {!! Form::hidden('persona_id',$persona->id,['id'=>'persona_id']) !!}
         <div class="row clearfix justify-content-center">
 
             <div class="col-md-10 col-sm-12 mb-30">

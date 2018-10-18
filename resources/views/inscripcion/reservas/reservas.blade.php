@@ -24,7 +24,7 @@
                 <h5 class="text-blue">Inscripciones pendientes</h5>
             </div>
 
-            @can('add_reservas')
+            @can('delete_reservas')
                 <div class="col-md-6 pull-right">
                     {!! Form::open (['route' => 'admin.reserva.export',	'method' => 'POST', 'autocomplete'=> 'off', 'role' => 'search' ])!!}
                     <div class="form-group row">

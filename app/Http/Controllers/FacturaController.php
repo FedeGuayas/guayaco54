@@ -254,8 +254,14 @@ class FacturaController extends Controller
         }
 
 
-        $comprobantes = Factura::with('user', 'persona', 'mpago', 'descuento', 'inscripciones')
-            ->where('status', Factura::PAGADA);
+//        $comprobantes = Factura::with('user', 'persona', 'mpago', 'descuento', 'inscripciones')
+//            ->where('status', Factura::PAGADA);
+
+        $comprobantes = Inscripcion::with('factura', 'user', 'persona', 'producto', 'escenario')
+             ->whereHas('factura', function($query){ //con rol=employee
+                 $query->where('status', Factura::PAGADA);
+             })
+            ->groupBy('factura_id') ;//para cuando haya mas de una inscripcion con una sola factura
 
         if (!$start && !$end) { //no se escogio fecha
             //todos los comprobantes
@@ -277,13 +283,16 @@ class FacturaController extends Controller
             'CtaxCob', 'CtaxAnt', 'cupo', 'empresasri'
         ];
 
-        foreach ($comprobantes as $comp) {
+        foreach ($comprobantes as $comp) {  //inscipciones
 
-            $ruc = $comp->identificacion;
-            $email = $comp->email;
+            $ruc = $comp->factura->identificacion;
+            $email = $comp->factura->email;
+
+            $circuito=$comp->producto->circuito->circuito;
+            $categoria=$comp->producto->categoria->categoria;
 
             if (ValidarRUC::valida_ruc($ruc) === "OK") {
-                $ruc = $comp->identificacion;
+                $ruc = $comp->factura->identificacion;
 
             } elseif (ValidarRUC::valida_ruc($ruc) === "CF" || ValidarRUC::valida_ruc($ruc) == "El formato es incorrecto") {
                 $ruc = 999999999;
@@ -293,29 +302,28 @@ class FacturaController extends Controller
             $comprobantesArray[] = [
                 'codigopadre' => '',
                 'codigo' => '',
-                'nombre' => $comp->nombre,
-                'nombrecomercial' => $comp->nombre,
-                'RUC' => $ruc,
-//                'RUC' => floatval($ruc),
-//                    'Fecha' => substr(str_replace('-','/',$comp->fecha1), 0, 10),
+                'nombre' => $comp->factura->nombre,
+                'nombrecomercial' => $comp->factura->nombre,
+                'RUC' => (int)$ruc,
+//              'Fecha' => substr(str_replace('-','/',$comp->fecha1), 0, 10),
                 'Fecha' => (string)$comp->created_at->format('d/m/Y'),  //$comp->created_at
-                'Referencia' => 'INSCRIPCIÓN EN LA CARRERA GUAYACO RUNNER 2018',//agregar el circuito
-                'Comentario' => $comp->numero,
+                'Referencia' => 'INSCRIPCIÓN EN LA CARRERA GUAYACO RUNNER 2018'. '-' . $circuito . '/' .$categoria,
+                'Comentario' => $comp->factura->numero,
                 'CtaIngreso' => '6252499004001',
                 'Cantidad' => 1,
-                'Valor' => (float)$comp->total,
+                'Valor' => (float)$comp->factura->total,
                 'Iva' => 'S',
-                'DIRECCION' => $comp->direccion,
+                'DIRECCION' => $comp->factura->direccion,
                 'division' => 1002,
                 'TipoCli' => 1,
                 'actividad' => 1,
                 'codvend' => '',
                 'recaudador' => '',
-                'formadepago' => $comp->mpago->nombre,
+                'formadepago' => $comp->factura->mpago->nombre,
                 'estado' => 'A',
                 'diasplazo' => 1,
                 'precio' => 1,
-                'telefono' => (string)$comp->telefono,
+                'telefono' => (string)$comp->factura->telefono,
                 'fax' => '',
                 'celular' => '',
                 'e_mail' => $email,
