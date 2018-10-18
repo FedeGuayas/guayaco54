@@ -298,15 +298,15 @@ class FacturaController extends Controller
                 'RUC' => $ruc,
 //                'RUC' => floatval($ruc),
 //                    'Fecha' => substr(str_replace('-','/',$comp->fecha1), 0, 10),
-                'Fecha' => $comp->created_at,
-                'Referencia' => 'PAGO POR INSCRIPCIÓN EN CARRERA GUAYACO RUNNER 2018',
-                'Comentario' => 'GUAYACORUNNER',
-                'CtaIngreso' => '6252499004001',//Actualizar esto 6252499004001
+                'Fecha' => (string)$comp->created_at->format('d/m/Y'),  //$comp->created_at
+                'Referencia' => 'INSCRIPCIÓN EN LA CARRERA GUAYACO RUNNER 2018',//agregar el circuito
+                'Comentario' => $comp->numero,
+                'CtaIngreso' => '6252499004001',
                 'Cantidad' => 1,
                 'Valor' => (float)$comp->total,
                 'Iva' => 'S',
-                'DIRECCION' => 'GUAYAQUIL',
-                'division' => 2004,
+                'DIRECCION' => $comp->direccion,
+                'division' => 1002,
                 'TipoCli' => 1,
                 'actividad' => 1,
                 'codvend' => '',
@@ -315,7 +315,7 @@ class FacturaController extends Controller
                 'estado' => 'A',
                 'diasplazo' => 1,
                 'precio' => 1,
-                'telefono' => 'NO',
+                'telefono' => (string)$comp->telefono,
                 'fax' => '',
                 'celular' => '',
                 'e_mail' => $email,
@@ -323,7 +323,7 @@ class FacturaController extends Controller
                 'provincia' => 1,
                 'ciudad' => 4,
                 'CtaxCob' => '1110101001',
-                'CtaxAnt' => '210307999',
+                'CtaxAnt' => '2120307999',
                 'cupo' => 500,
                 'empresasri' => 'PERSONAS NO OBLIGADAS A LLEVAR CONTABILIDAD, FACTURA',
             ];
@@ -340,7 +340,7 @@ class FacturaController extends Controller
                     'C' => 'General',
                     'D' => 'General',
                     'E' => '0',
-                    'F' => 'dd/mm/yyyy;@',
+                    'F' => 'dd/mm/yyyy;@',//@
                     'I' => '@',
                     'K' => '#,##0.00_-',
                     'N' => '0',
@@ -354,6 +354,7 @@ class FacturaController extends Controller
                     'AF' => '#,##0.00_-',
                     'AD' => 'General',
                     'AE' => 'General'
+
                 ]);
 
                 $sheet->fromArray($comprobantesArray, null, 'A1', false, false);

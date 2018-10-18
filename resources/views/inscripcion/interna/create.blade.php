@@ -24,7 +24,6 @@
         @endif
 
         {!! Form::open(['route'=>['inscriptions.store'],'method' => 'post', 'autocomplete'=> 'off', 'class'=>'form_noEnter']) !!}
-        {!! Form::hidden('persona_id',$persona->id,['id'=>'persona_id']) !!}
         {!! Form::hidden('persona_edad',$persona->getEdad(),['id'=>'persona_edad']) !!}
         <div class="row clearfix justify-content-center">
 
@@ -399,7 +398,8 @@ $("#categoria_id").change(function () {
                     data: {
                         descuento_id: descuento_id,
                         circuito_id: circuito_id,
-                        categoria_id: categoria_id
+                        categoria_id: categoria_id,
+                        persona_edad:persona_edad
                     },
                     success: (response) => {
                         resolve(response);

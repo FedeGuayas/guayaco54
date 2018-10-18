@@ -16,7 +16,7 @@
         </div>
 
         {!! Form::model($inscription,['route'=>['inscriptions.update',$inscription->id],'method' => 'put', 'autocomplete'=> 'off', 'class'=>'form_noEnter']) !!}
-{{--        {!! Form::hidden('persona_id',$persona->id,['id'=>$persona->id]) !!}--}}
+        {!! Form::hidden('persona_edad',$inscription->persona->getEdad(),['id'=>'persona_edad']) !!}
         <div class="row clearfix justify-content-center">
 
             <div class="col-md-10 col-sm-12 mb-30">
@@ -253,6 +253,7 @@
 
         let token = $("input[name=token]").val();
 
+        let persona_edad = $("#persona_edad").val();
         let deporte = $("#deporte_id");
         let talla = $("#talla");
         let circuito = $("#circuito_id");
@@ -383,7 +384,8 @@ $("#categoria_id").change(function () {
                     data: {
                         descuento_id: descuento_id,
                         circuito_id: circuito_id,
-                        categoria_id: categoria_id
+                        categoria_id: categoria_id,
+                        persona_edad:persona_edad
                     },
                     success: (response) => {
                         resolve(response);

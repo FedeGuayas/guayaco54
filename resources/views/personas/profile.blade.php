@@ -71,6 +71,10 @@
                 <p class="text-center text-muted" style="overflow-wrap:break-word;">
                     {{Auth::user()->email}}
                 </p>
+                <p class="text-center">
+                    <a href="{{route('inscription.create')}}" class="btn btn-primary"> Inscribirme <i
+                                class="fa fa-check"></i></a>
+                </p>
 
                 <div class="profile-info">
                     <h5 class="mb-20 weight-500">Información de Contacto</h5>
@@ -91,7 +95,6 @@
                     </ul>
 
                 </div>
-
 
             </div>
         </div>
