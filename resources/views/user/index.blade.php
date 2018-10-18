@@ -80,14 +80,14 @@
 //        });
 
     });
-
+    let  table;
     function cargarDatatables() {
 
         $('.tfoot_search').each(function () {
             let title = $(this).text();
             $(this).html('<input type="text" class="input-sm" placeholder="Buscar ' + title + '" />');
         });
-        let table = $(".data-table").DataTable({
+        table = $(".data-table").DataTable({
             lengthMenu: [[5, 10, -1], [5, 10, 'Todos']],
             scrollCollapse: true,
             autoWidth: false,
@@ -187,7 +187,7 @@
         let data = form.serialize();
         swal({
             title: 'Confirme la acción',
-            text: "Se eliminará el permiso!",
+            text: "Se eliminará el usuario!",
             type: 'warning',
             showCancelButton: true,
             confirmButtonText: 'Si, proceder! <i class="fa fa-thumbs-up"></i>',
@@ -220,15 +220,13 @@
             if (result.value) {
                 swal({
                     title: ':)',
-                    text: 'Permiso eliminado correctamente',
+                    text: 'Usuario eliminado correctamente',
                     type: 'success',
                     allowOutsideClick: false,
                     allowEscapeKey: false
                 }).then((resp) => {
                     if (resp.value) { //recargar al dar en ok
-                        window.setTimeout(function () {
-                            location.reload()
-                        }, 1);
+                        table.ajax.reload();
                     }
                 })
                 //cancelo la eliminacion
