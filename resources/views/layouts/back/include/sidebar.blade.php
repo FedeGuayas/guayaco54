@@ -50,12 +50,19 @@
                     <ul class="submenu">
                         <li><a href="{{route('facturas.index')}}">Comprobantes</a></li>
                         <li><a href="{{route('admin.facturacion.arqueo')}}">Arqueo</a></li>
+                        @can('add_refunds')
+                            <li>
+                                <a href="{{route('user.getRefund')}}">Rembolsos
+                                    <span class="badge-pill badge-danger"><i class="fa fa-refresh"></i></span>
+                                </a>
+                            </li>
+                        @endcan
                     </ul>
                 </li>
                 <li>
                     <a href="{{route('admin.inscripcions.reservas')}}" class="dropdown-toggle no-arrow">
-                        <span class="fa fa-pencil-square"></span><span class="mtext">Insc. Pendientes <span
-                                    class="badge-pill badge-danger ">{{$cantidad_reservas}}</span>
+                        <span class="fa fa-pencil-square"></span><span class="mtext">Insc. Pendientes
+                            <span class="badge-pill badge-danger ">{{$cantidad_reservas}}</span>
                         </span>
                     </a>
                 </li>
@@ -107,14 +114,11 @@
                     <ul class="submenu">
                         <li><a href="{{route('inscription.create')}}">Nueva Inscripción <i
                                         class="fa fa-pencil-square-o"></i></a>
-                        <li><a href="{{route('user.getComprobantes')}}">Comprobantes <span class="badge-pill badge-danger ">
+                        <li><a href="{{route('user.getComprobantes')}}">Comprobantes <span
+                                        class="badge-pill badge-danger ">
                                     {{ $insc_pagar}}</span>
                             </a>
                         </li>
-                        {{--<li><a href="{{route('user.getRefund')}}">Rembolsos <span class="badge-pill badge-danger ">--}}
-                                    {{--<i class="fa fa-refresh"></i></span>--}}
-                            {{--</a>--}}
-                        {{--</li>--}}
                     </ul>
                 </li>
                 @endhasallroles

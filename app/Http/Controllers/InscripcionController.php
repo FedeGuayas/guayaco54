@@ -954,7 +954,8 @@ class InscripcionController extends Controller
                 $inscripcion = Inscripcion::where('id', $id)->with('factura', 'user')->first();
                 $inscripcion->status = Inscripcion::PAGADA;
                 $inscripcion->num_corredor = $nexNumCorredor;
-                $inscripcion->user_edit = $user->id; //usuario que confirmo la reserva
+                $inscripcion->inscripcion_type=Inscripcion::INSCRIPCION_ONLINE;
+                $inscripcion->user()->associate($user); //usuario que confirmo la reserva, quien la aprobo o cobro aunque sea online
                 $inscripcion->fecha = Carbon::now(); //fecha de aprobada
                 $inscripcion->escenario_id = $user->escenario_id; //escenario donde se confirmo la reserva
                 $inscripcion->update();
