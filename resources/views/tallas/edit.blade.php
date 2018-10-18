@@ -79,6 +79,7 @@
     $(".stock_touchspin").TouchSpin({
         initval: 0,
         min: 0,
+        max:1000,
         step: 1,
         buttondown_class: "btn btn-outline-primary",
         buttonup_class: "btn btn-outline-primary"
