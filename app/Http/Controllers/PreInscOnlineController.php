@@ -99,9 +99,11 @@ class PreInscOnlineController extends Controller
             ->get();
         $tallas = $tallas_all->pluck('talla', 'id');
 
+        $fp = Mpago::where('status', Mpago::ACTIVO)
+            ->where('nombre', 'NOT LIKE', '%tarj%')//momentaneamente no enviar la forma de pago tarjeta
+            ->get();
 
-        $mp = Mpago::where('status', Mpago::ACTIVO)->get();
-        $formas_pago = $mp->pluck('nombre', 'id');
+        $formas_pago = $fp->pluck('nombre', 'id');
 
 
         return view('inscripcion.online.create', compact('categorias', 'tallas', 'perfil', 'formas_pago', 'asociado'));

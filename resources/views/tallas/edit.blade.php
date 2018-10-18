@@ -34,7 +34,7 @@
             <div class="col-md-3 col-sm-6">
                 <div class="form-group">
                     <label for="color">Color</label>
-                    {!! Form::select('color', ['NEGRA'=> 'NEGRA', 'BLANCA' => 'BLANCA','FUCSIA'=>'FUCSIA','AZUL'=>'AZUL'],$talla->color, ['class'=>'form-control','required']) !!}
+                    {!! Form::select('color', ['NEGRA'=> 'NEGRA', 'BLANCA' => 'BLANCA','FUCSIA'=>'FUCSIA','AZUL'=>'AZUL','NARANJA'=>'NARANJA','CELESTE'=>'CELESTE'],$talla->color, ['class'=>'form-control','required']) !!}
                 </div>
             </div>
         </div>
