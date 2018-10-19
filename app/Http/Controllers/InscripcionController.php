@@ -31,6 +31,7 @@ class InscripcionController extends Controller
     public function __construct()
     {
         setlocale(LC_TIME, 'es_ES.utf8');
+        $this->middleware('auth');
     }
 
     /**
@@ -61,7 +62,6 @@ class InscripcionController extends Controller
                     ->join('personas', 'personas.id', '=', 'inscripcions.persona_id')
                     ->leftJoin('registros', 'registros.inscripcion_id', '=', 'inscripcions.id')
                     ->where('inscripcions.status', '=', Inscripcion::PAGADA)//solo mostrar las pagadas
-                    ->where('inscripcions.inscripcion_type', '=', Inscripcion::INSCRIPCION_PRESENCIAL)//mostrar las que hicieron los trabajadores
                     ->orderBy('inscripcions.id', 'desc')
 //                ->whereHas('roles', function($q){ //con rol=employee
 //                    $q->where('name', '=', 'employee');
@@ -82,14 +82,18 @@ class InscripcionController extends Controller
                     </a>
                 @endcan
                 @can(\'edit_inscripciones\')
+                    @if ($inscripcion_type==\App\Inscripcion::INSCRIPCION_PRESENCIAL)
                     <a class="dropdown-item" href="{{ route(\'inscriptions.edit\',[$id]) }}" data-toggle="tooltip" data-placement="top" title="Editar Inscripción">
                         <i class="fa fa-pencil text-success"></i> Editar
                     </a>
+                    @endif
                 @endcan
                 @can(\'delete_inscripciones\')
+                   @if ($inscripcion_type==\App\Inscripcion::INSCRIPCION_PRESENCIAL)
                     <a class="dropdown-item delete" href="#" data-id="{{$id}}" data-toggle="tooltip" data-placement="top" title="Eliminar">
                         <i class="fa fa-trash-o text-danger"></i>  Eliminar
                     </a>
+                    @endif
                 @endcan
                 @if ($deporte_id==\'\')  
                     @if ($kit!=\\App\\Inscripcion::KIT_ENTREGADO)   

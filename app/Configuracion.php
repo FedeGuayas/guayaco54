@@ -15,6 +15,10 @@ class Configuracion extends Model
         'ejercicio_id','impuesto_id','empresa','telefonos','ruc','email','direccion','nombre_contacto','status'
     ];
 
+    protected $hidden = [
+        'client_app_code', 'client_app_key','server_app_code','server_app_key'
+    ];
+
     public function getEmpresaAttribute($value)
     {
         return  mb_strtoupper($value);

@@ -137,7 +137,7 @@
 <script src="{{asset('themes/back/src/plugins/datatables/media/js/dataTables.responsive.js')}}"></script>
 <script src="{{asset('themes/back/src/plugins/datatables/media/js/responsive.bootstrap4.js')}}"></script>
 <script src="{{ asset('js/toastr_message.js') }}"></script>
-<script src="https://cdn.paymentez.com/js/ccapi/stg/paymentez.min.js"></script>
+{{--<script src="https://cdn.paymentez.com/js/ccapi/stg/paymentez.min.js"></script>--}}
 
 <script>
 
@@ -256,94 +256,94 @@
 //             console.log('modal closed');
         },
         onResponse: function (response) { // The callback to invoke when the Checkout process is completed
+console.log(response)
+            {{--if (response.transaction.status === 'success' && response.transaction.status_detail === 3) {--}}
+                {{--let payID = response.transaction.id;--}}
+                {{--swal({--}}
+                    {{--title: ':) Transacción satisfactoria',--}}
+                    {{--text: ' Se realizó el pago correctamente',--}}
+                    {{--type: 'success',--}}
+                    {{--allowOutsideClick: false,--}}
+                    {{--allowEscapeKey: false--}}
+                {{--}).then((resp) => {--}}
+{{--//                        console.log('enviar correo');--}}
+                    {{--if (resp.value) { //Enviar correo de confirmacion y actualizacion de estado--}}
+                        {{--let id = id_insc;--}}
+                        {{--token = $("input[name=_token]").val();--}}
+                        {{--let url = "{{route('user.sendInscripcionPayOut')}}";--}}
+                        {{--let data = {--}}
+                            {{--insc_id: id,--}}
+                            {{--payID: payID--}}
+                        {{--};--}}
+                        {{--let promise = new Promise((resolve, reject) => {--}}
+                            {{--$.ajax({--}}
+                                {{--url: url,--}}
+                                {{--data: data,--}}
+                                {{--headers: {'X-CSRF-TOKEN': token},--}}
+                                {{--type: "post",--}}
+                                {{--success: function (response) {--}}
+                                    {{--resolve(response);--}}
+                                {{--},--}}
+                                {{--error: function (error) {--}}
+                                    {{--reject(error)--}}
+                                {{--}--}}
+                            {{--});--}}
+                        {{--});--}}
+                        {{--promise.then((response) => {--}}
+                            {{--swal({--}}
+                                {{--title: ':) Se actualizó la inscripción',--}}
+                                {{--text: '' + response.data + '',--}}
+                                {{--type: 'success',--}}
+                                {{--allowOutsideClick: false,--}}
+                                {{--allowEscapeKey: false--}}
+                            {{--}).then((resp) => {--}}
+                                {{--window.setTimeout(function () {--}}
+                                    {{--location.reload()--}}
+                                {{--}, 1);--}}
+                            {{--})--}}
+                        {{--}).catch((error) => { //error en la respuesta ajax--}}
+{{--//                            console.log(error);--}}
+                            {{--let message;--}}
+                            {{--if (error.responseJSON.data !== null) {--}}
+                                {{--message = error.responseJSON.data;--}}
+                            {{--} else {--}}
+                                {{--message = ':( Lo sentimos ocurrio un error';--}}
+                            {{--}--}}
+                            {{--swal(--}}
+                                {{--'' + message + '',--}}
+                                {{--'' + error.status + ' ' + error.statusText + '',--}}
+                                {{--'error'--}}
+                            {{--)--}}
+                        {{--});--}}
 
-            if (response.transaction.status === 'success' && response.transaction.status_detail === 3) {
-                let payID = response.transaction.id;
-                swal({
-                    title: ':) Transacción satisfactoria',
-                    text: ' Se realizó el pago correctamente',
-                    type: 'success',
-                    allowOutsideClick: false,
-                    allowEscapeKey: false
-                }).then((resp) => {
-//                        console.log('enviar correo');
-                    if (resp.value) { //Enviar correo de confirmacion y actualizacion de estado
-                        let id = id_insc;
-                        token = $("input[name=_token]").val();
-                        let url = "{{route('user.sendInscripcionPayOut')}}";
-                        let data = {
-                            insc_id: id,
-                            payID: payID
-                        };
-                        let promise = new Promise((resolve, reject) => {
-                            $.ajax({
-                                url: url,
-                                data: data,
-                                headers: {'X-CSRF-TOKEN': token},
-                                type: "post",
-                                success: function (response) {
-                                    resolve(response);
-                                },
-                                error: function (error) {
-                                    reject(error)
-                                }
-                            });
-                        });
-                        promise.then((response) => {
-                            swal({
-                                title: ':) Se actualizó la inscripción',
-                                text: '' + response.data + '',
-                                type: 'success',
-                                allowOutsideClick: false,
-                                allowEscapeKey: false
-                            }).then((resp) => {
-                                window.setTimeout(function () {
-                                    location.reload()
-                                }, 1);
-                            })
-                        }).catch((error) => { //error en la respuesta ajax
-//                            console.log(error);
-                            let message;
-                            if (error.responseJSON.data !== null) {
-                                message = error.responseJSON.data;
-                            } else {
-                                message = ':( Lo sentimos ocurrio un error';
-                            }
-                            swal(
-                                '' + message + '',
-                                '' + error.status + ' ' + error.statusText + '',
-                                'error'
-                            )
-                        });
+                    {{--}--}}
+                {{--})--}}
 
-                    }
-                })
-
-            } else if (response.transaction.status === 'failure' || response.transaction.status === 'pending') {
-                let message_error;
-                switch (response.transaction.status_detail) {
-                    case 9 : //Rechazada
-                        message_error = 'Transacción denegada';
-                        break;
-                    case 1 : //Pendiente
-                        message_error = 'Transacción revisada';
-                        break;
-                    case 11 : //Rechazada, fraude
-                        message_error = 'Rechazado por transacción de sistema de fraude';
-                        break;
-                    case 12 : //Rechazada
-                        message_error = 'Tarjeta en lista negra';
-                        break;
-                    default:
-                        message_error = 'No se pudo realizar el pago';
-                }
-                // console.log(message_error);
-                swal(
-                    ':( Lo sentimos ocurrio un error durante la transacción',
-                    ' Inténtelo mas tarde y si los problemas persisten, puede pagar en uno de nuestros centros de inscripción',
-                    'error'
-                )
-            }
+            {{--} else if (response.transaction.status === 'failure' || response.transaction.status === 'pending') {--}}
+                {{--let message_error;--}}
+                {{--switch (response.transaction.status_detail) {--}}
+                    {{--case 9 : //Rechazada--}}
+                        {{--message_error = 'Transacción denegada';--}}
+                        {{--break;--}}
+                    {{--case 1 : //Pendiente--}}
+                        {{--message_error = 'Transacción revisada';--}}
+                        {{--break;--}}
+                    {{--case 11 : //Rechazada, fraude--}}
+                        {{--message_error = 'Rechazado por transacción de sistema de fraude';--}}
+                        {{--break;--}}
+                    {{--case 12 : //Rechazada--}}
+                        {{--message_error = 'Tarjeta en lista negra';--}}
+                        {{--break;--}}
+                    {{--default:--}}
+                        {{--message_error = 'No se pudo realizar el pago';--}}
+                {{--}--}}
+                {{--// console.log(message_error);--}}
+                {{--swal(--}}
+                    {{--':( Lo sentimos ocurrio un error durante la transacción',--}}
+                    {{--' Inténtelo mas tarde y si los problemas persisten, puede pagar en uno de nuestros centros de inscripción',--}}
+                    {{--'error'--}}
+                {{--)--}}
+            {{--}--}}
 
         }
     });
@@ -378,7 +378,7 @@
                     user_id: response.data.user_online.toString(), //id de usuario
                     user_email: response.data.factura.email ? response.data.factura.email : '', //correo facturacion
                     user_phone: response.data.factura.telefono ? response.data.factura.telefono : '', //telefono facturacion
-                    order_description: 'Guayaco Runner 2018', //descripcion de la compra
+                    order_description: 'GR-2018 #'+response.data.factura.numero, //descripcion de la compra
                     order_amount: response.data.factura.total, //monto del pago
                     order_vat: 0, //impuestos
                     order_reference: response.data.id.toString(), //orden de compra (inscripcion_id)

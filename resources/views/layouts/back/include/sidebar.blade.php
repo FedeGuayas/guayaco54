@@ -50,13 +50,6 @@
                     <ul class="submenu">
                         <li><a href="{{route('facturas.index')}}">Comprobantes</a></li>
                         <li><a href="{{route('admin.facturacion.arqueo')}}">Arqueo</a></li>
-                        @can('add_refunds')
-                            <li>
-                                <a href="{{route('user.getRefund')}}">Rembolsos
-                                    <span class="badge-pill badge-danger"><i class="fa fa-refresh"></i></span>
-                                </a>
-                            </li>
-                        @endcan
                     </ul>
                 </li>
                 <li>
@@ -119,6 +112,13 @@
                                     {{ $insc_pagar}}</span>
                             </a>
                         </li>
+                        @can('add_refunds')
+                            <li>
+                                <a href="{{route('user.getRefund')}}">Rembolsos
+                                    <span class="badge-pill badge-danger"><i class="fa fa-refresh"></i></span>
+                                </a>
+                            </li>
+                        @endcan
                     </ul>
                 </li>
                 @endhasallroles

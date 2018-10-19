@@ -52,9 +52,9 @@
                                    data-toggle="dropdown"><i class="fa fa-ellipsis-h"></i></a>
                                 <div class="dropdown-menu dropdown-menu-left">
                                     <a class="dropdown-item refund" href="#" data-id="{{$c->factura->payment_id}}"
-                                           data-toggle="tooltip"
-                                           data-placement="top" title="Reembolsar y cancelar Inscripción">
-                                            <i class="fa fa-recycle text-danger"></i> Reembolsar
+                                       data-toggle="tooltip"
+                                       data-placement="top" title="Reembolsar y cancelar Inscripción">
+                                        <i class="fa fa-recycle text-danger"></i> Reembolsar
                                     </a>
                                 </div>
                             </div>
@@ -92,12 +92,12 @@
 <script src="{{asset('themes/back/src/plugins/datatables/media/js/dataTables.responsive.js')}}"></script>
 <script src="{{asset('themes/back/src/plugins/datatables/media/js/responsive.bootstrap4.js')}}"></script>
 <script src="{{ asset('js/toastr_message.js') }}"></script>
-<link href="https://cdn.paymentez.com/js/ccapi/stg/paymentez.min.css" rel="stylesheet" type="text/css" />
+<link href="https://cdn.paymentez.com/js/ccapi/stg/paymentez.min.css" rel="stylesheet" type="text/css"/>
 <script src="https://cdn.paymentez.com/js/ccapi/stg/paymentez.min.js"></script>
 <script>
 
     let table;
-    Paymentez.init('stg', 'FEDE-EC-SERVER', 'rQph9IKZPta4KhiOXXwCfvWco9Vml6');
+    //    Paymentez.init('stg', 'FEDE-EC-SERVER', 'rQph9IKZPta4KhiOXXwCfvWco9Vml6');
 
     $('document').ready(function () {
 
@@ -122,11 +122,11 @@
     });
 
     let token = $("input[name=_token]").val();
-//
+    //
 
-    function genToken(){
+    function genToken() {
         let data;
-        let url="{{route('payment.getToken')}}";
+        let url = "{{route('payment.getToken')}}";
         $.ajax({
             url: url,
             data: '',
@@ -134,28 +134,79 @@
             headers: {'X-CSRF-TOKEN': token},
             type: "post",
             success: function (response) {
-                data=response;
+                data = response;
             },
             error: function (error) {
-               console.log(error);
+                console.log(error);
             }
         });
         return data;
     }
 
-    //Realizar reembolso
-    $(document).on('click', '.refund', function (e) {
-        e.preventDefault();
-        {{--let client_app_code= "{{ $configuracion->client_app_code }}";--}}
-        {{--let client_app_key= "{{ $configuracion->client_app_key }}";--}}
-        {{--let unix_timestamp= $.now().toString();--}}
-        {{--let uniq_token_string = client_app_key + unix_timestamp;--}}
+    ////////////////token//////////////
 
-        let auth_token=genToken();
+    let getUniqToken = function (auth_timestamp, paymentez_client_app_key) {
+        let uniq_token_string = paymentez_client_app_key + auth_timestamp;
+        return getHash(uniq_token_string)
+    };
+
+    let getAuthToken = function (paymentez_client_app_code, app_client_key) {
+        let d = new Date,
+            n = d.getTime(),
+            auth_timestamp = "" + n,
+            string_auth_token = paymentez_client_app_code + ";" + auth_timestamp + ";" + getUniqToken(auth_timestamp, app_client_key);
+        return btoa(string_auth_token)
+    };
+
+    let getHash = function (message) {
+        let sha256 = new jsSHA("SHA-256", "TEXT");
+        return sha256.update(message), sha256.getHash("HEX")
+    };
+
+
+//    let createToken = function (createTokenRequest, successCallback, erroCallback) {
+//            let SERVER_URL = 'https://ccapi-stg.paymentez.com/v2/transaction/refund/', xmlhttp = new XMLHttpRequest;
+//
+//            xmlhttp.open("POST", SERVER_URL + "/v2/card/add", !0),
+//                xmlhttp.setRequestHeader("Content-Type", "application/json"),
+//                xmlhttp.setRequestHeader("Auth-Token", auth_token_payment),
+//                xmlhttp.onreadystatechange = function () {
+//                    if (xmlhttp.readyState == XMLHttpRequest.DONE)
+//                        try {
+//                            var objResponse = JSON.parse(xmlhttp.responseText);
+//                            200 == xmlhttp.status ? successCallback(objResponse) : erroCallback(400 == xmlhttp.status ? objResponse : objResponse)
+//                        } catch (e) {
+//                            var server_error = {
+//                                error: {
+//                                    type: "Server Error",
+//                                    help: "Server Error",
+//                                    description: "Server Error"
+//                                }
+//                            };
+//                            erroCallback(server_error)
+//                        }
+//                },
+//                xmlhttp.send(JSON.stringify(createTokenRequest))
+//        },
+
+
+        //////////////////////////////////
+
+
+        //Realizar reembolso
+        $
+    (document).on('click', '.refund', function (e) {
+        e.preventDefault();
+                {{--let client_app_code= "{{ $configuracion->client_app_code }}";--}}
+                {{--let client_app_key= "{{ $configuracion->client_app_key }}";--}}
+                {{--let unix_timestamp= $.now().toString();--}}
+                {{--let uniq_token_string = client_app_key + unix_timestamp;--}}
+
+//        let auth_token = genToken();
 
 
         let id = $(this).attr('data-id');
-        console.log(auth_token)
+        console.log( getAuthToken('FEDE-EC-SERVER', 'rQph9IKZPta4KhiOXXwCfvWco9Vml6'));
         let row = $(this).parents('tr');
         let form = $("#form-refund");
         let url = 'https://ccapi-stg.paymentez.com/v2/transaction/refund/';
@@ -181,12 +232,19 @@
             preConfirm: function () {
                 return new Promise((resolve, reject) => {
                     $.ajax({
+//                        beforeSend: function(xhrObj){
+//                            xhrObj.setRequestHeader("Content-Type","application/json");
+//                            xhrObj.setRequestHeader('Auth-Token', auth_token);
+//                        },
                         url: url,
                         data: data,
-                        headers: {'Auth-Token': auth_token},
+                        headers: {
+                            'Auth-Token': getAuthToken('FEDE-EC-SERVER', 'rQph9IKZPta4KhiOXXwCfvWco9Vml6')
+//                            'Content-Type': 'application/json'
+                        },
                         type: "post",
                         contentType: 'application/json',
-                        dataType:'json',
+                        dataType: 'json',
                         success: function (response) {
                             resolve(response);
                         },
@@ -232,8 +290,7 @@
     });
 
 
-
-       //    Fin Paymentez
+    //    Fin Paymentez
 
             {{--Alertas con Toastr--}}
             @if(Session::has('message_toastr'))

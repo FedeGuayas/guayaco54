@@ -110,6 +110,8 @@ class ConfiguracionController extends Controller
             $configuracion->nombre_contacto = $request->input('nombre_contacto');
             $configuracion->client_app_code=trim($request->input('client_app_code'));
             $configuracion->client_app_key=trim($request->input('client_app_key'));
+            $configuracion->server_app_code=trim($request->input('server_app_code'));
+            $configuracion->server_app_key=trim($request->input('server_app_key'));
             $configuracion->save();
 
             DB::Commit();
@@ -192,6 +194,8 @@ class ConfiguracionController extends Controller
             $configuracion->nombre_contacto = $request->input('nombre_contacto');
             $configuracion->client_app_code=trim($request->input('client_app_code'));
             $configuracion->client_app_key=trim($request->input('client_app_key'));
+            $configuracion->server_app_code=trim($request->input('server_app_code'));
+            $configuracion->server_app_key=trim($request->input('server_app_key'));
             $configuracion->update();
 
             DB::Commit();

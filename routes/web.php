@@ -27,6 +27,8 @@ Route::get('email-verification/error/{message}', 'Auth\RegisterController@getVer
 Route::get('email-verification/check/{token}', 'Auth\RegisterController@getVerification')->name('email-verification.check');
 
 
+Route::post('payment/check-out', 'PaymentController@getCallback')->name('getPaymentCallback');
+
 /*
  *Usuarios autenticados y con cuentas verificadas
  */
