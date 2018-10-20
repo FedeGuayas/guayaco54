@@ -73,13 +73,14 @@ class PaymentController extends Controller
             $status_detail = $request->transaction->status_detail;//short
             $date = $request->transaction->date;//string
             $message = $request->transaction->message;//string
-            $transaction_id = $request->transaction->transaction_id;//string
-            $dev_reference = $request->transaction->dev_reference;//string
+            $transaction_id = $request->transaction->id;//string
+            $dev_reference = $request->transaction->dev_reference;//string,  Identificarás esta compra utilizando esta referencia.
             $carrier_code = $request->transaction->carrier_code;//int
             $amount = $request->transaction->amount;//double
-            $paid_date = $request->transaction->paid_date;//string
+            $paid_date = $request->transaction->paid_date;//string '19/10/2018 16:41:00',
             $installments = $request->transaction->installments;//int
             $application_code = $request->transaction->application_code;//string
+            $transaction_stoken = $request->transaction->stoken;//string
 
             //user
             $user_id = $request->user->id;//string
@@ -103,41 +104,42 @@ class PaymentController extends Controller
             }
 
             //stoken generation
-            $for_md5 = $request->transaction->id . "_" . $app_code . "_" . $request->user->id . "_" . $app_key;// "123_HF_123456_2GYx7SdjmbucLKE924JVFcmCl8t6nB";
-            //$hashed = md5('123_HF_123456_2GYx7SdjmbucLKE924JVFcmCl8t6nB');
-            $stoken = md5($for_md5); //hash md5
+            $stoken_string = $transaction_id . "_" . $app_code . "_" . $user_id . "_" . $app_key;
+            $stoken_gen = md5($stoken_string); //hash md5
+
+
+            //Get Response
+            $responsePaymentez = "Respuesta Paymentez: status: " . $status
+                . " - " . $this->getStatusDescription($status)
+                . " | status_detail: " . $status_detail
+                . " - " . $this->getStatusDetailDescription($status_detail)
+                . " | order_description: " . $order_description
+                . " | authorization_code: " . $authorization_code
+                . " | date: " . $date
+                . " | message: " . $message
+                . " | transaction_id: " . $transaction_id
+                . " | dev_reference: " . $dev_reference
+                . " | amount: " . $amount
+                . " | paid_date: " . $paid_date
+                . " | installments: " . $installments
+                . " | stoken: " . $transaction_stoken
+                . " | application_code: " . $application_code
+                . " | user_id: " . $user_id
+                . " | email: " . $user_email
+                . " | bin: " . $bin
+                . " | holder_name: " . $holder_name
+                . " | type: " . $type
+                . " | number: " . $number
+                . " | origin: " . $origin
+            ;
+
+            if ($transaction_stoken == $stoken_gen)
+            {
+
+            }
 
 
 
-
-//            data: {
-//                'transaction': {
-//                    'status': 1,
-//                    'order_description': u'Guayaco Runner 2018',
-//                    'authorization_code': u'123456',
-//                    'dev_reference': u'1',
-//                    'carrier_code': u'00',
-//                    'status_detail': 3,
-//                    'installments': u'0',
-//                    'amount': 8.0,
-//                    'paid_date': '19/10/2018 16:41:00',
-//                    'date': '19/10/2018 16:41:00',
-//                    'message': u'Response by mock',
-//                    'stoken': '0622620ac8ec7007258e66e5965354fb',
-//                    'id': u'DF-61264',
-//                    'application_code': u'FEDE-EC-CLIENT'
-//                },
-//                'user': {
-//                    'id': u'6',
-//                    'email': u'osalas@paymentez.com'
-//                },
-//                'card': {
-//                    'bin': u'411111',
-//                    'origin': 'Paymentez',
-//                    'holder_name': u'Oliver Salas',
-//                    'type': 'vi',
-//                    'number': u'1111'
-//                }
         }
 
 
@@ -151,6 +153,130 @@ class PaymentController extends Controller
 
     }
 
+
+    public function getStatusDescription($status){
+        $statusDescription = '';
+        //reference on https://paymentez.github.io/api-doc/#status-details
+        switch ($status) {
+            case 1:
+            {
+                $statusDescription = "Approved";
+                break;
+            }
+            case 2:
+            {
+                $statusDescription = "Cancelled";
+                break;
+            }
+            case 4:
+            {
+                $statusDescription = "Rejected";
+                break;
+            }
+        }
+
+        return $statusDescription;
+    }
+
+    public function getStatusDetailDescription($status_detail){
+        $statusDetailDescription = '';
+
+    //reference on https://paymentez.github.io/api-doc/#status-details
+
+        switch ($status_detail)
+            {
+            case 0:
+            {
+                $statusDetailDescription = "Waiting for Payment."; break;
+            }
+            case 1:
+            {
+                $statusDetailDescription = "Verification required, please see Verification section."; break;
+            }
+            case 3:
+            {
+                $statusDetailDescription = "Paid"; break;
+            }
+            case 6:
+            {
+                $statusDetailDescription = "Fraud"; break;
+            }
+            case 7:
+            {
+                $statusDetailDescription = "Refund"; break;
+            }
+            case 8:
+            {
+                $statusDetailDescription = "Chargeback"; break;
+            }
+            case 9:
+            {
+                $statusDetailDescription = "Rejected by carrier"; break;
+            }
+            case 10:
+            {
+                $statusDetailDescription = "System error"; break;
+            }
+            case 11:
+            {
+                $statusDetailDescription = "Paymentez fraud"; break;
+            }
+            case 12:
+            {
+                $statusDetailDescription = "Paymentez blacklist"; break;
+            }
+            case 13:
+            {
+                $statusDetailDescription = "Time tolerance."; break;
+            }
+            case 19:
+            {
+                $statusDetailDescription = "Invalid Authorization Code."; break;
+            }
+            case 20:
+            {
+                $statusDetailDescription = "Authorization code expired."; break;
+            }
+            case 21:
+            {
+                $statusDetailDescription = "Paymentez Fraud - Pending refund."; break;
+            }
+            case 22:
+            {
+                $statusDetailDescription = "Invalid AuthCode - Pending refund."; break;
+            }
+            case 23:
+            {
+                $statusDetailDescription = "AuthCode expired - Pending refund."; break;
+            }
+            case 24:
+            {
+                $statusDetailDescription = "Paymentez Fraud - Refund requested."; break;
+            }
+            case 25:
+            {
+                $statusDetailDescription = "Invalid AuthCode - Refund requested."; break;
+            }
+            case 26:
+            {
+                $statusDetailDescription = "AuthCode expired - Refund requested."; break;
+            }
+            case 27:
+            {
+                $statusDetailDescription = "Merchant - Pending refund."; break;
+            }
+            case 28:
+            {
+                $statusDetailDescription = "Merchant - Refund requested."; break;
+            }
+            case 30:
+            {
+                $statusDetailDescription = "Transaction seated (only Datafast)."; break;
+            }
+        }
+
+            return $statusDetailDescription;
+        }
 
 
     /**
