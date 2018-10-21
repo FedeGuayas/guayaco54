@@ -136,6 +136,19 @@ class PaymentController extends Controller
             if ($transaction_stoken == $stoken_gen)
             {
 
+                //Buscar en tabla payments la orden de compra por el campo dev_reference
+                $order=$resultado;
+                if (isset($order)){
+
+                    //compruebe la transaction_id para asegurarse de que no está obteniendo un POST duplicado.
+                    $exist_transaction= $buscar_por_transaction_id;
+                    //if transaction doesn't exist
+
+                    if ($exist_transaction == null){
+                        
+                    }
+                }
+
             }
 
 
@@ -153,7 +166,12 @@ class PaymentController extends Controller
 
     }
 
-
+    /**
+     * Status de la transaccion
+     * @param $status
+     * @return string
+     */
+    //https://paymentez.github.io/api-doc/#status-details
     public function getStatusDescription($status){
         $statusDescription = '';
         //reference on https://paymentez.github.io/api-doc/#status-details
@@ -178,10 +196,14 @@ class PaymentController extends Controller
         return $statusDescription;
     }
 
+    /**
+     * Detalles del status de transaccion
+     * @param $status_detail
+     * @return string
+     */
+    //https://paymentez.github.io/api-doc/#status-details
     public function getStatusDetailDescription($status_detail){
         $statusDetailDescription = '';
-
-    //reference on https://paymentez.github.io/api-doc/#status-details
 
         switch ($status_detail)
             {
@@ -273,10 +295,28 @@ class PaymentController extends Controller
             {
                 $statusDetailDescription = "Transaction seated (only Datafast)."; break;
             }
+            case 31:
+            {
+                $statusDetailDescription = "Waiting for OTP."; break;
+            }
+            case 32:
+            {
+                $statusDetailDescription = "OTP successfully validated."; break;
+            }
+            case 33:
+            {
+                $statusDetailDescription = "OTP not validated."; break;
+            }
+            case 34:
+            {
+                $statusDetailDescription = "Partial refund"; break;
+            }
+
         }
 
             return $statusDetailDescription;
         }
+
 
 
     /**
