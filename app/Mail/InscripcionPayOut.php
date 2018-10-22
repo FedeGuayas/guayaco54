@@ -3,6 +3,7 @@
 namespace App\Mail;
 
 use App\Inscripcion;
+use App\Payment;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
@@ -13,15 +14,17 @@ class InscripcionPayOut extends Mailable
     use Queueable, SerializesModels;
 
     public $inscripcion;
+    public $payment;
 
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct(Inscripcion $inscription)
+    public function __construct(Inscripcion $inscription,Payment $payment)
     {
         $this->inscripcion=$inscription;
+        $this->payment=$payment;
     }
 
     /**

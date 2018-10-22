@@ -154,4 +154,10 @@ class User extends Authenticatable
         return $this->hasMany('App\LogActivities');
     }
 
+    //un usuario online puede realizar mucho pagos
+    public function payments()
+    {
+        return $this->hasMany('App\Payment');
+    }
+
 }

@@ -107,7 +107,7 @@ Route::middleware(['auth', 'isVerified'])->group(function () {
         //Obtener los datos de la preinscripcion al dar en el boton pagar
         Route::post('payment/check-out/getInscripcion', 'PaymentController@getInscripcionPay')->name('user.getInscripcionPay');
         //Actualizar el estado de la inscripcion a pagada y enviar correo al usuario
-        Route::post('payment/check-out/setInscripcionPay', 'PaymentController@sendInscripcionPayOut')->name('user.sendInscripcionPayOut');
+        Route::post('payment/check-out/setInscripcionPay', 'PaymentController@setFacturaTransID')->name('user.setFacturaTransID');
         //Comprobante de inscripcion, para realizar pago en WU o Contado en Fedeguayas
         Route::get('inscription/comprobante/{inscription}', 'PreInscOnlineController@comprobantePDF')->name('user.comprobantePDF');
         //Registro de inscripcion aprobado y pagado de usuario online

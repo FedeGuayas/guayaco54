@@ -6,6 +6,7 @@ use App\Configuracion;
 use App\Factura;
 use App\Inscripcion;
 use App\Mail\InscripcionPayOut;
+use App\Payment;
 use App\Registro;
 use App\User;
 use Illuminate\Http\Request;
@@ -50,6 +51,74 @@ class PaymentController extends Controller
         return false;
     }
 
+    /**
+     *
+     * Actualizar estado de inscripcion y factura, asignar transaction_id a la factura , crear registro de corredor
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function setFacturaTransID(Request $request)
+    {
+        if ($request->ajax()) {
+
+            $transaction_id = $request->input('payID');
+            $insc_id = $request->input('insc_id');
+
+            $inscripcion = Inscripcion::with('factura', 'user', 'producto', 'persona')->where('id', $insc_id)->first();
+            $factura = $inscripcion->factura;
+
+//            if (!$inscripcion || !$factura) {
+//                $notification = 'Se realizo su pago pero ocurrio un error al actualizar el estado de la inscripción, por favor pongase en contacto con nosotros proporcionando este ID de transacción ID: ' . $transaction_id . '';
+//                return response()->json(['data' => $notification], 400);
+//            }
+
+            $factura->transaction_id = $transaction_id;
+            $factura->status = Factura::PENDIENTE;
+            $factura->update();
+
+            try {
+
+                DB::beginTransaction();
+
+                //CREAR NUMERO DE CORREDOR
+                $maxNumCorr = DB::table('registros')->max('numero'); //maximo valor en la columna numero
+                if (is_numeric($maxNumCorr)) {
+                    $nexNumCorredor = $maxNumCorr + 1;
+                } else {
+                    $maxNumCorr = 0;
+                    $nexNumCorredor = 1;
+                }
+
+                $inscripcion->status = Inscripcion::RESERVADA;
+                $inscripcion->num_corredor = $nexNumCorredor;
+                $inscripcion->inscripcion_type = Inscripcion::INSCRIPCION_ONLINE;
+                $inscripcion->update();
+
+                $persona = $inscripcion->persona;
+
+                //CREAR EL REGISTRO DEL CORREDOR
+                $registro = new Registro();
+                $registro->numero = $nexNumCorredor;
+                $registro->inscripcion()->associate($inscripcion);
+                $registro->persona()->associate($persona);
+                $registro->save();
+
+                DB::commit();
+
+                $message = 'Se le enviará un correo con el estado de su pago.';
+                return response()->json(['data' => $message], 200);
+
+            } catch (\Exception $e) {
+                DB::rollback();
+//              $message=$e->getMessage();
+                $message = 'Lo sentimos ha ocurrido un error, pongase en contacto con nosotros';
+                return response()->json(['data' => $message], 400);
+            }
+
+        }
+    }
+
+
 
     public function getCallback(Request $request)
     {
@@ -74,7 +143,7 @@ class PaymentController extends Controller
             $date = $request->transaction->date;//string
             $message = $request->transaction->message;//string
             $transaction_id = $request->transaction->id;//string
-            $dev_reference = $request->transaction->dev_reference;//string,  Identificarás esta compra utilizando esta referencia.
+            $dev_reference = $request->transaction->dev_reference;//string,  Identificarás esta compra utilizando esta referencia = order_reference = inscripcion_id
             $carrier_code = $request->transaction->carrier_code;//int
             $amount = $request->transaction->amount;//double
             $paid_date = $request->transaction->paid_date;//string '19/10/2018 16:41:00',
@@ -130,39 +199,156 @@ class PaymentController extends Controller
                 . " | holder_name: " . $holder_name
                 . " | type: " . $type
                 . " | number: " . $number
-                . " | origin: " . $origin
-            ;
+                . " | origin: " . $origin;
 
-            if ($transaction_stoken == $stoken_gen)
-            {
+            //para asegurarse de que el POST provino de Paymentez
+            if ($transaction_stoken == $stoken_gen) {
 
-                //Buscar en tabla payments la orden de compra por el campo dev_reference
-                $order=$resultado;
-                if (isset($order)){
+                //Buscar en tabla facturas la orden de compra por el campo dev_reference (factura_id)
+                $order = Factura::where('id', $dev_reference)->first();
+
+                if (isset($order)) { //si existe kla factura
+
+                    $inscripcion=Inscripcion::with('persona','producto')->where('factura_id',$order->id)->first();
 
                     //compruebe la transaction_id para asegurarse de que no está obteniendo un POST duplicado.
-                    $exist_transaction= $buscar_por_transaction_id;
-                    //if transaction doesn't exist
+                    $payment = Payment::where('transaction_id', $transaction_id)->first();
 
-                    if ($exist_transaction == null){
-                        
+                    // si la transacción no existe
+                    if (!isset($payment)) { //no se encuentra la transaccion, es primer post del callback
+
+                        //Approved, actualizar inscripcion->status, factura->status y guardar transaccion
+                        if ($status == 1 && $order->status == Factura::PENDIENTE) {
+
+                            $payment->status=Payment::CONFIRMADA;
+                            $payment->order_description = $order_description;
+                            $payment->authorization_code = $authorization_code;
+                            $payment->status_detail = $status_detail;
+                            $payment->date = $date;
+                            $payment->message = $message;
+                            $payment->transaction_id = $transaction_id;
+                            $payment->dev_reference = $dev_reference;
+                            $payment->carrier_code = $carrier_code;
+                            $payment->amount = $amount;
+                            $payment->paid_date = $paid_date;
+                            $payment->installments = $installments;
+                            $payment->application_code = $application_code;
+                            $payment->stoken = $transaction_stoken;
+                            //user
+                            $payment->user_id = $user_id;
+                            $payment->user_email = $user_email;
+                            //card
+                            $payment->bin = $bin;
+                            $payment->holder_name = $holder_name;
+                            $payment->type = $type;
+                            $payment->number = $number;
+                            $payment->origin = $origin;
+                            $payment->save();
+
+                            $inscripcion->status = Inscripcion::PAGADA;
+                            $inscripcion->update();
+
+
+                            $order->status = Factura::PAGADA;
+                            $order->update();
+
+                              //email de confirmacion de compra al correo de facturacion del usuario
+                            Mail::to($payment->user_email)->send(new InscripcionPayOut($inscripcion,$payment));
+
+                            if (count(Mail::failures() < 0)) {
+                                //correo enviado
+                                LogActivity::addToPaymentLog('Enviado correo de confirmacion de pago', $payment, $responsePaymentez);
+                            } else {
+                            //correo no enviado
+                            LogActivity::addToPaymentLog('Error al enviar correo de confirmacion de pago', $payment, $responsePaymentez);
+                            }
+
+                            //200	success
+                            return response()->json(['success' => 'Approved'], 200);
+
+                        } elseif ($status == 4) {  //Rejected
+
+                            $payment->status=Payment::RECHAZADA;
+                            $payment->order_description = $order_description;
+                            $payment->authorization_code = $authorization_code;
+                            $payment->status_detail = $status_detail;
+                            $payment->date = $date;
+                            $payment->message = $message;
+                            $payment->transaction_id = $transaction_id;
+                            $payment->dev_reference = $dev_reference;
+                            $payment->carrier_code = $carrier_code;
+                            $payment->amount = $amount;
+                            $payment->paid_date = $paid_date;
+                            $payment->installments = $installments;
+                            $payment->application_code = $application_code;
+                            $payment->stoken = $transaction_stoken;
+                            //user
+                            $payment->user_id = $user_id;
+                            $payment->user_email = $user_email;
+                            //card
+                            $payment->bin = $bin;
+                            $payment->holder_name = $holder_name;
+                            $payment->type = $type;
+                            $payment->number = $number;
+                            $payment->origin = $origin;
+                            $payment->save();
+                            LogActivity::addToPaymentLog('Pago rechazado', $payment, $responsePaymentez);
+
+                            //200	success
+                            return response()->json(['success' => 'Rejected'], 200);
+                        } elseif ($status == 2 && $order->status == Factura::PAGADA) {  //Cancelled -- Reversed
+
+                            $payment->status=Payment::CANCELADA;
+                            $payment->order_description = $order_description;
+                            $payment->authorization_code = $authorization_code;
+                            $payment->status_detail = $status_detail;
+                            $payment->date = $date;
+                            $payment->message = $message;
+                            $payment->transaction_id = $transaction_id;
+                            $payment->dev_reference = $dev_reference;
+                            $payment->carrier_code = $carrier_code;
+                            $payment->amount = $amount;
+                            $payment->paid_date = $paid_date;
+                            $payment->installments = $installments;
+                            $payment->application_code = $application_code;
+                            $payment->stoken = $transaction_stoken;
+                            //user
+                            $payment->user_id = $user_id;
+                            $payment->user_email = $user_email;
+                            //card
+                            $payment->bin = $bin;
+                            $payment->holder_name = $holder_name;
+                            $payment->type = $type;
+                            $payment->number = $number;
+                            $payment->origin = $origin;
+                            $payment->save();
+
+                            $inscripcion->status = Inscripcion::RESERVADA; //eliminar
+                            $inscripcion->update();
+
+                            $order->status = Factura::CANCELADA; //pago reverzado
+                            $order->update();
+
+                            LogActivity::addToPaymentLog('Pago reversado', $payment, $responsePaymentez);
+                            //200	success
+                            return response()->json(['success' => 'Cancelled'], 200);
+
+                        } else { //204	transaction_id already received
+
+                            //200	success
+                            return response()->json(['success' => 'transaction_id already received'], 204);
+                        }
+
                     }
-                }
 
+                }
+            } else {//203	token error
+
+                //200	success
+                return response()->json(['success' => 'token error'], 203);
             }
 
-
-
-        }
-
-
-//        $user = User::where('id', 1)->first();
-//        LogActivity::addToLog('Respuesta callback paymentez', $user, $data);
-//            $notification = [
-//                'message_toastr' => ''.$request->all().'',
-//                'alert-type' => 'error'];
-//            return dd($request->all());
-
+        } //$request->ajax()
 
     }
 
@@ -172,22 +358,20 @@ class PaymentController extends Controller
      * @return string
      */
     //https://paymentez.github.io/api-doc/#status-details
-    public function getStatusDescription($status){
+    public function getStatusDescription($status)
+    {
         $statusDescription = '';
         //reference on https://paymentez.github.io/api-doc/#status-details
         switch ($status) {
-            case 1:
-            {
+            case 1: {
                 $statusDescription = "Approved";
                 break;
             }
-            case 2:
-            {
+            case 2: {
                 $statusDescription = "Cancelled";
                 break;
             }
-            case 4:
-            {
+            case 4: {
                 $statusDescription = "Rejected";
                 break;
             }
@@ -202,201 +386,122 @@ class PaymentController extends Controller
      * @return string
      */
     //https://paymentez.github.io/api-doc/#status-details
-    public function getStatusDetailDescription($status_detail){
+    public function getStatusDetailDescription($status_detail)
+    {
         $statusDetailDescription = '';
 
-        switch ($status_detail)
-            {
-            case 0:
-            {
-                $statusDetailDescription = "Waiting for Payment."; break;
+        switch ($status_detail) {
+            case 0: {
+                $statusDetailDescription = "Waiting for Payment.";
+                break;
             }
-            case 1:
-            {
-                $statusDetailDescription = "Verification required, please see Verification section."; break;
+            case 1: {
+                $statusDetailDescription = "Verification required, please see Verification section.";
+                break;
             }
-            case 3:
-            {
-                $statusDetailDescription = "Paid"; break;
+            case 3: {
+                $statusDetailDescription = "Paid";
+                break;
             }
-            case 6:
-            {
-                $statusDetailDescription = "Fraud"; break;
+            case 6: {
+                $statusDetailDescription = "Fraud";
+                break;
             }
-            case 7:
-            {
-                $statusDetailDescription = "Refund"; break;
+            case 7: {
+                $statusDetailDescription = "Refund";
+                break;
             }
-            case 8:
-            {
-                $statusDetailDescription = "Chargeback"; break;
+            case 8: {
+                $statusDetailDescription = "Chargeback";
+                break;
             }
-            case 9:
-            {
-                $statusDetailDescription = "Rejected by carrier"; break;
+            case 9: {
+                $statusDetailDescription = "Rejected by carrier";
+                break;
             }
-            case 10:
-            {
-                $statusDetailDescription = "System error"; break;
+            case 10: {
+                $statusDetailDescription = "System error";
+                break;
             }
-            case 11:
-            {
-                $statusDetailDescription = "Paymentez fraud"; break;
+            case 11: {
+                $statusDetailDescription = "Paymentez fraud";
+                break;
             }
-            case 12:
-            {
-                $statusDetailDescription = "Paymentez blacklist"; break;
+            case 12: {
+                $statusDetailDescription = "Paymentez blacklist";
+                break;
             }
-            case 13:
-            {
-                $statusDetailDescription = "Time tolerance."; break;
+            case 13: {
+                $statusDetailDescription = "Time tolerance.";
+                break;
             }
-            case 19:
-            {
-                $statusDetailDescription = "Invalid Authorization Code."; break;
+            case 19: {
+                $statusDetailDescription = "Invalid Authorization Code.";
+                break;
             }
-            case 20:
-            {
-                $statusDetailDescription = "Authorization code expired."; break;
+            case 20: {
+                $statusDetailDescription = "Authorization code expired.";
+                break;
             }
-            case 21:
-            {
-                $statusDetailDescription = "Paymentez Fraud - Pending refund."; break;
+            case 21: {
+                $statusDetailDescription = "Paymentez Fraud - Pending refund.";
+                break;
             }
-            case 22:
-            {
-                $statusDetailDescription = "Invalid AuthCode - Pending refund."; break;
+            case 22: {
+                $statusDetailDescription = "Invalid AuthCode - Pending refund.";
+                break;
             }
-            case 23:
-            {
-                $statusDetailDescription = "AuthCode expired - Pending refund."; break;
+            case 23: {
+                $statusDetailDescription = "AuthCode expired - Pending refund.";
+                break;
             }
-            case 24:
-            {
-                $statusDetailDescription = "Paymentez Fraud - Refund requested."; break;
+            case 24: {
+                $statusDetailDescription = "Paymentez Fraud - Refund requested.";
+                break;
             }
-            case 25:
-            {
-                $statusDetailDescription = "Invalid AuthCode - Refund requested."; break;
+            case 25: {
+                $statusDetailDescription = "Invalid AuthCode - Refund requested.";
+                break;
             }
-            case 26:
-            {
-                $statusDetailDescription = "AuthCode expired - Refund requested."; break;
+            case 26: {
+                $statusDetailDescription = "AuthCode expired - Refund requested.";
+                break;
             }
-            case 27:
-            {
-                $statusDetailDescription = "Merchant - Pending refund."; break;
+            case 27: {
+                $statusDetailDescription = "Merchant - Pending refund.";
+                break;
             }
-            case 28:
-            {
-                $statusDetailDescription = "Merchant - Refund requested."; break;
+            case 28: {
+                $statusDetailDescription = "Merchant - Refund requested.";
+                break;
             }
-            case 30:
-            {
-                $statusDetailDescription = "Transaction seated (only Datafast)."; break;
+            case 30: {
+                $statusDetailDescription = "Transaction seated (only Datafast).";
+                break;
             }
-            case 31:
-            {
-                $statusDetailDescription = "Waiting for OTP."; break;
+            case 31: {
+                $statusDetailDescription = "Waiting for OTP.";
+                break;
             }
-            case 32:
-            {
-                $statusDetailDescription = "OTP successfully validated."; break;
+            case 32: {
+                $statusDetailDescription = "OTP successfully validated.";
+                break;
             }
-            case 33:
-            {
-                $statusDetailDescription = "OTP not validated."; break;
+            case 33: {
+                $statusDetailDescription = "OTP not validated.";
+                break;
             }
-            case 34:
-            {
-                $statusDetailDescription = "Partial refund"; break;
-            }
-
-        }
-
-            return $statusDetailDescription;
-        }
-
-
-
-    /**
-     * Actualizar estado de inscripcion, crear registro de corredor y enviar correo de pago al usuario
-     * @param Request $request
-     * @return \Illuminate\Http\RedirectResponse
-     */
-    public
-    function sendInscripcionPayOut(Request $request)
-    {
-        if ($request->ajax()) {
-
-            $transaction_id = $request->input('payID');
-            $insc_id = $request->input('insc_id');
-
-            $inscripcion = Inscripcion::with('factura', 'user', 'producto', 'persona')->where('id', $insc_id)->first();
-            $factura = $inscripcion->factura;
-
-            if (!$inscripcion || !$factura) {
-                $notification = 'Se realizo su pago pero ocurrio un error al actualizar el estado de la inscripción, por favor pongase en contacto con nosotros proporcionando este ID de transacción ID: ' . $transaction_id . '';
-                return response()->json(['data' => $notification], 400);
-            }
-
-            $factura->payment_id = $transaction_id;
-            $factura->status = Factura::PAGADA;
-            $factura->update();
-
-            try {
-
-                DB::beginTransaction();
-
-                //CREAR NUMERO DE CORREDOR
-                $maxNumCorr = DB::table('registros')->max('numero'); //maximo valor en la columna numero
-                if (is_numeric($maxNumCorr)) {
-                    $nexNumCorredor = $maxNumCorr + 1;
-                } else {
-                    $maxNumCorr = 0;
-                    $nexNumCorredor = 1;
-                }
-
-                $inscripcion->status = Inscripcion::PAGADA;
-                $inscripcion->num_corredor = $nexNumCorredor;
-                $inscripcion->inscripcion_type = Inscripcion::INSCRIPCION_ONLINE;
-                $inscripcion->update();
-
-                $persona = $inscripcion->persona;
-
-                //CREAR EL REGISTRO DEL CORREDOR
-                $registro = new Registro();
-                $registro->numero = $nexNumCorredor;
-                $registro->inscripcion()->associate($inscripcion);
-                $registro->persona()->associate($persona);
-                $registro->save();
-
-                //email de confirmacion de compra al correo de facturacion del usuario
-                Mail::to($factura->email)->send(new InscripcionPayOut($inscripcion));
-
-                if (count(Mail::failures() < 0)) {
-                    //correo enviado
-                    LogActivity::addToLog('Enviado correo de confirmacion de pago (inscripcion->id , factura_email) ', $request->user(), $inscripcion->id, $factura->email);
-                } else {
-                    //correo no enviado
-                    LogActivity::addToLog('Error al enviar correo de confirmacion de pago (inscripcion->id , factura_email) ', $request->user(), $inscripcion->id, $factura->email);
-                }
-
-                DB::commit();
-
-                $message = 'Se actualizó el estado del pago';
-                return response()->json(['data' => $message], 200);
-
-            } catch (\Exception $e) {
-                DB::rollback();
-//              $message=$e->getMessage();
-                $message = 'Ocurrio un error y no se pudo actualizar la inscripción';
-                return response()->json(['data' => $message], 400);
-
+            case 34: {
+                $statusDetailDescription = "Partial refund";
+                break;
             }
 
         }
+
+        return $statusDetailDescription;
     }
+
+
 
 
     /**
@@ -404,8 +509,7 @@ class PaymentController extends Controller
      * @param Request $request
      * @return bool|\Illuminate\Http\JsonResponse
      */
-    public
-    function setRefund(Request $request)
+    public function setRefund(Request $request)
     {
         if ($request->ajax()) {
 

@@ -13,9 +13,11 @@ Categoría: {{$inscripcion->producto->categoria->categoria}}
 
 Referencia de pago:
 
-ID: {{$inscripcion->factura->payment_id}}
+ID: {{$payment->transaction_id}}
 
-Valor: $ {{$inscripcion->factura->total}}
+Valor: $ {{$payment->amount}}
+
+Código de Autorización: {{$payment->authorization_code}}
 
 Puede imprimir sus registros de inscripción aquí.
 @component('mail::button', ['url' =>  route('user.getComprobantes')])

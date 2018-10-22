@@ -51,7 +51,7 @@
                                 <a class="btn btn-outline-primary dropdown-toggle" href="#" role="button"
                                    data-toggle="dropdown"><i class="fa fa-ellipsis-h"></i></a>
                                 <div class="dropdown-menu dropdown-menu-left">
-                                    <a class="dropdown-item refund" href="#" data-id="{{$c->factura->payment_id}}"
+                                    <a class="dropdown-item refund" href="#" data-id="{{$c->factura->transaction_id}}"
                                        data-toggle="tooltip"
                                        data-placement="top" title="Reembolsar y cancelar Inscripción">
                                         <i class="fa fa-recycle text-danger"></i> Reembolsar
@@ -60,11 +60,11 @@
                             </div>
                         </td>
                         <td>{{$c->id}}</td>
-                        <td>{{$c->factura->payment_id}}</td>
+                        <td>{{$c->factura->transaction_id}}</td>
                         <td>{{$c->factura->updated_at}}</td>
                         <td>$ {{ number_format($c->factura->total,2,'.', ' ') }}</td>
                         <td>
-                            @if ( ($c->factura->status===\App\Factura::PAGADA && $c->status===\App\Inscripcion::PAGADA) && !is_null($c->factura->payment_id) && strtolower($c->factura->mpago->nombre)=== 'tarjeta' )
+                            @if ( ($c->factura->status===\App\Factura::PAGADA && $c->status===\App\Inscripcion::PAGADA) && !is_null($c->factura->transaction_id) && strtolower($c->factura->mpago->nombre)=== 'tarjeta' )
                                 <span class="text-success" data-toggle="tooltip" data-placement="left"
                                       title="Confirmada"><i class="fa fa-check-square-o fa-2x"></i></span>
                             @elseif (($c->factura->status===\App\Factura::PENDIENTE && $c->status===\App\Inscripcion::RESERVADA) && strtolower($c->factura->mpago->nombre)!= 'tarjeta')

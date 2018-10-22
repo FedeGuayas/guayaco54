@@ -246,7 +246,7 @@ class PreInscOnlineController extends Controller
             $factura->telefono = $telefono_fact;
             $factura->identificacion = $num_doc_fact;
             $factura->mpago()->associate($mpago);
-            $factura->payment_id = NULL;
+            $factura->transaction_id = NULL;
             $factura->status = Factura::PENDIENTE;
             $factura->save();
 
@@ -527,7 +527,7 @@ class PreInscOnlineController extends Controller
             ->where('user_online', $user->id)
             ->where('ejercicio_id', $ejercicio->ejercicio_id)
             ->whereHas('factura', function ($query) {
-                $query->whereNotNull('payment_id');
+                $query->whereNotNull('transaction_id');
             })
             ->get();
 

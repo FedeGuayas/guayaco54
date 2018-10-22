@@ -40,4 +40,25 @@ class LogActivity
         return LogActivityModel::latest()->with('user')->get();
     }
 
+    public static function addToPaymentLog($subject,$payment,$message)
+    {
+        $log = [];
+
+        $log['user_type'] = 'paymentez_callback' ;
+        $log['user_id'] = $payment->user_id;
+        $log['subject'] = $subject;
+        $log['old_values'] =$message ;
+        $log['new_values'] = null;
+//        $log['url'] = Request::fullUrl();
+        $log['url'] = Request::fullUrlWithQuery([]);
+        $log['method'] = Request::method();
+        $log['ip_address'] = Request::ip();
+        $log['user_agent'] =Request::header('User-Agent');
+//        $log['user_agent'] = Request::header('user-agent');
+
+
+        LogActivityModel::create($log);
+    }
+
+
 }

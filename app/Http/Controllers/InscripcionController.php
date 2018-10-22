@@ -337,7 +337,7 @@ class InscripcionController extends Controller
                 $factura->telefono = $telefono_fact;
                 $factura->identificacion = $num_doc_fact;
                 $factura->mpago()->associate($mpago);
-                $factura->payment_id = NULL;
+                $factura->transaction_id = NULL;
                 $factura->status = Factura::PAGADA;  //crear registro (numero de corredor)
                 $factura->save();
             }
@@ -585,7 +585,7 @@ class InscripcionController extends Controller
                 $factura->telefono = $telefono_fact;
                 $factura->identificacion = $num_doc_fact;
                 $factura->mpago()->associate($mpago);
-                $factura->payment_id = NULL; //solo para pago con tarjeta online
+                $factura->transaction_id = NULL; //solo para pago con tarjeta online
                 $factura->status = Factura::PAGADA;
                 $factura->save();
                 //EDITAR INSCRIPCION

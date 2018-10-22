@@ -11,7 +11,7 @@ class Factura extends Model
     const CANCELADA = '0'; //se elimino
 
     protected $fillable = [
-        'numero','fecha_edit','descuento','subtotal','total','user_id','persona_id','nombre','email','direccion','telefono','identificacion','mpago_id','payment_id','status'
+        'numero','fecha_edit','descuento','subtotal','total','user_id','persona_id','nombre','email','direccion','telefono','identificacion','mpago_id','transaction_id','status'
     ];
 
     public function setNombreAttribute($value)
@@ -39,13 +39,13 @@ class Factura extends Model
         return  mb_strtoupper($value);
     }
 
-    //como payment_id es unico, pero sino es null
-    public function setPaymentIdAttribute($value)
+    //como transaction_id es unico, pero sino es null
+    public function setTransactionIdAttribute($value)
     {
         if ( empty($value) ) {
-            $this->attributes['payment_id'] = NULL;
+            $this->attributes['transaction_id'] = NULL;
         } else {
-            $this->attributes['payment_id']=$value;
+            $this->attributes['transaction_id']=$value;
         }
     }
 
