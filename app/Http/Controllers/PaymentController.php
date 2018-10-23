@@ -252,7 +252,7 @@ class PaymentController extends Controller
                             $payment->stoken = $transaction_stoken;
                             //user
                             $payment->user_id = $user_id;
-                            $payment->user_email = $user_email;
+                            $payment->email = $user_email;
                             //card
                             $payment->bin = $bin;
                             $payment->holder_name = $holder_name;
@@ -264,11 +264,11 @@ class PaymentController extends Controller
                             $inscripcion->status = Inscripcion::PAGADA;
                             $inscripcion->update();
 
-                            $order->status = Factura::PAYMENT_APPROVED;
+                            $order->payment_status = Factura::PAYMENT_APPROVED;
                             $order->update();
 
                             //email de confirmacion de compra al correo de facturacion del usuario
-                            Mail::to($payment->user_email)->send(new InscripcionPayOut($inscripcion, $payment));
+                            Mail::to($payment->email)->send(new InscripcionPayOut($inscripcion, $payment));
 
                             if (count(Mail::failures() < 0)) {
                                 //correo enviado
@@ -301,7 +301,7 @@ class PaymentController extends Controller
                                 $payment->stoken = $transaction_stoken;
                                 //user
                                 $payment->user_id = $user_id;
-                                $payment->user_email = $user_email;
+                                $payment->email = $user_email;
                                 //card
                                 $payment->bin = $bin;
                                 $payment->holder_name = $holder_name;
@@ -313,7 +313,7 @@ class PaymentController extends Controller
                                 $inscripcion->status = Inscripcion::RESERVADA;
                                 $inscripcion->update();
 
-                                $order->status = Factura::PAYMENT_REJECTED;
+                                $order->payment_status = Factura::PAYMENT_REJECTED;
                                 $order->update();
 
                                 LogActivity::addToPaymentLog('Pago rechazado', $payment, $responsePaymentez);
@@ -342,7 +342,7 @@ class PaymentController extends Controller
                             $payment->stoken = $transaction_stoken;
                             //user
                             $payment->user_id = $user_id;
-                            $payment->user_email = $user_email;
+                            $payment->email = $user_email;
                             //card
                             $payment->bin = $bin;
                             $payment->holder_name = $holder_name;
