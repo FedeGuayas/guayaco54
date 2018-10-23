@@ -6,12 +6,19 @@ use Illuminate\Database\Eloquent\Model;
 
 class Factura extends Model
 {
+    //Status
     const PAGADA = '1'; //se pago
     const PENDIENTE= 'p'; //para pago online, esta pendiente de pago, despues que se pague pasara a ACTIVA (Pagada)
     const CANCELADA = '0'; //se elimino
 
+    //ONLINE PAYMENT_STATUS
+    const PAYMENT_PENDING = '0'; //Pendiente
+    const PAYMENT_APPROVED = '1'; //Se Confirmo
+    const PAYMENT_CANCELLED = '2'; //Se Cancelo o reverso
+    const PAYMENT_REJECTED = '4'; //Se Rechazo
+
     protected $fillable = [
-        'numero','fecha_edit','descuento','subtotal','total','user_id','persona_id','nombre','email','direccion','telefono','identificacion','mpago_id','transaction_id','status'
+        'numero','fecha_edit','descuento','subtotal','total','user_id','persona_id','nombre','email','direccion','telefono','identificacion','mpago_id','transaction_id','status','payment_status'
     ];
 
     public function setNombreAttribute($value)

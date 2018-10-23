@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Payment extends Model
 {
-
+    const PENDIENTE = '0';
     const CONFIRMADA = '1';
     const CANCELADA = '2';
     const RECHAZADA = '4';

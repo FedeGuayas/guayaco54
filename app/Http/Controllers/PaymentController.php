@@ -12,6 +12,7 @@ use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Facades\App\Classes\LogActivity;
 use function MongoDB\BSON\toJSON;
@@ -73,7 +74,7 @@ class PaymentController extends Controller
 //            }
 
             $factura->transaction_id = $transaction_id;
-            $factura->status = Factura::PENDIENTE;
+            $factura->status = Factura::PAGADA;
             $factura->update();
 
             try {
@@ -124,7 +125,18 @@ class PaymentController extends Controller
     {
         $configuracion = Configuracion::where('status', Configuracion::ATIVO)->first();
 
-        if ($request->ajax() && $request != null) {
+        //cada vez que se haga una transaction se debe responder con uno de los siguientes codigos para confirmar la recepcion del callback
+
+        /*  200	success
+            201	product_id error
+            202	user_id error
+            203	token error
+            204	transaction_id already received  //
+        */
+
+        if ($request ) {
+
+//            Log::info($request);
 
             $responsePaymentez = '';
 
@@ -136,33 +148,34 @@ class PaymentController extends Controller
             $app_key_client = $configuracion->client_app_key;
 
             //transaction
-            $status = $request->transaction->status;//int
-            $order_description = $request->transaction->order_description;//string
-            $authorization_code = $request->transaction->authorization_code;//string
-            $status_detail = $request->transaction->status_detail;//short
-            $date = $request->transaction->date;//string
-            $message = $request->transaction->message;//string
-            $transaction_id = $request->transaction->id;//string
-            $dev_reference = $request->transaction->dev_reference;//string,  Identificarás esta compra utilizando esta referencia = order_reference = inscripcion_id
-            $carrier_code = $request->transaction->carrier_code;//int
-            $amount = $request->transaction->amount;//double
-            $paid_date = $request->transaction->paid_date;//string '19/10/2018 16:41:00',
-            $installments = $request->transaction->installments;//int
-            $application_code = $request->transaction->application_code;//string
-            $transaction_stoken = $request->transaction->stoken;//string
+            $status = $request->input('transaction.status');//int
+            $order_description = $request->input('transaction.order_description');//string
+            $authorization_code = $request->input('transaction.authorization_code');//string
+            $dev_reference = $request->input('transaction.dev_reference');//string,   = order_reference = factura_id
+            $carrier_code = $request->input('transaction.carrier_code');//int
+            $status_detail = $request->input('transaction.status_detail');//short
+            $installments = $request->input('transaction.installments');//int
+            $amount = $request->input('transaction.amount');//double
+            $paid_date = $request->input('transaction.paid_date');//string '19/10/2018 16:41:00',
+            $date = $request->input('transaction.date');//string
+            $message = $request->input('transaction.message');//s.ing
+            $transaction_stoken = $request->input('transaction.stoken');//string
+            $transaction_id = $request->input('transaction.id');//string
+            $application_code = $request->input('transaction.application_code');//string
+
 
             //user
-            $user_id = $request->user->id;//string
-            $user_email = $request->user->email;//string
+            $user_id = $request->input('user.id');//string
+            $user_email = $request->input('user.email');//string
 
             //card
-            $bin = $request->card->bin;//string
-            $holder_name = $request->card->holder_name;//string
-            $type = $request->card->type;//string
-            $number = $request->card->number;//string
-            $origin = $request->card->origin;//string
+            $bin = $request->input('card.bin');//string
+            $holder_name = $request->input('card.holder_name');//string
+            $type = $request->input('card.type');//string
+            $number = $request->input('card.number');//string
+            $origin = $request->input('card.origin');//string
 
-            if ($request->transaction->application_code == $app_code_client) {
+            if ($application_code == $app_code_client) {
                 //desarrollo
                 $app_code = $app_code_client;
                 $app_key = $app_key_client;
@@ -201,26 +214,29 @@ class PaymentController extends Controller
                 . " | number: " . $number
                 . " | origin: " . $origin;
 
+
             //para asegurarse de que el POST provino de Paymentez
             if ($transaction_stoken == $stoken_gen) {
 
                 //Buscar en tabla facturas la orden de compra por el campo dev_reference (factura_id)
                 $order = Factura::where('id', $dev_reference)->first();
 
-                if (isset($order)) { //si existe kla factura
+                if (isset($order)) { //si existe la factura
 
-                    $inscripcion=Inscripcion::with('persona','producto')->where('factura_id',$order->id)->first();
-
-                    //compruebe la transaction_id para asegurarse de que no está obteniendo un POST duplicado.
+                    //compruebe la transaction_id en la tabla paymentez para asegurarse de que no está obteniendo un POST duplicado.
                     $payment = Payment::where('transaction_id', $transaction_id)->first();
 
+                    $inscripcion = Inscripcion::with('persona', 'producto')->where('factura_id', $order->id)->first();
+
+//                    LogActivity::addToPaymentLog('Prueba de callback ', $payment, $responsePaymentez);
                     // si la transacción no existe
                     if (!isset($payment)) { //no se encuentra la transaccion, es primer post del callback
 
-                        //Approved, actualizar inscripcion->status, factura->status y guardar transaccion
-                        if ($status == 1 && $order->status == Factura::PENDIENTE) {
+                        //Approved,
+                        if ($status == 1 && $order->status == Factura::PAGADA && $order->payment_status != Factura::PAYMENT_APPROVED) {
 
-                            $payment->status=Payment::CONFIRMADA;
+                            $payment = new Payment();
+                            $payment->status = $status;
                             $payment->order_description = $order_description;
                             $payment->authorization_code = $authorization_code;
                             $payment->status_detail = $status_detail;
@@ -248,27 +264,69 @@ class PaymentController extends Controller
                             $inscripcion->status = Inscripcion::PAGADA;
                             $inscripcion->update();
 
-
-                            $order->status = Factura::PAGADA;
+                            $order->status = Factura::PAYMENT_APPROVED;
                             $order->update();
 
-                              //email de confirmacion de compra al correo de facturacion del usuario
-                            Mail::to($payment->user_email)->send(new InscripcionPayOut($inscripcion,$payment));
+                            //email de confirmacion de compra al correo de facturacion del usuario
+                            Mail::to($payment->user_email)->send(new InscripcionPayOut($inscripcion, $payment));
 
                             if (count(Mail::failures() < 0)) {
                                 //correo enviado
                                 LogActivity::addToPaymentLog('Enviado correo de confirmacion de pago', $payment, $responsePaymentez);
                             } else {
-                            //correo no enviado
-                            LogActivity::addToPaymentLog('Error al enviar correo de confirmacion de pago', $payment, $responsePaymentez);
+                                //correo no enviado
+                                LogActivity::addToPaymentLog('Error al enviar correo de confirmacion de pago', $payment, $responsePaymentez);
                             }
-
+                            LogActivity::addToPaymentLog('Pago confirmado', $payment, $responsePaymentez);
                             //200	success
                             return response()->json(['success' => 'Approved'], 200);
 
-                        } elseif ($status == 4) {  //Rejected
+                        } else {
+                            if ($status == 4) {  //Rejected
 
-                            $payment->status=Payment::RECHAZADA;
+                                $payment = new Payment();
+                                $payment->status = $status;
+                                $payment->order_description = $order_description;
+                                $payment->authorization_code = $authorization_code;
+                                $payment->status_detail = $status_detail;
+                                $payment->date = $date;
+                                $payment->message = $message;
+                                $payment->transaction_id = $transaction_id;
+                                $payment->dev_reference = $dev_reference;
+                                $payment->carrier_code = $carrier_code;
+                                $payment->amount = $amount;
+                                $payment->paid_date = $paid_date;
+                                $payment->installments = $installments;
+                                $payment->application_code = $application_code;
+                                $payment->stoken = $transaction_stoken;
+                                //user
+                                $payment->user_id = $user_id;
+                                $payment->user_email = $user_email;
+                                //card
+                                $payment->bin = $bin;
+                                $payment->holder_name = $holder_name;
+                                $payment->type = $type;
+                                $payment->number = $number;
+                                $payment->origin = $origin;
+                                $payment->save();
+
+                                $inscripcion->status = Inscripcion::RESERVADA;
+                                $inscripcion->update();
+
+                                $order->status = Factura::PAYMENT_REJECTED;
+                                $order->update();
+
+                                LogActivity::addToPaymentLog('Pago rechazado', $payment, $responsePaymentez);
+
+                                //200	success
+                                return response()->json(['success' => 'Rejected'], 200);
+                            }
+                        }
+                    } else { //existia el pago payment
+
+                        if ($status == 2 && $order->status == Factura::PAGADA &&  $order->payment_status == Factura::PAYMENT_APPROVED) {  //Cancelled -- Reversed
+
+                            $payment->status = $status;
                             $payment->order_description = $order_description;
                             $payment->authorization_code = $authorization_code;
                             $payment->status_detail = $status_detail;
@@ -292,41 +350,16 @@ class PaymentController extends Controller
                             $payment->number = $number;
                             $payment->origin = $origin;
                             $payment->save();
-                            LogActivity::addToPaymentLog('Pago rechazado', $payment, $responsePaymentez);
 
-                            //200	success
-                            return response()->json(['success' => 'Rejected'], 200);
-                        } elseif ($status == 2 && $order->status == Factura::PAGADA) {  //Cancelled -- Reversed
-
-                            $payment->status=Payment::CANCELADA;
-                            $payment->order_description = $order_description;
-                            $payment->authorization_code = $authorization_code;
-                            $payment->status_detail = $status_detail;
-                            $payment->date = $date;
-                            $payment->message = $message;
-                            $payment->transaction_id = $transaction_id;
-                            $payment->dev_reference = $dev_reference;
-                            $payment->carrier_code = $carrier_code;
-                            $payment->amount = $amount;
-                            $payment->paid_date = $paid_date;
-                            $payment->installments = $installments;
-                            $payment->application_code = $application_code;
-                            $payment->stoken = $transaction_stoken;
-                            //user
-                            $payment->user_id = $user_id;
-                            $payment->user_email = $user_email;
-                            //card
-                            $payment->bin = $bin;
-                            $payment->holder_name = $holder_name;
-                            $payment->type = $type;
-                            $payment->number = $number;
-                            $payment->origin = $origin;
-                            $payment->save();
-
-                            $inscripcion->status = Inscripcion::RESERVADA; //eliminar
+                            $inscripcion->status = Inscripcion::RESERVADA; //eliminar inscripcion
                             $inscripcion->update();
 
+                            //eliminar registro
+
+                            //aumentar talla stock
+
                             $order->status = Factura::CANCELADA; //pago reverzado
+                            $order->payment_status = Factura::PAYMENT_CANCELLED; //pago reverzado
                             $order->update();
 
                             LogActivity::addToPaymentLog('Pago reversado', $payment, $responsePaymentez);
@@ -344,11 +377,9 @@ class PaymentController extends Controller
                 }
             } else {//203	token error
 
-                //200	success
                 return response()->json(['success' => 'token error'], 203);
             }
-
-        } //$request->ajax()
+        }
 
     }
 

@@ -40,12 +40,12 @@ class LogActivity
         return LogActivityModel::latest()->with('user')->get();
     }
 
-    public static function addToPaymentLog($subject,$payment,$message)
+    public static function addToPaymentLog($subject,$payment=null,$message=null)
     {
         $log = [];
 
         $log['user_type'] = 'paymentez_callback' ;
-        $log['user_id'] = $payment->user_id;
+        $log['user_id'] = $payment!=null ? $payment->user_id : null;
         $log['subject'] = $subject;
         $log['old_values'] =$message ;
         $log['new_values'] = null;
