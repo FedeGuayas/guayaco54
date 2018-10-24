@@ -9,6 +9,7 @@ use App\Mail\InscripcionPayOut;
 use App\Payment;
 use App\Registro;
 use App\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -148,7 +149,7 @@ class PaymentController extends Controller
             $app_key_client = $configuracion->client_app_key;
 
             //transaction
-            $status = $request->input('transaction.status');//int
+            $status = $request->input('transaction.status');//int 0	Pending,  1	Approved ,2	Cancelled, 4 Rejected
             $order_description = $request->input('transaction.order_description');//string
             $authorization_code = $request->input('transaction.authorization_code');//string
             $dev_reference = $request->input('transaction.dev_reference');//string,   = order_reference = factura_id
@@ -229,8 +230,9 @@ class PaymentController extends Controller
                     $inscripcion = Inscripcion::with('persona', 'producto')->where('factura_id', $order->id)->first();
 
 //                    LogActivity::addToPaymentLog('Prueba de callback ', $payment, $responsePaymentez);
+
                     // si la transacción no existe
-                    if (!isset($payment)) { //no se encuentra la transaccion, es primer post del callback
+                    if (!isset($payment)) { //no se encuentra la transaccion, es primer post del callback sobre esta transaccion
 
                         //Approved,
                         if ($status == 1 && $order->status == Factura::PAGADA && $order->payment_status != Factura::PAYMENT_APPROVED) {
@@ -322,9 +324,9 @@ class PaymentController extends Controller
                                 return response()->json(['success' => 'Rejected'], 200);
                             }
                         }
-                    } else { //existia el pago payment
+                    } else { //existia el pago,  payment 0,	Pending ,2	Cancelled, 4 Rejected
 
-                        if ($status == 2 && $order->status == Factura::PAGADA &&  $order->payment_status == Factura::PAYMENT_APPROVED) {  //Cancelled -- Reversed
+                        if ( ($status == 0 || $status == 2 || $status == 4 ) ) {  //Cancelled -- Reversed
 
                             $payment->status = $status;
                             $payment->order_description = $order_description;
@@ -374,7 +376,11 @@ class PaymentController extends Controller
 
                     }
 
+                }  else {//201	product_id error
+
+                    return response()->json(['success' => 'product_id error'], 201);
                 }
+
             } else {//203	token error
 
                 return response()->json(['success' => 'token error'], 203);
@@ -533,6 +539,34 @@ class PaymentController extends Controller
     }
 
 
+    /**
+     * Obtener los pagos online aprobados para realizar reembolsos y cancelaciones
+     * @param Request $request
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function getRefund(Request $request)
+    {
+        $user = $request->user();
+
+        $ejercicio = Configuracion::where('status', Configuracion::ATIVO)
+            ->select('ejercicio_id')
+            ->first();
+
+        $comprobantes = Inscripcion::from('inscripcions as i')
+            ->join('facturas as f', 'f.id', '=', 'i.factura_id')
+            ->join('payments as p', 'p.transaction_id', '=', 'f.transaction_id')
+            ->whereNotNull('i.user_online')
+            ->whereNotNull('f.transaction_id')
+            ->where('f.status',Factura::PAGADA)
+            ->where('f.payment_status',Factura::PAYMENT_APPROVED)
+            ->where('i.inscripcion_type',Inscripcion::INSCRIPCION_ONLINE)
+            ->where('i.status',Inscripcion::PAGADA)
+            ->where('i.ejercicio_id', $ejercicio->ejercicio_id)
+            ->select('f.transaction_id','f.id as fId','p.date','p.paid_date','p.amount','i.id','i.factura_id','p.dev_reference','p.transaction_id','i.user_online','f.status','f.payment_status','i.inscripcion_type','i.status','i.ejercicio_id')
+            ->get();
+
+        return view('inscripcion.online.index-refund', compact('comprobantes'));
+    }
 
 
     /**
@@ -540,23 +574,79 @@ class PaymentController extends Controller
      * @param Request $request
      * @return bool|\Illuminate\Http\JsonResponse
      */
-    public function setRefund(Request $request)
-    {
+    public function setRefund(Request $request){
+
+//        $inscripcion = Inscripcion::with('factura', 'producto')
+//            ->where('id', $request->input('insc_id'))
+//            ->where('user_online', $request->user()->id)
+//            ->first();
+
         if ($request->ajax()) {
 
-            $inscripcion = Inscripcion::with('factura', 'producto')
-                ->where('id', $request->input('insc_id'))
-                ->where('user_online', $request->user()->id)
-                ->first();
+            $url = '';
+            $transc_id = $request->input('transc_id');
 
-            if ($inscripcion) {
-                return response()->json(['data' => $inscripcion], 200);
-            } else {
-                return response()->json(['data' => 'No se encontró la inscripción'], 404);
+            $order = Factura::where('transaction_id', $transc_id)->first();
+
+            if (isset($order)) {
+
+                if ($order->payment_status == Factura::PAYMENT_APPROVED) {
+                    //reversar
+
+
+
+                } else {
+                    $message = "Error! No se pudo completar el reverso, el pago ya ha sido reversado o cancelado previamente!";
+                    return response()->json(['data' => $message], 200);
+                }
+
+
+            }else {
+                $message = "Error! El código de confirmación es incorrecto, la orden no existe!";
+                return response()->json(['data' => $message], 404);
             }
 
+
         }
-        return false;
+
+
+//            if ($inscripcion) {
+//                return response()->json(['data' => $inscripcion], 200);
+//            } else {
+//                return response()->json(['data' => 'No se encontró la inscripción'], 404);
+//            }
+
+
+    }
+
+    //generar el token paymentez
+    public function paymentezGenerateToken(Request $request)
+    {
+        $configuracion = Configuracion::where('status', Configuracion::ATIVO)->first();
+
+//        $unix_timestamp=(int)$request->input('unix_timestamp');
+        $paymentez_server_application_code = $configuracion->server_app_code;
+        $paymentez_server_app_key = $configuracion->server_app_key;
+//        $paymentez_server_application_code = $configuracion->client_app_code;;
+//        $paymentez_server_app_key = $configuracion->client_app_key;
+
+//        $unix_timestamp=1540411771; //        UNIX TIMESTAMP: 1540411771
+
+//        $paymentez_server_application_code = 'FEDE-EC-SERVER';
+//        $paymentez_server_app_key = 'rQph9IKZPta4KhiOXXwCfvWco9Vml6';
+        //UNIQ STRING: rQph9IKZPta4KhiOXXwCfvWco9Vml61540411771
+        //UNIQ HASH: 7920e79a3b3a5169fc9e693c33ef8a6838c4536d0efaad1899be407569b7696c
+        //AUTH TOKEN: RkVERS1FQy1TRVJWRVI7MTU0MDQxMTc3MTs3OTIwZTc5YTNiM2E1MTY5ZmM5ZTY5M2MzM2VmOGE2ODM4YzQ1MzZkMGVmYWFkMTg5OWJlNDA3NTY5Yjc2OTZj
+
+        $unix_timestamp =(string)Carbon::now()->timestamp;
+        $uniq_token_string = $paymentez_server_app_key.''. $unix_timestamp;
+
+        $uniq_token_hash = hash('sha256', $uniq_token_string, false);
+
+        $string=$paymentez_server_application_code.';'.$unix_timestamp.';'.$uniq_token_hash;
+        $auth_token = base64_encode($string);
+
+        return $auth_token;
     }
 
 }

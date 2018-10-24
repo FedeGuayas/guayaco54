@@ -137,8 +137,6 @@
 <script src="{{asset('themes/back/src/plugins/datatables/media/js/dataTables.responsive.js')}}"></script>
 <script src="{{asset('themes/back/src/plugins/datatables/media/js/responsive.bootstrap4.js')}}"></script>
 <script src="{{ asset('js/toastr_message.js') }}"></script>
-{{--<script src="https://cdn.paymentez.com/js/ccapi/stg/paymentez.min.js"></script>--}}
-
 <script>
 
     let table;
@@ -256,7 +254,6 @@
 //             console.log('modal closed');
         },
         onResponse: function (response) { // The callback to invoke when the Checkout process is completed
-console.log(response)
             if (response.transaction.status === 'success' && response.transaction.status_detail === 3) {
                 let payID = response.transaction.id;
                 swal({

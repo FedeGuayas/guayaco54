@@ -99,11 +99,11 @@ Route::middleware(['auth', 'isVerified'])->group(function () {
         //Obtener comprobantes del usuario
         Route::get('payment/check-out', 'PreInscOnlineController@getComprobantes')->name('user.getComprobantes');
         //Obtener comprobantes pagados online para realizar reembolsos
-        Route::get('payment/refund', 'PreInscOnlineController@getRefund')->name('user.getRefund');
+        Route::get('payment/refund', 'PaymentController@getRefund')->name('user.getRefund');
         //Realizar reembolso
-        Route::get('payment/set-refund', 'PreInscOnlineController@setRefund')->name('user.setRefund');
+        Route::get('payment/set-refund', 'PaymentController@setRefund')->name('postRefund');
         //generar auth token payment
-        Route::post('payment/get-token', 'PreInscOnlineController@paymentezGenerateToken')->name('payment.getToken');
+        Route::post('payment/get-token', 'PaymentController@paymentezGenerateToken')->name('payment.getToken');
         //Obtener los datos de la preinscripcion al dar en el boton pagar
         Route::post('payment/check-out/getInscripcion', 'PaymentController@getInscripcionPay')->name('user.getInscripcionPay');
         //Actualizar el estado de la inscripcion a pagada y enviar correo al usuario

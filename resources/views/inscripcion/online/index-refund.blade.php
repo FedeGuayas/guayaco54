@@ -83,8 +83,8 @@
     </div>
 
 
-    {!! Form::open(['method'=>'POST','id'=>'form-refund']) !!}
-    {!! Form::close() !!}
+    {{--{!! Form::open(['method'=>'POST','id'=>'form-refund']) !!}--}}
+    {{--{!! Form::close() !!}--}}
 
 @endsection
 
@@ -131,7 +131,6 @@
         let url = "{{route('payment.getToken')}}";
         $.ajax({
             url: url,
-            data: '',
             async: false,
             headers: {'X-CSRF-TOKEN': token},
             type: "post",
@@ -145,76 +144,16 @@
         return data;
     }
 
-    ////////////////token//////////////
-
-    let getUniqToken = function (auth_timestamp, paymentez_client_app_key) {
-        let uniq_token_string = paymentez_client_app_key + auth_timestamp;
-        return getHash(uniq_token_string)
-    };
-
-    let getAuthToken = function (paymentez_client_app_code, app_client_key) {
-        let d = new Date,
-            n = d.getTime(),
-            auth_timestamp = "" + n,
-            string_auth_token = paymentez_client_app_code + ";" + auth_timestamp + ";" + getUniqToken(auth_timestamp, app_client_key);
-        return btoa(string_auth_token)
-    };
-
-    let getHash = function (message) {
-        let sha256 = new jsSHA("SHA-256", "TEXT");
-        return sha256.update(message), sha256.getHash("HEX")
-    };
-
-
-//    let createToken = function (createTokenRequest, successCallback, erroCallback) {
-//            let SERVER_URL = 'https://ccapi-stg.paymentez.com/v2/transaction/refund/', xmlhttp = new XMLHttpRequest;
-//
-//            xmlhttp.open("POST", SERVER_URL + "/v2/card/add", !0),
-//                xmlhttp.setRequestHeader("Content-Type", "application/json"),
-//                xmlhttp.setRequestHeader("Auth-Token", auth_token_payment),
-//                xmlhttp.onreadystatechange = function () {
-//                    if (xmlhttp.readyState == XMLHttpRequest.DONE)
-//                        try {
-//                            var objResponse = JSON.parse(xmlhttp.responseText);
-//                            200 == xmlhttp.status ? successCallback(objResponse) : erroCallback(400 == xmlhttp.status ? objResponse : objResponse)
-//                        } catch (e) {
-//                            var server_error = {
-//                                error: {
-//                                    type: "Server Error",
-//                                    help: "Server Error",
-//                                    description: "Server Error"
-//                                }
-//                            };
-//                            erroCallback(server_error)
-//                        }
-//                },
-//                xmlhttp.send(JSON.stringify(createTokenRequest))
-//        },
-
-
-        //////////////////////////////////
-
-
         //Realizar reembolso
         $
     (document).on('click', '.refund', function (e) {
         e.preventDefault();
-                {{--let client_app_code= "{{ $configuracion->client_app_code }}";--}}
-                {{--let client_app_key= "{{ $configuracion->client_app_key }}";--}}
-                {{--let unix_timestamp= $.now().toString();--}}
-                {{--let uniq_token_string = client_app_key + unix_timestamp;--}}
-
-//        let auth_token = genToken();
-
-
-        let id = $(this).attr('data-id');
-        console.log( getAuthToken('FEDE-EC-SERVER', 'rQph9IKZPta4KhiOXXwCfvWco9Vml6'));
+        let id = $(this).attr('data-id'); //transaction_id
+        let auth_token= genToken();
         let row = $(this).parents('tr');
-        let form = $("#form-refund");
-        let url = 'https://ccapi-stg.paymentez.com/v2/transaction/refund/';
-        let data = {
-            "transaction": {
-                "id": id
+        let data={
+            'transaction': {
+                'id': id
             }
         };
         swal({
@@ -234,19 +173,15 @@
             preConfirm: function () {
                 return new Promise((resolve, reject) => {
                     $.ajax({
-//                        beforeSend: function(xhrObj){
-//                            xhrObj.setRequestHeader("Content-Type","application/json");
-//                            xhrObj.setRequestHeader('Auth-Token', auth_token);
-//                        },
-                        url: url,
-                        data: data,
                         headers: {
-                            'Auth-Token': getAuthToken('FEDE-EC-SERVER', 'rQph9IKZPta4KhiOXXwCfvWco9Vml6')
-//                            'Content-Type': 'application/json'
+                            'Content-Type': 'application/json',
+                            'Auth-Token': auth_token
                         },
-                        type: "post",
-                        contentType: 'application/json',
-                        dataType: 'json',
+                        url: "https://ccapi-stg.paymentez.com/v2/transaction/refund/",
+                        data: JSON.stringify(data),
+                        contentType: "application/json",
+                        processData: false,
+                        type: "POST",
                         success: function (response) {
                             resolve(response);
                         },
@@ -257,7 +192,7 @@
                 })
             },
         }).then((response) => { //respuesta ajax
-            console.log(response)
+            console.log(response) //status	Could be one of the following: success, pending or failure
             //confirmo la acción
             if (response.value) {
 //                    console.log(response)
@@ -282,7 +217,7 @@
                 )
             }
         }).catch((error) => { //error en la respuesta ajax
-            row.show();
+            console.log(error)
             swal(
                 ':( Lo sentimos ocurrio un error durante su petición',
                 '' + error.status + ' ' + error.statusText + '',
