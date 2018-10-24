@@ -258,7 +258,7 @@ class FacturaController extends Controller
 //            ->where('status', Factura::PAGADA);
 
         $comprobantes = Inscripcion::with('factura', 'user', 'persona', 'producto', 'escenario')
-             ->whereHas('factura', function($query){ //con rol=employee
+             ->whereHas('factura', function($query){
                  $query->where('status', Factura::PAGADA);
              })
             ->groupBy('factura_id') ;//para cuando haya mas de una inscripcion con una sola factura
@@ -291,19 +291,29 @@ class FacturaController extends Controller
             $circuito=$comp->producto->circuito->circuito;
             $categoria=$comp->producto->categoria->categoria;
 
+            $forma_pago=$comp->factura->mpago->nombre;
+
+            //las inscripciones online y que no sean pagadas al contado tendran division=1002 sino el codigo del escenario
+            if ($comp->inscripcion_type==Inscripcion::INSCRIPCION_ONLINE && stripos($forma_pago, 'contado')==false){
+                $division=1002;
+            }else {
+                $division=(int)$comp->escenario->codigo;
+            }
+
             if (ValidarRUC::valida_ruc($ruc) === "OK") {
                 $ruc = $comp->factura->identificacion;
-
+                $nombre=$comp->factura->nombre;
             } elseif (ValidarRUC::valida_ruc($ruc) === "CF" || ValidarRUC::valida_ruc($ruc) == "El formato es incorrecto") {
                 $ruc = 999999999;
                 $email = 'consumidor@final.mail';
+                $nombre='CONSUMIDOR FINAL';
             }
 
             $comprobantesArray[] = [
                 'codigopadre' => '',
                 'codigo' => '',
-                'nombre' => $comp->factura->nombre,
-                'nombrecomercial' => $comp->factura->nombre,
+                'nombre' => $nombre,
+                'nombrecomercial' => $nombre,
                 'RUC' => (int)$ruc,
 //              'Fecha' => substr(str_replace('-','/',$comp->fecha1), 0, 10),
                 'Fecha' => (string)$comp->created_at->format('d/m/Y'),  //$comp->created_at
@@ -314,12 +324,12 @@ class FacturaController extends Controller
                 'Valor' => (float)$comp->factura->total,
                 'Iva' => 'S',
                 'DIRECCION' => $comp->factura->direccion,
-                'division' => 1002,
+                'division' => $division,
                 'TipoCli' => 1,
                 'actividad' => 1,
                 'codvend' => '',
                 'recaudador' => '',
-                'formadepago' => $comp->factura->mpago->nombre,
+                'formadepago' => $forma_pago,
                 'estado' => 'A',
                 'diasplazo' => 1,
                 'precio' => 1,
