@@ -21,7 +21,7 @@
     <div class="pd-20 bg-white border-radius-4 box-shadow mb-30">
         <div class="clearfix mb-20">
             <div class="pull-left">
-                <h5 class="text-blue">Pagos realizados con tarjeta que desee reembolsar</h5>
+                <h5 class="text-blue">Realizar reembolsos</h5>
             </div>
         </div>
         <div class="form-text small mb-30">
@@ -36,11 +36,12 @@
                 <thead>
                 <tr>
                     <th class="datatable-nosort">Acción</th>
-                    <th class="datatable-nosort">Reg.</th>
+                    <th class="datatable-nosort">Dev Ref.</th>
                     <th>Transacción</th>
-                    <th>Fecha. Pago</th>
+                    <th>F. Transacción</th>
+                    <th>F. Pago</th>
                     <th>Valor</th>
-                    <th>Estado</th>
+                    {{--<th>Estado</th>--}}
                 </tr>
                 </thead>
                 <tbody>
@@ -51,28 +52,29 @@
                                 <a class="btn btn-outline-primary dropdown-toggle" href="#" role="button"
                                    data-toggle="dropdown"><i class="fa fa-ellipsis-h"></i></a>
                                 <div class="dropdown-menu dropdown-menu-left">
-                                    <a class="dropdown-item refund" href="#" data-id="{{$c->factura->transaction_id}}"
+                                    <a class="dropdown-item refund" href="#" data-id="{{$c->transaction_id}}"
                                        data-toggle="tooltip"
-                                       data-placement="top" title="Reembolsar y cancelar Inscripción">
+                                       data-placement="top" title="Reembolsar">
                                         <i class="fa fa-recycle text-danger"></i> Reembolsar
                                     </a>
                                 </div>
                             </div>
                         </td>
-                        <td>{{$c->id}}</td>
-                        <td>{{$c->factura->transaction_id}}</td>
-                        <td>{{$c->factura->updated_at}}</td>
-                        <td>$ {{ number_format($c->factura->total,2,'.', ' ') }}</td>
-                        <td>
-                            @if ( ($c->factura->status===\App\Factura::PAGADA && $c->status===\App\Inscripcion::PAGADA) && !is_null($c->factura->transaction_id) && strtolower($c->factura->mpago->nombre)=== 'tarjeta' )
-                                <span class="text-success" data-toggle="tooltip" data-placement="left"
-                                      title="Confirmada"><i class="fa fa-check-square-o fa-2x"></i></span>
-                            @elseif (($c->factura->status===\App\Factura::PENDIENTE && $c->status===\App\Inscripcion::RESERVADA) && strtolower($c->factura->mpago->nombre)!= 'tarjeta')
-                                <span class="text-danger" data-toggle="tooltip" data-placement="left"
-                                      title="Reembolsado"> <i class="fa fa-recycle fa-2x"></i>
-                                </span>
-                            @endif
-                        </td>
+                        <td>{{$c->fId}}</td>
+                        <td>{{$c->transaction_id}}</td>
+                        <td>{{$c->date}}</td>
+                        <td>{{$c->paid_date}}</td>
+                        <td>$ {{ number_format($c->amount,2,'.', ' ') }}</td>
+                        {{--<td>--}}
+                            {{--@if ( ($c->factura->status===\App\Factura::PAGADA && $c->status===\App\Inscripcion::PAGADA) && !is_null($c->factura->transaction_id) && strtolower($c->factura->mpago->nombre)=== 'tarjeta' )--}}
+                                {{--<span class="text-success" data-toggle="tooltip" data-placement="left"--}}
+                                      {{--title="Confirmada"><i class="fa fa-check-square-o fa-2x"></i></span>--}}
+                            {{--@elseif (($c->factura->status===\App\Factura::PENDIENTE && $c->status===\App\Inscripcion::RESERVADA) && strtolower($c->factura->mpago->nombre)!= 'tarjeta')--}}
+                                {{--<span class="text-danger" data-toggle="tooltip" data-placement="left"--}}
+                                      {{--title="Reembolsado"> <i class="fa fa-recycle fa-2x"></i>--}}
+                                {{--</span>--}}
+                            {{--@endif--}}
+                        {{--</td>--}}
                     </tr>
                 @endforeach
                 </tbody>

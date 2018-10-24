@@ -523,15 +523,18 @@ class PreInscOnlineController extends Controller
             ->select('ejercicio_id')
             ->first();
 
-        $comprobantes = Inscripcion::with('producto', 'factura')
-            ->where('user_online', $user->id)
-            ->where('ejercicio_id', $ejercicio->ejercicio_id)
-            ->whereHas('factura', function ($query) {
-                $query->whereNotNull('transaction_id');
-            })
+        $comprobantes = Inscripcion::from('inscripcions as i')
+            ->join('facturas as f', 'f.id', '=', 'i.factura_id')
+            ->join('payments as p', 'p.transaction_id', '=', 'f.transaction_id')
+            ->whereNotNull('i.user_online')
+            ->whereNotNull('f.transaction_id')
+            ->where('f.status',Factura::PAGADA)
+            ->where('f.payment_status',Factura::PAYMENT_APPROVED)
+            ->where('i.inscripcion_type',Inscripcion::INSCRIPCION_ONLINE)
+            ->where('i.status',Inscripcion::PAGADA)
+            ->where('i.ejercicio_id', $ejercicio->ejercicio_id)
+            ->select('f.transaction_id','f.id as fId','p.date','p.paid_date','p.amount','i.id','i.factura_id','p.dev_reference','p.transaction_id','i.user_online','f.status','f.payment_status','i.inscripcion_type','i.status','i.ejercicio_id')
             ->get();
-
-
 
         return view('inscripcion.online.index-refund', compact('comprobantes'));
     }
