@@ -112,6 +112,10 @@
                                         data-toggle="tooltip" data-placement="top" title="Proceder al pago"><i
                                             class="fa fa-money"></i> Pagar
                                 </button>
+                            @elseif ( (\Carbon\Carbon::now()->diffInHours($c->created_at)< 48) && ($c->factura->status===\App\Factura::PAGADA && $c->factura->payment_status==\App\Factura::PAYMENT_PENDING && $c->status===\App\Inscripcion::RESERVADA) && (strtolower($c->factura->mpago->nombre)=='tarjeta'))
+                                <span class="text-danger">Pendiente</span>
+                            @elseif ( ($c->factura->status===\App\Factura::CANCELADA && $c->factura->payment_status==\App\Factura::PAYMENT_CANCELLED && $c->status===\App\Inscripcion::RESERVADA))
+                                <span class="text-danger">Reversado</span>
                             @elseif (($c->factura->status===\App\Factura::PAGADA && $c->status===\App\Inscripcion::PAGADA))
                                 <span class="text-success" data-toggle="tooltip" data-placement="left"
                                       title="Confirmada"><i class="fa fa-check-square-o fa-2x"></i></span>
@@ -254,67 +258,56 @@
 //             console.log('modal closed');
         },
         onResponse: function (response) { // The callback to invoke when the Checkout process is completed
+            console.log(response);
             if (response.transaction.status === 'success' && response.transaction.status_detail === 3) {
                 let payID = response.transaction.id;
-                swal({
-                    title: ':) Transacción satisfactoria',
-                    text: 'De click en OK para continuar',
-                    type: 'success',
-                    allowOutsideClick: false,
-                    allowEscapeKey: false
-                }).then((resp) => {
-{{--//                        console.log('actualizar status factura');--}}
-                    if (resp.value) { //Enviar correo de confirmacion y actualizacion de estado
-                        let id = id_insc;
-                        token = $("input[name=_token]").val();
-                        let url = "{{route('user.setFacturaTransID')}}";
-                        let data = {
-                            insc_id: id,
-                            payID: payID
-                        };
-                        let promise = new Promise((resolve, reject) => {
-                            $.ajax({
-                                url: url,
-                                data: data,
-                                headers: {'X-CSRF-TOKEN': token},
-                                type: "post",
-                                success: function (response) {
-                                    resolve(response);
-                                },
-                                error: function (error) {
-                                    reject(error)
-                                }
-                            });
-                        });
-                        promise.then((response) => {
-                            swal({
-                                title: ':) Se actualizó la inscripción',
-                                text: '' + response.data + '',
-                                type: 'success',
-                                allowOutsideClick: false,
-                                allowEscapeKey: false
-                            }).then((resp) => {
-                                window.setTimeout(function () {
-                                    location.reload()
-                                }, 1);
-                            })
-                        }).catch((error) => { //error en la respuesta ajax
-//                            console.log(error);
-                            let message;
-                            if (error.responseJSON.data !== null) {
-                                message = error.responseJSON.data;
-                            } else {
-                                message = ':( Lo sentimos ocurrio un error';
-                            }
-                            swal(
-                                '' + message + '',
-                                '' + error.status + ' ' + error.statusText + '',
-                                'error'
-                            )
-                        });
-
+                let id = id_insc;
+                token = $("input[name=_token]").val();
+                let url = "{{route('user.setFacturaTransID')}}";
+                let data = {
+                    insc_id: id,
+                    payID: payID
+                };
+                let promise = new Promise((resolve, reject) => {
+                    $.ajax({
+                        url: url,
+                        data: data,
+                        headers: {'X-CSRF-TOKEN': token},
+                        type: "post",
+                        success: function (response) {
+                            resolve(response);
+                        },
+                        error: function (error) {
+                            reject(error)
+                        }
+                    });
+                });
+                promise.then((response) => {
+                    swal({
+                        title: ':) Transacción satisfactoria',
+                        text: '' + response.data + '',
+                        type: 'success',
+                        allowOutsideClick: false,
+                        allowEscapeKey: false
+                    }).then((resp) => {
+                        window.setTimeout(function () {
+                            location.reload()
+                        }, 1);
+                    })
+                }).catch((error) => { //error en la respuesta ajax
+                    console.log(error);
+                    let message;
+                    if (error.responseJSON.data !== null) {
+                        message = error.responseJSON.data;
+                    } else {
+                        message = ':( Lo sentimos ocurrio un error';
                     }
-                })
+                    swal(
+                        '' + message + '',
+                        '' + error.status + ' ' + error.statusText + '',
+                        'error'
+                    )
+                });
 
             } else if (response.transaction.status === 'failure' || response.transaction.status === 'pending') {
                 let message_error;
@@ -334,9 +327,9 @@
                     default:
                         message_error = 'No se pudo realizar el pago';
                 }
-                // console.log(message_error);
+                 console.log(message_error);
                 swal(
-                    ':( Lo sentimos ocurrio un error durante la transacción',
+                    ''+message_error+'',
                     ' Inténtelo mas tarde y si los problemas persisten, puede pagar en uno de nuestros centros de inscripción',
                     'error'
                 )

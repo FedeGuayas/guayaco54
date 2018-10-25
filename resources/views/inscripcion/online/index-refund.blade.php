@@ -193,12 +193,10 @@
             },
         }).then((response) => { //respuesta ajax
             console.log(response) //status	Could be one of the following: success, pending or failure
-            //confirmo la acción
-            if (response.value) {
-//                    console.log(response)
+            if (response.value) {//OK
                 swal({
                     title: ':)',
-                    text: 'Inscripción eliminada, reembolso realizado',
+                    text: 'Reembolso realizado',
                     type: 'success',
                     allowOutsideClick: false,
                     allowEscapeKey: false
