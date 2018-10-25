@@ -94,8 +94,6 @@
 <script src="{{asset('themes/back/src/plugins/datatables/media/js/dataTables.responsive.js')}}"></script>
 <script src="{{asset('themes/back/src/plugins/datatables/media/js/responsive.bootstrap4.js')}}"></script>
 <script src="{{ asset('js/toastr_message.js') }}"></script>
-<link href="https://cdn.paymentez.com/js/ccapi/stg/paymentez.min.css" rel="stylesheet" type="text/css"/>
-<script src="https://cdn.paymentez.com/js/ccapi/stg/paymentez.min.js"></script>
 <script>
 
     let table;

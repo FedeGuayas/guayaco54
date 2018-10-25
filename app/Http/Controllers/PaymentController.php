@@ -38,13 +38,21 @@ class PaymentController extends Controller
     {
         if ($request->ajax()) {
 
+            $iva_conf=Configuracion::with('impuesto')->where('status',Configuracion::ATIVO)->first();
+
+            $tax_div=(float)$iva_conf->impuesto->divisor;
+            $tax_mult=($iva_conf->impuesto->porciento)/100;
+
             $inscripcion = Inscripcion::with('factura', 'producto')
                 ->where('id', $request->input('insc_id'))
                 ->where('user_online', $request->user()->id)
                 ->first();
 
+            $order_taxable_amount=$inscripcion->factura->total/$tax_div; // 8.00/1.12
+            $order_vat=($inscripcion->factura->total/$tax_div)*$tax_mult; // (8.00/1.12)*0.12
+
             if ($inscripcion) {
-                return response()->json(['data' => $inscripcion], 200);
+                return response()->json(['data' => $inscripcion,'order_vat'=>$order_vat,'order_taxable_amount'=>$order_taxable_amount], 200);
             } else {
                 return response()->json(['data' => 'No se encontró la inscripción'], 404);
             }

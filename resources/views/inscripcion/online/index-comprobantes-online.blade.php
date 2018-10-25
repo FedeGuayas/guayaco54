@@ -31,10 +31,6 @@
                 sistema. </strong>
         </div>
         <div class="row">
-            <div id="loader" hidden>
-                <i class="fa fa-spinner fa-pulse fa-5x fa-fw text-success"></i>
-                <span class="sr-only">Cargando...</span>
-            </div>
             <table class="data-table stripe hover nowrap compact">
                 <thead>
                 <tr>
@@ -364,17 +360,19 @@
             });
             promise.then((response) => {
                 // Open Checkout with further options:
+                console.log( 'order_vat:'+ parseFloat(response.order_vat.toFixed(2)))
+                console.log( 'order_taxable_amount:'+ parseFloat(response.order_taxable_amount.toFixed(2)))
                 paymentezCheckout.open({
-                    user_id: response.data.user_online.toString(), //id de usuario
-                    user_email: response.data.factura.email ? response.data.factura.email : '', //correo facturacion
-                    user_phone: response.data.factura.telefono ? response.data.factura.telefono : '', //telefono facturacion
-                    order_description: 'GR-2018 #'+response.data.factura.id, //descripcion de la compra  (GR-2018 #factura.id)
+                    user_id: response.data.user_online.toString(),
+                    user_email: response.data.factura.email ? response.data.factura.email : '',
+                    user_phone: response.data.factura.telefono ? response.data.factura.telefono : '',
+                    order_description: 'GR-2018 #'+response.data.factura.id, //(GR-2018 #factura.id)
                     order_amount: response.data.factura.total, //monto del pago
-                    order_vat: 0, //impuestos
+                    order_vat: parseFloat(response.order_vat.toFixed(2)),
                     order_reference: response.data.factura.id.toString(), //orden de compra (factura_id)
-//                    order_installments_type: 2, // optional: The installments type are only available for Equador. The valid values are: https://paymentez.github.io/api-doc/#installments-type
-                    //order_taxable_amount: 0, // optional: Only available for Datafast (Equador). The taxable amount, if it is zero, it is calculated on the total. Format: Decimal with two fraction digits.
-                    //order_tax_percentage: 10 // optional: Only available for Datafast (Equador). The tax percentage to be applied to this order.
+                    order_installments_type: 2,
+                    order_taxable_amount: parseFloat(response.order_taxable_amount.toFixed(2)),//
+                    //order_tax_percentage: 10
                 });
 
             }).catch((error) => {
