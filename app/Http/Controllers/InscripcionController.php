@@ -1175,7 +1175,7 @@ class InscripcionController extends Controller
 
         $inscripciones = Inscripcion::from('inscripcions as i')
             ->with('user', 'producto', 'persona', 'factura', 'talla', 'escenario')
-//            ->where('user_id', $user->id)
+            ->where('user_id', $user->id)
             ->where('ejercicio_id', $ejercicio->ejercicio_id)
             ->get();
 
