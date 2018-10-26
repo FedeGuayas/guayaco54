@@ -164,6 +164,11 @@ Route::middleware(['auth', 'isVerified'])->group(function () {
         //Print recibo inscripcion backend
         Route::get('inscription/{inscripcion}/print', 'InscripcionController@reciboInscripcion')->name('admin.inscripcion.recibo');
 
+        //exportar inscripciones para programar chips
+        Route::get('inscriptions/export/program-chip', 'ChipController@inscripcionesExcelChip')->name('admin.inscription.chip-program');
+        //exportar inscripciones echas por el usuario logueado
+        Route::get('inscriptions/user/export','InscripcionController@inscripcionesUser')->name('admin.inscription.user.export');
+
         //Todos los comprobantes ajax
         Route::get('facturas/getAllInside', 'FacturaController@getAll')->name('admin.getAll.inside');
         Route::post('facturas/facturacion-masiva', 'FacturaController@facturacionMasiva')->name('admin.facturacion.masiva');
@@ -184,7 +189,6 @@ Route::middleware(['auth', 'isVerified'])->group(function () {
         Route::put('pre-inscripcion/reserva/{inscripcion}/update','InscripcionController@reservaUpdate')->name('admin.reserva.update');
         //exportar reservas
         Route::post('pre-inscripcion/reserva/export','InscripcionController@reservasExport')->name('admin.reserva.export');
-
 
 
         Route::resource('users', 'UserController');

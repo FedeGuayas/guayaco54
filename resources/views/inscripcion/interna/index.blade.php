@@ -41,6 +41,26 @@
 
         <div class="row">
             <div class="table-responsive">
+                <div class="dataTables_wrapper container-fluid dt-bootstrap4">
+                    <div class="dt-buttons btn-group pull-right">
+                        @role('admin')
+                        {!! Form::open(['route' =>['admin.inscription.chip-program'], 'method'=>'get','id'=>'export-chip-form']) !!}
+                            <div class="form-group row">
+                                <div class="col-3">
+                                    {!! Form::number('reg_desde', null, ['class' => 'form-control','id'=>'reg_desde',' data-toggle'=>'tooltip','data-placement'=>'top', 'title'=>'Desde el Registro','placeholder'=>'Desde']) !!}
+                                </div>
+                                <div class="col-3">
+                                    {!! Form::number('reg_hasta', null, ['class' => 'form-control',' data-toggle'=>'tooltip','data-placement'=>'top', 'title'=>'Hasta el Registro','id'=>'reg_hasta','placeholder'=>'Hasta']) !!}
+                                </div>
+                                <div class="col">
+                                    <button type="submit" data-toggle="tooltip" data-placement="top" title="Exportar Insc para programar Chips" class="btn btn-outline-primary"><i class="fa fa-file-excel-o"></i> Chips</button>
+                                </div>
+                            </div>
+                        {!! Form::close() !!}
+                        @endrole
+                    </div>
+                </div>
+
                 <table class="data-table stripe hover nowrap compact" style="display:none;">
                     <thead>
                     <tr>
@@ -104,6 +124,20 @@
 
     });
 
+//    let reg_desde = $("#reg_desde").val();
+//    let reg_hasta = $("#reg_hasta").val();
+//
+//    //enviar el form de exportar chips
+//    $(document).on('click', '#export_chip', function (e) {
+//        e.preventDefault();
+//        let form = $("#export-chip-form");
+//        form.submit();
+//    });
+
+//    $(document).on('click', '#insc_chip', function (event) {
+//        event.preventDefault();
+//        console.log('Desde: ' + reg_desde + ' Hasta: ' + reg_desde)
+//    });
     let table;
     function cargarDatatables() {
 
@@ -210,11 +244,8 @@
                     }
                 });
             }
-
         });
-
     }
-
 
     //Entrega/ devolucion de kit
     $(document).on('click', '.status_kit', function (e) {
@@ -359,7 +390,7 @@
     });
 
 
-            {{--Alertas con Toastr--}}
+    {{--Alertas con Toastr--}}
             @if(Session::has('message_toastr'))
     let type = "{{ Session::get('alert-type') }}";
     let text_toastr = "{{ Session::get('message_toastr') }}";

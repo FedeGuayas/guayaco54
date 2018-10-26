@@ -958,7 +958,7 @@ class InscripcionController extends Controller
                 $inscripcion = Inscripcion::where('id', $id)->with('factura', 'user')->first();
                 $inscripcion->status = Inscripcion::PAGADA;
                 $inscripcion->num_corredor = $nexNumCorredor;
-                $inscripcion->inscripcion_type=Inscripcion::INSCRIPCION_ONLINE;
+                $inscripcion->inscripcion_type = Inscripcion::INSCRIPCION_ONLINE;
                 $inscripcion->user()->associate($user); //usuario que confirmo la reserva, quien la aprobo o cobro aunque sea online
                 $inscripcion->fecha = Carbon::now(); //fecha de aprobada
                 $inscripcion->escenario_id = $user->escenario_id; //escenario donde se confirmo la reserva
@@ -969,7 +969,7 @@ class InscripcionController extends Controller
                 $factura->fecha_edit = Carbon::now();
                 $factura->update();
 
-                $persona=$inscripcion->persona;
+                $persona = $inscripcion->persona;
 
                 //CREAR EL REGISTRO DEL CORREDOR
                 $registro = new Registro();
@@ -1162,10 +1162,61 @@ class InscripcionController extends Controller
             return abort(403);
     }
 
-
-    public function getPayment()
+    /**
+     * Inscripciones del usuario logueado
+     * @param Request $request
+     */
+    public function inscripcionesUser(Request $request)
     {
-        return view('inscripcion.online.paymentez');
+        $ejercicio = Configuracion::where('status', Configuracion::ATIVO)
+            ->select('ejercicio_id')
+            ->first();
+        $user = $request->user();
+
+        $inscripciones = Inscripcion::from('inscripcions as i')
+            ->with('user', 'producto', 'persona', 'factura', 'talla', 'escenario')
+            ->where('user_id', $user->id)
+            ->where('ejercicio_id', $ejercicio->ejercicio_id)
+            ->get();
+
+        $inscripcionArray[] = ['Número', 'Nombres ', 'Apellidos', 'CI', 'Talla', 'Color', 'Genero', 'Edad', 'Categoria', 'Circuito',
+            'Costo', 'Fecha', 'Escenario', 'Nombres Fact ', 'CI Fact', 'Correo Fact', 'Teléfono Fact', 'Dirección Fact', 'Forma Pago',
+        ];
+        foreach ($inscripciones as $insc) {
+
+            $inscripcionArray[] = [
+                'num' => $insc->num_corredor,
+                'nombresp' => $insc->persona->nombres,
+                'apellidosp' => $insc->persona->apellidos,
+                'cip' => $insc->persona->num_doc,
+                'talla' => $insc->talla->talla,
+                'color' => $insc->talla->color,
+                'genp' => $insc->persona->gen,
+                'edad' => $insc->persona->getEdad(),
+                'cat' => $insc->producto->categoria->categoria,
+                'cir' => $insc->producto->circuito->circuito,
+//                        'rec' => $insc->recomendado,
+                'cost' => $insc->factura->total,
+                'fecha' => $insc->created_at,
+//                    'usuario' => $insc->user,
+                'esc' => isset($insc->escenario) ? $insc->escenario->escenario : '-',
+                'factname' => $insc->factura->nombre,
+                'cedula' => $insc->factura->identificacion,
+                'emailf' => $insc->factura->email,
+                'telefonof' => $insc->factura->telefono,
+                'direccionf' => $insc->factura->direccion,
+                'formapago' => $insc->factura->mpago->nombre,
+            ];
+        }
+
+        Excel::create('Inscripciones Excel', function ($excel) use ($inscripcionArray) {
+
+            $excel->sheet('Inscripciones', function ($sheet) use ($inscripcionArray) {
+
+                $sheet->fromArray($inscripcionArray, null, 'A1', false, false);
+
+            });
+        })->export('xlsx');
     }
 
 

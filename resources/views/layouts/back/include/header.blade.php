@@ -22,6 +22,12 @@
                 <div class="dropdown-menu dropdown-menu-right">
                     <a class="dropdown-item" href="{{route('getProfile')}}"><i class="fa fa-user-md"
                                                                                aria-hidden="true"></i>Mi Perfil</a>
+                    @hasanyrole(['admin','employee'])
+                    <a class="dropdown-item" href="{{route('admin.inscription.user.export')}}">
+                        <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                        Mis Inscripciones
+                    </a>
+                    @endhasanyrole
                     <a class="dropdown-item" href="faq.php"><i class="fa fa-question" aria-hidden="true"></i> Ayuda</a>
                     <div class="dropdown-divider"></div>
                     <a class="dropdown-item" href="#"

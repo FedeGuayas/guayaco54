@@ -254,7 +254,7 @@
 //             console.log('modal closed');
         },
         onResponse: function (response) { // The callback to invoke when the Checkout process is completed
-            console.log(response);
+//            console.log(response);
             if (response.transaction.status === 'success' && response.transaction.status_detail === 3) {
                 let payID = response.transaction.id;
                 let id = id_insc;
@@ -291,7 +291,7 @@
                         }, 1);
                     })
                 }).catch((error) => { //error en la respuesta ajax
-                    console.log(error);
+//                    console.log(error);
                     let message;
                     if (error.responseJSON.data !== null) {
                         message = error.responseJSON.data;
@@ -323,7 +323,7 @@
                     default:
                         message_error = 'No se pudo realizar el pago';
                 }
-                 console.log(message_error);
+//                 console.log(message_error);
                 swal(
                     ''+message_error+'',
                     ' Inténtelo mas tarde y si los problemas persisten, puede pagar en uno de nuestros centros de inscripción',
@@ -360,8 +360,6 @@
             });
             promise.then((response) => {
                 // Open Checkout with further options:
-                console.log( 'order_vat:'+ parseFloat(response.order_vat.toFixed(2)))
-                console.log( 'order_taxable_amount:'+ parseFloat(response.order_taxable_amount.toFixed(2)))
                 paymentezCheckout.open({
                     user_id: response.data.user_online.toString(),
                     user_email: response.data.factura.email ? response.data.factura.email : '',
@@ -370,9 +368,9 @@
                     order_amount: response.data.factura.total, //monto del pago
                     order_vat: parseFloat(response.order_vat.toFixed(2)),
                     order_reference: response.data.factura.id.toString(), //orden de compra (factura_id)
-                    order_installments_type: 2,
+//                    order_installments_type: 2,
                     order_taxable_amount: parseFloat(response.order_taxable_amount.toFixed(2)),//
-                    //order_tax_percentage: 10
+                    order_tax_percentage: 12
                 });
 
             }).catch((error) => {
