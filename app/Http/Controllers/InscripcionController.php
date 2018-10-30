@@ -1139,7 +1139,7 @@ class InscripcionController extends Controller
 
             Excel::create('Formato Excel Western Union- ' . Carbon::now() . '', function ($excel) use ($arrayExp) {
 
-                $excel->sheet('WU', function ($sheet) use ($arrayExp) {
+                $excel->sheet('hoja1', function ($sheet) use ($arrayExp) {
 
                     $sheet->setColumnFormat(array(
                         'A' => '@',
