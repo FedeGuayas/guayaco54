@@ -92,11 +92,19 @@
                     </a>
                 </li>
                 @endrole
+                {{--@can('add_refunds')--}}
+                    {{--<li>--}}
+                        {{--<a href="{{route('user.getRefund')}}" class="dropdown-toggle no-arrow">--}}
+                            {{--<span class="badge-pill badge-danger"></span>--}}
+                            {{--<span class="mtext">Rembolsos</span>--}}
+                            {{--<i class="fa fa-refresh"></i>--}}
+                        {{--</a>--}}
+                    {{--</li>--}}
+                {{--@endcan--}}
                 {{--<li>--}}
-                {{--<a href="chat.php" class="dropdown-toggle no-arrow">--}}
-                {{--<span class="fa fa-comments-o"></span><span class="mtext">Chat <span--}}
-                {{--class="fi-burst-new text-danger new"></span></span>--}}
-                {{--</a>--}}
+                    {{--<a href="chat.php" class="dropdown-toggle no-arrow">--}}
+                        {{--<span class="fa fa-comments-o"></span><span class="mtext">Chat <span class="fi-burst-new text-danger new"></span></span>--}}
+                    {{--</a>--}}
                 {{--</li>--}}
 
                 @role('client')
@@ -112,13 +120,6 @@
                                     {{ $insc_pagar}}</span>
                             </a>
                         </li>
-                        @can('add_refunds')
-                            <li>
-                                <a href="{{route('user.getRefund')}}">Rembolsos
-                                    <span class="badge-pill badge-danger"><i class="fa fa-refresh"></i></span>
-                                </a>
-                            </li>
-                        @endcan
                     </ul>
                 </li>
                 @endhasallroles

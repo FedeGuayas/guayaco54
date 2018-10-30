@@ -56,7 +56,6 @@
             <div class="col-sm-12 col-md-6">
                 {!! Form::text('client_app_code',isset($config->client_app_code) ? $config->client_app_code : null,['class'=>'form-control','placeholder'=>'app code paymentez']) !!}
             </div>
-            <small class="form-text">Desarrollo</small>
         </div>
         <div class="form-group row">
             <label for="client_app_key" class="col-sm-12 col-md-2 col-form-label weight-600">App Key</label>
@@ -69,7 +68,6 @@
             <div class="col-sm-12 col-md-6">
                 {!! Form::text('server_app_code',isset($config->server_app_code) ? $config->server_app_code : null,['class'=>'form-control','placeholder'=>'server-app-code paymentez']) !!}
             </div>
-            <small class="form-text">Producción</small>
         </div>
         <div class="form-group row">
             <label for="server_app_key" class="col-sm-12 col-md-2 col-form-label weight-600">Server App Key</label>

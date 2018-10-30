@@ -246,7 +246,7 @@
         client_app_code:"{{ $configuracion->client_app_code }}", // Client Credentials Provied by Paymentez
         client_app_key: "{{ $configuracion->client_app_key }}", // Client Credentials Provied by Paymentez
         locale: 'es', // User's preferred language (es, en, pt). English will be used by default.
-        env_mode: 'stg', // `prod`, `stg`, `dev`, `local` to change environment. Default is `stg`
+        env_mode: 'prod', // `prod`, `stg`, `dev`, `local` to change environment. Default is `stg`
         onOpen: function () {  //The callback to invoke when Checkout is opened
             // console.log('modal open');
         },
@@ -326,7 +326,7 @@
 //                 console.log(message_error);
                 swal(
                     ''+message_error+'',
-                    ' Inténtelo mas tarde y si los problemas persisten, puede pagar en uno de nuestros centros de inscripción',
+                    ' Pruebe con otra tarjeta o inténtelo mas tarde y si los problemas persisten puede pagar en uno de nuestros centros de inscripción',
                     'error'
                 )
             }

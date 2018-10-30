@@ -175,7 +175,7 @@
                             'Content-Type': 'application/json',
                             'Auth-Token': auth_token
                         },
-                        url: "https://ccapi-stg.paymentez.com/v2/transaction/refund/",
+                        url: "https://ccapi.paymentez.com/v2/transaction/refund/",
                         data: JSON.stringify(data),
                         contentType: "application/json",
                         processData: false,
