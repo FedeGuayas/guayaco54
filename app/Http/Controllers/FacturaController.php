@@ -409,17 +409,33 @@ class FacturaController extends Controller
             ->where('f.status', Factura::PAGADA)
             ->groupBy('i.factura_id');//agrupo por facturas de la tabla inscripciones xk hay varias insccripciones con una misma factura
 
+
+        $insc_online_tarj= Factura::from('facturas as f')
+            ->join('inscripcions as i', 'i.factura_id', '=', 'f.id')
+            ->join('mpagos as p', 'p.id', '=', 'f.mpago_id')
+            ->select('f.total', 'i.factura_id','f.created_at', 'i.status', 'i.inscripcion_type','f.status','f.transaction_id','f.payment_status')
+            ->where('i.status', Inscripcion::PAGADA)
+            ->whereNotNull('i.user_online')
+            ->where('i.inscripcion_type', Inscripcion::INSCRIPCION_ONLINE)
+            ->where('f.status', Factura::PAGADA)
+            ->where('f.payment_status', Factura::PAYMENT_APPROVED)
+            ->whereNotNull('f.transaction_id')
+            ->groupBy('i.factura_id');
+
         if (!$fecha && !isset($escenario)){
             $cuadre=$cuadre->get();
+            $insc_online_tarj=$insc_online_tarj->sum('f.total');
         }elseif ($fecha && !isset($escenario)){
-//            dd($fecha);
             $cuadre=$cuadre->where('f.created_at','like', "%$fecha%")->get();
+            $insc_online_tarj=$insc_online_tarj->where('f.created_at','like', "%$fecha%")->sum('f.total');
         }elseif (!$fecha && isset($escenario)){
             $cuadre=$cuadre->where('i.escenario_id',$escenario)->get();
+            $insc_online_tarj=$insc_online_tarj->sum('f.total');
         }elseif ( $fecha && isset($escenario)){
             $cuadre=$cuadre->where('f.created_at','like', "$fecha%")
                 ->where('i.escenario_id',$escenario)
                 ->get();
+            $insc_online_tarj=$insc_online_tarj->where('f.created_at','like', "%$fecha%")->sum('f.total');
         }
 
         $group = [];
@@ -477,11 +493,8 @@ class FacturaController extends Controller
             "totalContado" => $totalContado,
             "totalTarjeta" => $totalTarjeta,
             "totalGeneral" => $valorFinal,
+            "totalOnlineTarjeta"=>$insc_online_tarj
         ];
-
-
-//return view('campamentos.reportes.cuadre', compact('escenarioSelect', 'usuarioSelect', 'escenario', 'usuario',
-//'fecha', 'cuadreArray', 'total', 'cuadre'));
 
         return view('facturas.interna.cuadre', compact('escenarios', 'usuarios', 'escenario', 'usuario', 'fecha', 'cuadreArray','total','cuadre'));
 

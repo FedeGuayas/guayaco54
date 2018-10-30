@@ -41,7 +41,7 @@
 
         <section id="printable">
 
-        <div class="pd-20 bg-white border-radius-4 box-shadow">
+        <div class="pd-20 bg-white border-radius-4 box-shadow mb-30">
 
             <div class="table-responsive">
                 <table class="table table-striped">
@@ -71,12 +71,32 @@
                         <th>$ {{number_format($total['totalWestern'],2,'.',' ')}}</th>
                         <th>$ {{number_format($total['totalGeneral'],2,'.',' ')}}</th>
                     </tr>
+                    <tr>
+                        <th>
+                            Inscripciones con Tarjetas Online
+                        </th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th class="text-info">$ {{number_format($total['totalOnlineTarjeta'],2,'.',' ')}}</th>
+                    </tr>
+                    <tr>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th class="bg-light-blue"> TOTAL</th>
+                        <th class="text-red-50 bg-light-blue">$ {{number_format(($total['totalGeneral']+$total['totalOnlineTarjeta']),2,'.',' ')}}</th>
+                    </tr>
                     </tbody>
                 </table>
             </div>
 
         </div>
         </section>
+
+        <div class="text-info mt-30">
+            {{--Recaudado por Inscripciones con Tarjetas Online: <strong>$ {{number_format($insc_online_tarj,2,',',' ')}}</strong>--}}
+        </div>
     </div>
 
 

@@ -577,11 +577,6 @@ class PaymentController extends Controller
     public function setRefund(Request $request)
     {
 
-//        $inscripcion = Inscripcion::with('factura', 'producto')
-//            ->where('id', $request->input('insc_id'))
-//            ->where('user_online', $request->user()->id)
-//            ->first();
-
         if ($request->ajax()) {
 
             $url = '';
@@ -609,14 +604,6 @@ class PaymentController extends Controller
 
         }
 
-
-//            if ($inscripcion) {
-//                return response()->json(['data' => $inscripcion], 200);
-//            } else {
-//                return response()->json(['data' => 'No se encontró la inscripción'], 404);
-//            }
-
-
     }
 
 //generar el token paymentez
@@ -624,19 +611,8 @@ class PaymentController extends Controller
     {
         $configuracion = Configuracion::where('status', Configuracion::ATIVO)->first();
 
-//        $unix_timestamp=(int)$request->input('unix_timestamp');
         $paymentez_server_application_code = $configuracion->server_app_code;
         $paymentez_server_app_key = $configuracion->server_app_key;
-//        $paymentez_server_application_code = $configuracion->client_app_code;;
-//        $paymentez_server_app_key = $configuracion->client_app_key;
-
-//        $unix_timestamp=1540411771; //        UNIX TIMESTAMP: 1540411771
-
-//        $paymentez_server_application_code = 'FEDE-EC-SERVER';
-//        $paymentez_server_app_key = 'rQph9IKZPta4KhiOXXwCfvWco9Vml6';
-        //UNIQ STRING: rQph9IKZPta4KhiOXXwCfvWco9Vml61540411771
-        //UNIQ HASH: 7920e79a3b3a5169fc9e693c33ef8a6838c4536d0efaad1899be407569b7696c
-        //AUTH TOKEN: RkVERS1FQy1TRVJWRVI7MTU0MDQxMTc3MTs3OTIwZTc5YTNiM2E1MTY5ZmM5ZTY5M2MzM2VmOGE2ODM4YzQ1MzZkMGVmYWFkMTg5OWJlNDA3NTY5Yjc2OTZj
 
         $unix_timestamp = (string)Carbon::now()->timestamp;
         $uniq_token_string = $paymentez_server_app_key . '' . $unix_timestamp;
