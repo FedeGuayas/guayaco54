@@ -58,6 +58,10 @@
                 <th>Fecha Inscripción</th>
                 <td>{{$inscription->created_at}}</td>
             </tr>
+            <tr>
+                <th>Forma de Pago</th>
+                <td>{{$inscription->factura->mpago->nombre}}</td>
+            </tr>
             </tbody>
         </table>
     </section>
