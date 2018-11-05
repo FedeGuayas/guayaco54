@@ -101,7 +101,7 @@ class PreInscOnlineController extends Controller
 
 
         $fp = Mpago::where('status', Mpago::ACTIVO)
-            ->where('nombre', 'NOT LIKE', '%tarj%')//momentaneamente no enviar la forma de pago tarjeta
+//            ->where('nombre', 'NOT LIKE', '%tarj%')//momentaneamente no enviar la forma de pago tarjeta
             ->get();
 
 
