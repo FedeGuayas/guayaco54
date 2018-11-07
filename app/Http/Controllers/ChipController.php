@@ -108,6 +108,7 @@ class ChipController extends Controller
             ->with('producto','persona','factura')
             ->whereBetween('i.id', [$reg_desde, $reg_hasta])
             ->where('ejercicio_id', $ejercicio->ejercicio_id)
+            ->where('i.status',Inscripcion::PAGADA)
             ->get();
 
         $inscripcionesArray[] = ['CHIP', 'APELLIDOS', 'NOMBRES', 'CEDULA', 'FECHA DE NAC.', 'SEXO', 'EMAIL', 'TELEFONO', 'DIRECCION', 'CATEGORÍA', 'CIRCUITO'];

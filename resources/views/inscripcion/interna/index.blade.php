@@ -43,7 +43,7 @@
             <div class="table-responsive">
                 <div class="dataTables_wrapper container-fluid dt-bootstrap4">
                     <div class="dt-buttons btn-group pull-right">
-                        @role('admin')
+                        @can('export_chip')
                         {!! Form::open(['route' =>['admin.inscription.chip-program'], 'method'=>'get','id'=>'export-chip-form']) !!}
                             <div class="form-group row">
                                 <div class="col-3">
@@ -57,7 +57,7 @@
                                 </div>
                             </div>
                         {!! Form::close() !!}
-                        @endrole
+                        @endcan
                     </div>
                 </div>
 
