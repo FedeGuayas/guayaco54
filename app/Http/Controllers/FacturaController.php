@@ -409,7 +409,6 @@ class FacturaController extends Controller
             ->where('f.status', Factura::PAGADA)
             ->groupBy('i.factura_id');//agrupo por facturas de la tabla inscripciones xk hay varias insccripciones con una misma factura
 
-
         $insc_online_tarj= Factura::from('facturas as f')
             ->join('inscripcions as i', 'i.factura_id', '=', 'f.id')
             ->join('mpagos as p', 'p.id', '=', 'f.mpago_id')
@@ -424,18 +423,18 @@ class FacturaController extends Controller
 
         if (!$fecha && !isset($escenario)){
             $cuadre=$cuadre->get();
-            $insc_online_tarj=$insc_online_tarj->sum('f.total');
+            $insc_online_tarj=$insc_online_tarj->get()->sum('total');
         }elseif ($fecha && !isset($escenario)){
             $cuadre=$cuadre->where('f.created_at','like', "%$fecha%")->get();
-            $insc_online_tarj=$insc_online_tarj->where('f.created_at','like', "%$fecha%")->sum('f.total');
+            $insc_online_tarj=$insc_online_tarj->where('f.created_at','like', "%$fecha%")->get()->sum('total');
         }elseif (!$fecha && isset($escenario)){
             $cuadre=$cuadre->where('i.escenario_id',$escenario)->get();
-            $insc_online_tarj=$insc_online_tarj->sum('f.total');
+            $insc_online_tarj=$insc_online_tarj->get()->sum('total');
         }elseif ( $fecha && isset($escenario)){
             $cuadre=$cuadre->where('f.created_at','like', "$fecha%")
                 ->where('i.escenario_id',$escenario)
                 ->get();
-            $insc_online_tarj=$insc_online_tarj->where('f.created_at','like', "%$fecha%")->sum('f.total');
+            $insc_online_tarj=$insc_online_tarj->where('f.created_at','like', "%$fecha%")->get()->sum('total');
         }
 
         $group = [];
