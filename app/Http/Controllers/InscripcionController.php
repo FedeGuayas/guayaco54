@@ -1220,4 +1220,92 @@ class InscripcionController extends Controller
     }
 
 
+    /**
+     * Esportar listado de inscripciones general
+     * @param Request $request
+     */
+    public function inscripcionesExcel(Request $request)
+    {
+        {
+            $escenarioSelect = ['' => 'Seleccione el escenario'] + Escenario::lists('escenario', 'id')->all();
+            $usuarioSelect = ['' => 'Seleccione el usuario'] + User::lists('nombre', 'id')->all();
+            if ($request) {
+                $fecha = $request->get('fecha');
+                $escenario = $request->get('escenario');
+                $usuario = $request->get('usuario');
+                $inscripcion = DB::table('inscripciones as i')
+                    ->join('users as u', 'u.id', '=', 'i.user_id')
+                    ->join('personas as p', 'p.id', '=', 'i.persona_id')
+                    ->join('categorias as cat', 'cat.id', '=', 'i.categoria_id')
+                    ->join('circuitos as c', 'c.id', '=', 'i.circuito_id')
+                    ->join('escenarios as e', 'e.id', '=', 'u.escenario_id')
+                    ->join('comprobantes as comp', 'comp.inscripcion_id', '=', 'i.id')
+                    ->select('p.nombres', 'p.apellidos', 'p.num_doc', 'p.genero', 'i.edad', 'cat.categoria', 'c.circuito',
+                        'i.num_corredor', 'i.talla', 'i.recomendado', 'i.costo', 'i.created_at',
+                        'u.nombre as user', 'e.escenario as esc',
+                        'i.user_id', 'i.id', 'e.id as eid', 'u.id as uid',
+                        'comp.nombres as nombresf', 'comp.apellidos as apellidosf', 'comp.num_doc as cedula',
+                        'comp.email as emailf', 'comp.telefono as telefonof', 'comp.direccion as direccionf',
+                        'i.form_pago')
+                    ->where('i.created_at', 'LIKE', '%' . $fecha . '%')
+                    ->where('e.id', 'LIKE', '%' . $escenario . '%')
+                    ->orWhere('u.id', '=', $usuario)
+                    ->orderBy('i.num_corredor')
+                    ->get();
+
+                $inscripcionArray[] = ['Número', 'Nombres ', 'Apellidos', 'CI', 'Talla', 'Color', 'Genero', 'Edad', 'Categoria', 'Circuito',
+                    'Costo', 'Fecha', 'Usuario', 'Escenario', 'Nombres Fact ', 'Apellidos Fact',
+                    'CI Fact', 'Correo Fact', 'Teléfono Fact', 'Dirección Fact',
+                    'Forma Pago',];
+                foreach ($inscripcion as $insc) {
+
+                    $talla = $insc->talla;
+
+                    if ($insc->talla != '' || $insc->talla != NULL) {
+                        $talla_obj = Talla::where('id', $insc->talla)->first();
+                        $talla = $talla_obj->talla;
+                        $talla_color = $talla_obj->color;
+                        $color = $talla_color == 'B' ? 'Blanca' : 'Negra';
+                    } else {
+                        $color = '-';
+                    }
+
+                    $inscripcionArray[] = [
+                        'num' => $insc->num_corredor,
+                        'nombresp' => $insc->nombres,
+                        'apellidosp' => $insc->apellidos,
+                        'cip' => $insc->num_doc,
+                        'talla' => $talla,
+                        'color' => $color,
+                        'genp' => $insc->genero,
+                        'edad' => $insc->edad,
+                        'cat' => $insc->categoria,
+                        'cir' => $insc->circuito,
+//                        'rec' => $insc->recomendado,
+                        'cost' => $insc->costo,
+                        'fecha' => $insc->created_at,
+                        'usuario' => $insc->user,
+                        'esc' => $insc->esc,
+                        'factname' => $insc->nombresf,
+                        'apellidosf' => $insc->apellidosf,
+                        'cedula' => $insc->cedula,
+                        'emailf' => $insc->emailf,
+                        'telefonof' => $insc->telefonof,
+                        'direccionf' => $insc->direccionf,
+                        'formapago' => $insc->form_pago,
+                    ];
+                }
+
+                Excel::create('Inscripciones Excel', function ($excel) use ($inscripcionArray) {
+
+                    $excel->sheet('Inscripciones', function ($sheet) use ($inscripcionArray) {
+
+                        $sheet->fromArray($inscripcionArray, null, 'A1', false, false);
+
+                    });
+                })->export('xlsx');
+            }
+        }
+
+    }
 }

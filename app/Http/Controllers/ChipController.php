@@ -95,6 +95,11 @@ class ChipController extends Controller
     }
 
 
+    /**
+     * Exportar listado de inscripciones programar los chips
+     * @param Request $request
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function inscripcionesExcelChip(Request $request)
     {
         $ejercicio = Configuracion::where('status', Configuracion::ATIVO)
@@ -149,4 +154,6 @@ class ChipController extends Controller
         })->export('xlsx');
         return view('inscripcions.index');
     }
+
+
 }
