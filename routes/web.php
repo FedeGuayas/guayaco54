@@ -168,6 +168,8 @@ Route::middleware(['auth', 'isVerified'])->group(function () {
         Route::get('inscriptions/export/program-chip', 'ChipController@inscripcionesExcelChip')->name('admin.inscription.chip-program');
         //exportar inscripciones echas por el usuario logueado
         Route::get('inscriptions/user/export','InscripcionController@inscripcionesUser')->name('admin.inscription.user.export');
+        //exportar inscripciones todos
+        Route::get('inscriptions/export/all','InscripcionController@inscripcionesExcel')->name('admin.inscription.export.all');
 
         //Todos los comprobantes ajax
         Route::get('facturas/getAllInside', 'FacturaController@getAll')->name('admin.getAll.inside');

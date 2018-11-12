@@ -197,7 +197,7 @@
                 <div class="card p-3 col-12 col-md-6 col-lg-4">
                     <div class="card-wrapper">
                         <div class="card-img">
-                            <img src="{{asset('themes/front/assets/images/sin-titulo-3-1-454x454.png')}}"
+                            <img src="{{asset('themes/front/assets/images/RECORRIDO 1K-01.png')}}"
                                  alt="Recorrido 1K"
                                  title="Recorrido 1K" style="max-height: 250px;">
                         </div>
@@ -224,7 +224,7 @@
                 <div class="card p-3 col-12 col-md-6 col-lg-4">
                     <div class="card-wrapper">
                         <div class="card-img">
-                            <img src="{{asset('themes/front/assets/images/recorrido-5k-454x243.png')}}"
+                            <img src="{{asset('themes/front/assets/images/RECORRIDO 5K-03.png')}}"
                                  alt="Recorrido 5K"
                                  title="Recorrido 5K" style="max-height: 250px;">
                         </div>

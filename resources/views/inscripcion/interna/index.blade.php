@@ -42,57 +42,82 @@
         <div class="row">
             <div class="table-responsive">
                 <div class="dataTables_wrapper container-fluid dt-bootstrap4">
-                    <div class="dt-buttons btn-group pull-right">
-                        @can('export_chip')
-                        {!! Form::open(['route' =>['admin.inscription.chip-program'], 'method'=>'get','id'=>'export-chip-form']) !!}
-                            <div class="form-group row">
-                                <div class="col-3">
-                                    {!! Form::number('reg_desde', null, ['class' => 'form-control','id'=>'reg_desde',' data-toggle'=>'tooltip','data-placement'=>'top', 'title'=>'Desde el Registro','placeholder'=>'Desde']) !!}
-                                </div>
-                                <div class="col-3">
-                                    {!! Form::number('reg_hasta', null, ['class' => 'form-control',' data-toggle'=>'tooltip','data-placement'=>'top', 'title'=>'Hasta el Registro','id'=>'reg_hasta','placeholder'=>'Hasta']) !!}
+
+                    <div class="dt-buttons">
+
+                        <div class="form-group row">
+                            @can('export_chip')
+                                <div class="col">
+                                    {!! Form::open(['route' =>['admin.inscription.export.all'], 'method'=>'get','id'=>'export-insc-form']) !!}
+                                    <div class="btn-group ">
+                                        <div class=" col-3">
+                                            <button type="submit" data-toggle="tooltip" data-placement="top"
+                                                    title="Exportar todas las inscripciones"
+                                                    class="btn btn-outline-success"><i class="fa fa-download"></i>
+                                                Inscripciones
+                                            </button>
+                                        </div>
+                                    </div>
+                                    {!! Form::close() !!}
                                 </div>
                                 <div class="col">
-                                    <button type="submit" data-toggle="tooltip" data-placement="top" title="Exportar Insc para programar Chips" class="btn btn-outline-primary"><i class="fa fa-file-excel-o"></i> Chips</button>
+                                    {!! Form::open(['route' =>['admin.inscription.chip-program'], 'method'=>'get','id'=>'export-chip-form']) !!}
+                                    <div class="btn-group">
+                                        <div class="col">
+                                            {!! Form::number('reg_desde', null, ['class' => 'form-control','id'=>'reg_desde',' data-toggle'=>'tooltip','data-placement'=>'top', 'title'=>'Desde el Registro','placeholder'=>'Desde']) !!}
+                                        </div>
+                                        <div class="col">
+                                            {!! Form::number('reg_hasta', null, ['class' => 'form-control',' data-toggle'=>'tooltip','data-placement'=>'top', 'title'=>'Hasta el Registro','id'=>'reg_hasta','placeholder'=>'Hasta']) !!}
+                                        </div>
+                                        <div class="col">
+                                            <button type="submit" data-toggle="tooltip" data-placement="top"
+                                                    title="Exportar Insc para programar Chips"
+                                                    class="btn btn-outline-primary"><i class="fa fa-file-excel-o"></i>
+                                                Chips
+                                            </button>
+                                        </div>
+                                    </div>
+                                    {!! Form::close() !!}
                                 </div>
-                            </div>
-                        {!! Form::close() !!}
-                        @endcan
-                    </div>
-                </div>
+                            @endcan
 
-                <table class="data-table stripe hover nowrap compact" style="display:none;">
-                    <thead>
-                    <tr>
-                        <th class="datatable-nosort">Acción</th>
-                        <th>Reg.</th>
-                        <th>Nombres</th>
-                        <th>Num. Identidad</th>
-                        <th>Categoría</th>
-                        <th>Circuito</th>
-                        <th width="5">Corredor No.</th>
-                        <th>Kit</th>
-                        <th>Talla</th>
-                        <th>Email</th>
-                    </tr>
-                    </thead>
-                    <tfoot>
-                    <tr>
-                        <th></th>
-                        <th class="tfoot_search"></th>
-                        <th class="tfoot_search"></th>
-                        <th class="tfoot_search">Ced. / Pasapt</th>
-                        <th class="tfoot_select"></th>
-                        <th class="tfoot_select"></th>
-                        <th class="tfoot_search"></th>
-                        <th></th>
-                        <th></th>
-                        <th class="tfoot_search"></th>
-                    </tr>
-                    </tfoot>
-                    <tbody>
-                    </tbody>
-                </table>
+                        </div>
+                    </div>
+
+
+                    <table class="data-table stripe hover nowrap compact" style="display:none;">
+                        <thead>
+                        <tr>
+                            <th class="datatable-nosort">Acción</th>
+                            <th>Reg.</th>
+                            <th>Nombres</th>
+                            <th>Num. Identidad</th>
+                            <th>Categoría</th>
+                            <th>Circuito</th>
+                            <th width="5">Corredor No.</th>
+                            <th>Kit</th>
+                            <th>Talla</th>
+                            <th>Email</th>
+                        </tr>
+                        </thead>
+                        <tfoot>
+                        <tr>
+                            <th></th>
+                            <th class="tfoot_search"></th>
+                            <th class="tfoot_search"></th>
+                            <th class="tfoot_search">Ced. / Pasapt</th>
+                            <th class="tfoot_select"></th>
+                            <th class="tfoot_select"></th>
+                            <th class="tfoot_search"></th>
+                            <th></th>
+                            <th></th>
+                            <th class="tfoot_search"></th>
+                        </tr>
+                        </tfoot>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
@@ -124,20 +149,7 @@
 
     });
 
-//    let reg_desde = $("#reg_desde").val();
-//    let reg_hasta = $("#reg_hasta").val();
-//
-//    //enviar el form de exportar chips
-//    $(document).on('click', '#export_chip', function (e) {
-//        e.preventDefault();
-//        let form = $("#export-chip-form");
-//        form.submit();
-//    });
 
-//    $(document).on('click', '#insc_chip', function (event) {
-//        event.preventDefault();
-//        console.log('Desde: ' + reg_desde + ' Hasta: ' + reg_desde)
-//    });
     let table;
     function cargarDatatables() {
 
@@ -390,7 +402,7 @@
     });
 
 
-    {{--Alertas con Toastr--}}
+            {{--Alertas con Toastr--}}
             @if(Session::has('message_toastr'))
     let type = "{{ Session::get('alert-type') }}";
     let text_toastr = "{{ Session::get('message_toastr') }}";
