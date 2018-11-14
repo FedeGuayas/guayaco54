@@ -294,7 +294,7 @@ class FacturaController extends Controller
             $forma_pago=$comp->factura->mpago->nombre;
 
             //las inscripciones online y que no sean pagadas al contado tendran division=1002 sino el codigo del escenario
-            if ($comp->inscripcion_type==Inscripcion::INSCRIPCION_ONLINE && stripos($forma_pago, 'contado')==false){
+            if ($comp->inscripcion_type==Inscripcion::INSCRIPCION_ONLINE && stripos($forma_pago, 'contado')===false){
                 $division=1002;
             }else {
                 $division=(int)$comp->escenario->codigo;
