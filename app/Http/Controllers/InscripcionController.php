@@ -1189,23 +1189,23 @@ class InscripcionController extends Controller
                 'nombresp' => $insc->persona->nombres,
                 'apellidosp' => $insc->persona->apellidos,
                 'cip' => $insc->persona->num_doc,
-                'talla' => $insc->talla->talla,
-                'color' => $insc->talla->color,
+                'talla' => isset($talla) ? $insc->talla->talla : '' ,
+                'color' => isset($talla) ? $insc->talla->color : '',
                 'genp' => $insc->persona->gen,
                 'edad' => $insc->persona->getEdad(),
                 'cat' => $insc->producto->categoria->categoria,
                 'cir' => $insc->producto->circuito->circuito,
 //                        'rec' => $insc->recomendado,
-                'cost' => $insc->factura->total,
+                'cost' => isset($factura) ? $insc->factura->total: '',
                 'fecha' => $insc->created_at->toDateString(),
 //                    'usuario' => $insc->user,
-                'esc' => isset($insc->escenario) ? $insc->escenario->escenario : '-',
-                'factname' => $insc->factura->nombre,
-                'cedula' => $insc->factura->identificacion,
-                'emailf' => $insc->factura->email,
-                'telefonof' => $insc->factura->telefono,
-                'direccionf' => $insc->factura->direccion,
-                'formapago' => $insc->factura->mpago->nombre,
+                'esc' => isset($insc->escenario) ? $insc->escenario->escenario : '',
+                'factname' => isset($factura) ? $insc->factura->nombre : '' ,
+                'cedula' => isset($factura) ? $insc->factura->identificacion : '',
+                'emailf' => isset($factura) ? $insc->factura->email : '',
+                'telefonof' => isset($factura) ? $insc->factura->telefono: '',
+                'direccionf' => isset($factura) ? $insc->factura->direccion: '',
+                'formapago' => isset($factura) ? $insc->factura->mpago->nombre: '',
             ];
         }
 
@@ -1239,16 +1239,27 @@ class InscripcionController extends Controller
 
         foreach ($inscripciones as $insc) {
 
+
+
+            if ($insc->talla_id){
+                $talla=$insc->talla->talla;
+                $fact_total=$insc->factura->total;
+            }else {
+                $talla='';
+                $fact_total=0;
+            }
+
+
             $inscripcionArray[] = [
                 'reg' => $insc->id,
                 'num' => $insc->num_corredor,
-                'talla' => $insc->talla->talla,
+                'talla' => $talla,
                 'cip' => $insc->persona->num_doc,
                 'apellidosp' => $insc->persona->apellidos,
                 'nombresp' => $insc->persona->nombres,
                 'cat' => $insc->producto->categoria->categoria,
                 'cir' => $insc->producto->circuito->circuito,
-                'cost' => $insc->factura->total
+                'cost' => $fact_total
             ];
         }
 

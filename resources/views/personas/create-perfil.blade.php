@@ -109,7 +109,7 @@
                         </div>
                         <small class="form-text text-muted">
                             PARA PERSONAS DISCAPACITADAS QUE APLICAN DESCUENTOS LAS
-                            INCSCIPCIONES DEBEN REALIZARCE PRESENCIALMENTE EN CUALQUIER PUNTO DE INSCRIPCIÓN DE
+                            INCSCIPCIONES DEBEN REALIZARSE PRESENCIALMENTE EN CUALQUIER PUNTO DE INSCRIPCIÓN DE
                             FEDEGUAYAS
                         </small>
                     </div>

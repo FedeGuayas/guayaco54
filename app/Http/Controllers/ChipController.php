@@ -119,6 +119,14 @@ class ChipController extends Controller
         $inscripcionesArray[] = ['CHIP', 'APELLIDOS', 'NOMBRES', 'CEDULA', 'FECHA DE NAC.', 'SEXO', 'EMAIL', 'TELEFONO', 'DIRECCION', 'CATEGORÍA', 'CIRCUITO'];
         foreach ($inscripciones as $insc) {
 
+            if ($insc->talla_id){
+                $fact_email= $insc->factura->email;
+                $fact_tele= $insc->factura->telefono;
+            }else {
+                $fact_email= '';
+                $fact_tele= '';
+            }
+
             $inscripcionesArray[] = [
                 'numero' => $insc->num_corredor,
                 'apellidos' => $insc->persona->apellidos,
@@ -127,8 +135,8 @@ class ChipController extends Controller
                 'fecha_nac' => $insc->persona->fecha_nac,
 //                'sexo' => $insc->genero == 'Masculino' ? 'M' : 'F',
                 'sexo' => $insc->persona->gen,
-                'email' => isset($insc->persona->email) ? $insc->persona->email : $insc->factura->email,
-                'telefono' => isset($insc->persona->telefono) ? $insc->persona->telefono : $insc->factura->telefono,
+                'email' => isset($insc->persona->email) ? $insc->persona->email : $fact_email,
+                'telefono' => isset($insc->persona->telefono) ? $insc->persona->telefono : $fact_tele,
                 'direccion' => $insc->persona->direccion,
 //                'edad' => $insc->edad,
                 'categoria' => $insc->producto->categoria->categoria,
