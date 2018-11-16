@@ -119,23 +119,23 @@
             </thead>
             <tbody>
             @if ($inscripcion->factura)
-            <tr>
-                <td>{{$inscripcion->factura->nombre}}</td>
-                <td>{{$inscripcion->factura->identificacion}}</td>
-                <td>{{$inscripcion->factura->telefono}}</td>
-{{--                <td>{{$inscripcion->factura->direccion}}</td>--}}
-                <td>{{$inscripcion->factura->email}}</td>
-                <td>$ {{number_format($inscripcion->factura->subtotal,'2','.',' ')}}</td>
-                <td>$ {{number_format($inscripcion->factura->descuento,'2','.',' ')}}</td>
-                <td class="precio_total">$ {{number_format($inscripcion->factura->total,'2','.',' ')}}</td>
-            </tr>
-                @else
+                <tr>
+                    <td>{{$inscripcion->factura->nombre}}</td>
+                    <td>{{$inscripcion->factura->identificacion}}</td>
+                    <td>{{$inscripcion->factura->telefono}}</td>
+                    {{--                <td>{{$inscripcion->factura->direccion}}</td>--}}
+                    <td>{{$inscripcion->factura->email}}</td>
+                    <td>$ {{number_format($inscripcion->factura->subtotal,'2','.',' ')}}</td>
+                    <td>$ {{number_format($inscripcion->factura->descuento,'2','.',' ')}}</td>
+                    <td class="precio_total">$ {{number_format($inscripcion->factura->total,'2','.',' ')}}</td>
+                </tr>
+            @else
                 <tr class="text-center">
                     <th colspan="8">Información no registrada</th>
                 </tr>
 
 
-                @endif
+            @endif
             </tbody>
 
 
@@ -144,25 +144,30 @@
 
     <br><br><br>
 
-    <div class="cancelado">
-        <table class="table">
-            <caption>CANCELADO POR:</caption>
-            <thead>
-            <tr>
-                <th>Usuario:</th>
-                <th>Pto Cobro:</th>
-                <th>Fecha</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr>
-                <td>{{$inscripcion->user->getFullName()}}</td>
-                <td>{{$inscripcion->escenario ? $inscripcion->escenario->escenario : '-'}}</td>
-                <td>{{$inscripcion->created_at->formatLocalized('%d %B %Y')}}</td>
-            </tr>
-            </tbody>
-        </table>
-    </div>
+    @if ($inscripcion->inscripcion_type==\App\Inscripcion::INSCRIPCION_ONLINE && $inscripcion->factura->payment_status==\App\Payment::CONFIRMADA)
+
+    @else
+
+        <div class="cancelado">
+            <table class="table">
+                <caption>CANCELADO POR:</caption>
+                <thead>
+                <tr>
+                    <th>Usuario:</th>
+                    <th>Pto Cobro:</th>
+                    <th>Fecha</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>{{$inscripcion->user->getFullName()}}</td>
+                    <td>{{$inscripcion->escenario ? $inscripcion->escenario->escenario : '-'}}</td>
+                    <td>{{$inscripcion->created_at->formatLocalized('%d %B %Y')}}</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    @endif
 
 </div>
 
@@ -175,9 +180,10 @@
 <div class="footer">
     <em>
 
-        Oficina: José Mascote 1103 y Luque. Telfs: 2367856 - 2531488. <strong>https://guayaco-runner.fedeguayas.com.ec</strong>.
-            <br>
-            <strong>email: fdg@fedeguayas.com.ec</strong>
+        Oficina: José Mascote 1103 y Luque. Telfs: 2367856 - 2531488.
+        <strong>https://guayaco-runner.fedeguayas.com.ec</strong>.
+        <br>
+        <strong>email: fdg@fedeguayas.com.ec</strong>
 
 
         <br>
