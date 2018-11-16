@@ -9,6 +9,7 @@ use App\Deporte;
 use App\Descuento;
 use App\Factura;
 use App\Inscripcion;
+use App\Maintenance;
 use App\Mpago;
 use App\Persona;
 use App\Producto;
@@ -161,6 +162,20 @@ class InscripcionController extends Controller
      */
     public function create(Request $request, Persona $persona)
     {
+        $mantenimiento = Maintenance::where('id', 1)->first();
+        $users_permitidos = $mantenimiento->users_permit;
+        $user_log = $request->user();
+        if (isset($users_permitidos)) {
+            if ($mantenimiento->status == Maintenance::APP_ON && !in_array($user_log->id, $users_permitidos)) {
+
+                $notification = [
+                    'message_toastr' => "Lo sentimos momentaneamente no se permite realizar más inscripciones",
+                    'alert-type' => 'error'];
+                return back()->with($notification);
+            }
+        }
+
+
         $persona_email = $persona->email;
 
         $persona_email == '' || is_null($persona_email) ? $error_email = true : $error_email = false;
@@ -1189,21 +1204,21 @@ class InscripcionController extends Controller
                 'nombresp' => $insc->persona->nombres,
                 'apellidosp' => $insc->persona->apellidos,
                 'cip' => $insc->persona->num_doc,
-                'talla' => isset($insc->talla) ? $insc->talla->talla : '' ,
+                'talla' => isset($insc->talla) ? $insc->talla->talla : '',
                 'color' => isset($insc->talla) ? $insc->talla->color : '',
                 'genp' => $insc->persona->gen,
                 'edad' => $insc->persona->getEdad(),
                 'cat' => $insc->producto->categoria->categoria,
                 'cir' => $insc->producto->circuito->circuito,
-                'cost' => isset($insc->factura) ? $insc->factura->total: '',
+                'cost' => isset($insc->factura) ? $insc->factura->total : '',
                 'fecha' => $insc->created_at->toDateString(),
                 'esc' => isset($insc->escenario) ? $insc->escenario->escenario : '',
-                'factname' => isset($insc->factura) ? $insc->factura->nombre : '' ,
+                'factname' => isset($insc->factura) ? $insc->factura->nombre : '',
                 'cedula' => isset($insc->factura) ? $insc->factura->identificacion : '',
                 'emailf' => isset($insc->factura) ? $insc->factura->email : '',
-                'telefonof' => isset($insc->factura) ? $insc->factura->telefono: '',
-                'direccionf' => isset($insc->factura) ? $insc->factura->direccion: '',
-                'formapago' => isset($insc->factura) ? $insc->factura->mpago->nombre: '',
+                'telefonof' => isset($insc->factura) ? $insc->factura->telefono : '',
+                'direccionf' => isset($insc->factura) ? $insc->factura->direccion : '',
+                'formapago' => isset($insc->factura) ? $insc->factura->mpago->nombre : '',
             ];
         }
 
@@ -1233,8 +1248,8 @@ class InscripcionController extends Controller
             ->where('ejercicio_id', $ejercicio->ejercicio_id)
             ->get();
 
-        $inscripcionArray[] = ['Registro','Número', 'Nombres ', 'Apellidos', 'CI', 'Talla', 'Color', 'Genero', 'Edad', 'Categoria', 'Circuito',
-            'Costo', 'Fecha', 'Escenario', 'Nombres Fact ', 'CI Fact', 'Correo Fact', 'Teléfono Fact', 'Dirección Fact', 'Forma Pago',
+        $inscripcionArray[] = ['Registro', 'Número', 'Nombres ', 'Apellidos', 'CI', 'Talla', 'Color', 'Genero', 'Edad', 'Categoria', 'Circuito',
+            'Costo', 'Fecha', 'Escenario', 'Nombres Fact ', 'CI Fact', 'Correo Fact', 'Teléfono Fact', 'Dirección Fact', 'Forma Pago', 'Pago Online', 'Usuario Cobro'
         ];
         foreach ($inscripciones as $insc) {
 
@@ -1245,21 +1260,23 @@ class InscripcionController extends Controller
                 'nombresp' => $insc->persona->nombres,
                 'apellidosp' => $insc->persona->apellidos,
                 'cip' => $insc->persona->num_doc,
-                'talla' => isset($insc->talla) ? $insc->talla->talla : '' ,
+                'talla' => isset($insc->talla) ? $insc->talla->talla : '',
                 'color' => isset($insc->talla) ? $insc->talla->color : '',
                 'genp' => $insc->persona->gen,
                 'edad' => $insc->persona->getEdad(),
                 'cat' => $insc->producto->categoria->categoria,
                 'cir' => $insc->producto->circuito->circuito,
-                'cost' => isset($insc->factura) ? $insc->factura->total: '',
+                'cost' => isset($insc->factura) ? $insc->factura->total : '',
                 'fecha' => $insc->created_at->toDateString(),
                 'esc' => isset($insc->escenario) ? $insc->escenario->escenario : '',
-                'factname' => isset($insc->factura) ? $insc->factura->nombre : '' ,
+                'factname' => isset($insc->factura) ? $insc->factura->nombre : '',
                 'cedula' => isset($insc->factura) ? $insc->factura->identificacion : '',
                 'emailf' => isset($insc->factura) ? $insc->factura->email : '',
-                'telefonof' => isset($insc->factura) ? $insc->factura->telefono: '',
-                'direccionf' => isset($insc->factura) ? $insc->factura->direccion: '',
-                'formapago' => isset($insc->factura) ? $insc->factura->mpago->nombre: '',
+                'telefonof' => isset($insc->factura) ? $insc->factura->telefono : '',
+                'direccionf' => isset($insc->factura) ? $insc->factura->direccion : '',
+                'formapago' => isset($insc->factura) ? $insc->factura->mpago->nombre : '',
+                'online' => $insc->inscripcion_type == Inscripcion::INSCRIPCION_ONLINE ? 'SI' : 'NO',
+                'user' => isset($insc->user) ? $insc->user->getFullName() : ''
             ];
         }
 
@@ -1271,7 +1288,6 @@ class InscripcionController extends Controller
 
             });
         })->export('xlsx');
-
 
 
     }

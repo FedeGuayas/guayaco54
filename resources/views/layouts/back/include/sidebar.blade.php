@@ -77,6 +77,7 @@
                                 <li><a href="#">Inactivos <i class="fa fa-user-times" aria-hidden="true"></i></a></li>
                             </ul>
                         </li>
+                        <li><a href="{{route('maintenances.index')}}">Mantenimiento</a>
                         <li><a href="{{route('roles.index')}}">Roles</a>
                         <li><a href="{{route('permissions.index')}}">Permisos</a>
                         <li><a href="{{route('admin.configurations.index')}}">Configuración</a>

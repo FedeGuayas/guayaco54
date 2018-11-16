@@ -8,6 +8,7 @@ use App\Configuracion;
 use App\Deporte;
 use App\Factura;
 use App\Inscripcion;
+use App\Maintenance;
 use App\Mpago;
 use App\Persona;
 use App\Producto;
@@ -48,6 +49,14 @@ class PreInscOnlineController extends Controller
     public function create(Request $request)
     {
         $user = $request->user();
+
+        $mantenimiento = Maintenance::where('id', 1)->first();
+        if ($mantenimiento->status == Maintenance::APP_ON) {
+            $notification = [
+                'message_toastr' => "Lo sentimos momentaneamente no se permite realizar más inscripciones",
+                'alert-type' => 'error'];
+            return back()->with($notification);
+        }
 
         if (!isset($user->persona)) {//no tiene perfil, debe crearlo antes de inscribirse
             $notification = [

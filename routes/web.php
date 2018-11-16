@@ -206,6 +206,7 @@ Route::middleware(['auth', 'isVerified'])->group(function () {
         Route::resource('categoria-circuito', 'CategoriaCircuitoController', ['except' => ['show', 'destroy']]);
         Route::resource('productos', 'ProductoController');
         Route::resource('facturas', 'FacturaController');
+        Route::resource('maintenances', 'MaintenanceController',['only' => ['index', 'store']]);
 
         Route::resource('roles', 'RoleController');
         Route::resource('permissions', 'PermissionController');
